@@ -38,8 +38,8 @@ export default function Home() {
                 7 Charts
               </span>
             </div>
-            <a 
-              href="/publications/spotify" 
+            <a
+              href="/publications/spotify"
               className="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded font-semibold transition"
             >
               View Research →
@@ -58,8 +58,8 @@ export default function Home() {
                 8 Charts
               </span>
             </div>
-            <a 
-              href="/publications/manufacturing" 
+            <a
+              href="/publications/manufacturing"
               className="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded font-semibold transition"
             >
               View Research →
@@ -78,8 +78,8 @@ export default function Home() {
                 5 Charts
               </span>
             </div>
-            <a 
-              href="/publications/fire-safety" 
+            <a
+              href="/publications/fire-safety"
               className="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded font-semibold transition"
             >
               View Research →
@@ -98,8 +98,8 @@ export default function Home() {
                 3 Charts
               </span>
             </div>
-            <a 
-              href="/publications/network" 
+            <a
+              href="/publications/network"
               className="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded font-semibold transition"
             >
               View Research →

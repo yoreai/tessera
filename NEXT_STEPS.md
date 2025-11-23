@@ -38,7 +38,7 @@ npm run dev
 ```
 
 ```bash
-cd /Users/whitehat/dev/yev/aresa/apps/fire-safety  
+cd /Users/whitehat/dev/yev/aresa/apps/fire-safety
 npm install
 npm run dev
 # Visit http://localhost:3000
@@ -69,7 +69,7 @@ vercel --prod
 ```
 
 **Fire Safety:**
-```bash  
+```bash
 cd apps/fire-safety
 vercel --prod
 # Will be: fire-safety.vercel.app (or usfiresafety.vercel.app)
@@ -96,7 +96,7 @@ vercel --prod
 
 **For Fire Safety Dashboard:**
 
-**Phase 1 (Now):** 
+**Phase 1 (Now):**
 - Upload CSV to Vercel Blob
 - Query on-demand from blob storage
 - ~$0.15/GB storage, $0.30/GB transfer (very cheap for 42MB)
@@ -140,7 +140,7 @@ vercel --prod
 
 **Status:** Foundation ready, needs implementation of dashboards and data integration.
 
-**Estimated Completion:** 
+**Estimated Completion:**
 - Basic deployment: 2-3 hours
 - Full feature parity with Gradio: 8-10 hours
 - Commercial features (lead gen): 2-3 hours additional

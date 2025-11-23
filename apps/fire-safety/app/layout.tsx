@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "ARESA Lab - Autonomous Research Synthesis",
-  description: "Research publications in Machine Learning, Data Analytics, and Engineering from YoreAI",
-  keywords: ["machine learning", "data science", "research", "publications", "AI"],
+  title: "US Fire Safety Analytics Dashboard",
+  description: "Interactive analytics platform for emergency fire safety data and AI-approved alarm systems",
 };
 
 export default function RootLayout({
@@ -18,3 +17,4 @@ export default function RootLayout({
     </html>
   );
 }
+
