@@ -16,7 +16,7 @@ export default function IncidentChart() {
     },
   ];
 
-  const layout = {
+  const layout: any = {
     title: {
       text: "Emergency Dispatch Volume by Type (2015-2024)",
       font: { color: "#f0f0f0", size: 16 },

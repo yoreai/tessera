@@ -30,7 +30,7 @@ export default function SeasonalChart() {
     },
   ];
 
-  const layout = {
+  const layout: any = {
     title: {
       text: "Seasonal Incident Patterns (Relative to Annual Average)",
       font: { color: "#f0f0f0", size: 16 },

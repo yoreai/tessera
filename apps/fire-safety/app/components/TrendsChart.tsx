@@ -18,7 +18,7 @@ export default function TrendsChart() {
     },
   ];
 
-  const layout = {
+  const layout: any = {
     title: {
       text: "Annual Emergency Incidents (2015-2024)",
       font: { color: "#f0f0f0", size: 16 },
