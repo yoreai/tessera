@@ -5,7 +5,7 @@ import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContaine
 // Generate realistic heatmap data for Pittsburgh area
 const generateHeatmapData = () => {
   const data: Array<{ x: number; y: number; z: number; color: string }> = [];
-  
+
   // Pittsburgh hotspots with realistic density
   const hotspots = [
     { name: "Downtown", x: 50, y: 50, intensity: 100 },
@@ -24,12 +24,12 @@ const generateHeatmapData = () => {
       const offsetX = (Math.random() - 0.5) * 15;
       const offsetY = (Math.random() - 0.5) * 15;
       const intensity = spot.intensity * (0.6 + Math.random() * 0.4);
-      
-      // Color based on intensity
-      const color = intensity > 80 ? "#d32f2f" :
-                   intensity > 60 ? "#f44336" :
-                   intensity > 40 ? "#ff5722" :
-                   "#ff7043";
+
+      // Brighter colors for visibility on dark background
+      const color = intensity > 80 ? "#ff1744" :  // Bright red
+                   intensity > 60 ? "#ff5252" :  // Lighter red
+                   intensity > 40 ? "#ff6e40" :  // Coral
+                   "#ff9e80";                     // Light coral
       
       data.push({
         x: spot.x + offsetX,
@@ -39,7 +39,7 @@ const generateHeatmapData = () => {
       });
     }
   });
-  
+
   return data;
 };
 
@@ -47,7 +47,7 @@ export default function HeatmapViz() {
   const data = generateHeatmapData();
 
   return (
-    <div className="bg-gray-900 rounded p-4">
+    <div className="bg-gray-900/50 rounded p-4">
       <ResponsiveContainer width="100%" height={350}>
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <XAxis
@@ -75,7 +75,7 @@ export default function HeatmapViz() {
           />
           <Scatter data={data} fill="#f44336">
             {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.7} />
+              <Cell key={`cell-${index}`} fill={entry.color} fillOpacity={0.9} stroke="#fff" strokeWidth={0.5} />
             ))}
           </Scatter>
         </ScatterChart>
