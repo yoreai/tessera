@@ -10,14 +10,14 @@ export async function GET(request: Request) {
   try {
     // For now, return sample data structure
     // When Vercel Blob is set up, this will fetch from blob storage
-    
+
     // TODO: Replace with actual Vercel Blob fetch
     // const { blobs } = await list();
     // const dataBlob = blobs.find(b => b.pathname === 'corrected_fire_alarms.csv');
     // const response = await fetch(dataBlob.url);
     // const csvText = await response.text();
     // Parse CSV and filter based on params
-    
+
     const sampleData = {
       totalIncidents: year === "all" ? 930808 : Math.floor(930808 / 10),
       fireAlarms: year === "all" ? 347191 : Math.floor(347191 / 10),
