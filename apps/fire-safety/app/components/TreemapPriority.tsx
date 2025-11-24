@@ -48,29 +48,56 @@ const CustomContent = (props: any) => {
           strokeOpacity: 1,
         }}
       />
-      {width > 50 && height > 30 && (
+      {width > 70 && height > 40 && (
         <>
+          {/* Drop shadow for better readability */}
+          <text
+            x={x + width / 2 + 2}
+            y={y + height / 2 - 8}
+            textAnchor="middle"
+            fill="#000"
+            fontSize={15}
+            fontWeight="bold"
+            opacity={0.5}
+          >
+            {name}
+          </text>
           <text
             x={x + width / 2}
             y={y + height / 2 - 10}
             textAnchor="middle"
             fill="#ffffff"
-            fontSize={14}
+            fontSize={15}
             fontWeight="bold"
             stroke="#000"
-            strokeWidth={0.5}
+            strokeWidth={3}
+            paintOrder="stroke"
           >
             {name}
+          </text>
+          
+          {/* Number with shadow */}
+          <text
+            x={x + width / 2 + 2}
+            y={y + height / 2 + 12}
+            textAnchor="middle"
+            fill="#000"
+            fontSize={13}
+            fontWeight="600"
+            opacity={0.5}
+          >
+            {size?.toLocaleString()}
           </text>
           <text
             x={x + width / 2}
             y={y + height / 2 + 10}
             textAnchor="middle"
             fill="#ffffff"
-            fontSize={12}
+            fontSize={13}
             fontWeight="600"
             stroke="#000"
-            strokeWidth={0.3}
+            strokeWidth={2.5}
+            paintOrder="stroke"
           >
             {size?.toLocaleString()}
           </text>
