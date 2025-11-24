@@ -7,6 +7,7 @@ import SeasonalChart from "./components/SeasonalChart";
 import HourlyChart from "./components/HourlyChart";
 import PriorityChart from "./components/PriorityChart";
 import MunicipalityChart from "./components/MunicipalityChart";
+import FalseAlarmChart from "./components/FalseAlarmChart";
 import LeadGenModal from "./components/LeadGenModal";
 import Sidebar from "./components/Sidebar";
 import FireMap from "./components/FireMap";
@@ -167,6 +168,58 @@ export default function FireSafetyDashboard() {
             {/* Analysis Tab */}
             {activeTab === "analysis" && (
               <>
+                {/* The Hidden Cost Section */}
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  <div className="bg-gradient-to-br from-red-900/30 to-orange-900/30 rounded-lg p-6 border-l-4 border-red-500">
+                    <h3 className="text-xl font-bold mb-3 text-red-400">💰 The Hidden Cost</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      False alarms don't just waste money—they put lives at risk. When emergency responders
+                      are tied up with preventable calls, response times for real emergencies increase.
+                    </p>
+                  </div>
+                  <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 rounded-lg p-6 border-l-4 border-blue-500">
+                    <h3 className="text-xl font-bold mb-3 text-blue-400">🔧 Smart Solutions</h3>
+                    <p className="text-gray-300 text-sm leading-relaxed">
+                      Modern fire detection technology can reduce false alarms by 40-60% while maintaining safety.
+                      Investment in smart systems could save millions.
+                    </p>
+                  </div>
+                </div>
+
+                {/* False Alarm Analysis */}
+                <div className="bg-gray-800 rounded-lg p-6 mb-6">
+                  <h2 className="text-2xl font-bold mb-4 text-blue-400">
+                    False Alarm Breakdown
+                  </h2>
+                  <div className="grid md:grid-cols-2 gap-6">
+                    <div>
+                      <FalseAlarmChart />
+                    </div>
+                    <div className="flex flex-col justify-center space-y-4">
+                      <div className="bg-gradient-to-r from-red-600 to-orange-500 p-6 rounded-lg text-center">
+                        <div className="text-sm text-white/80 mb-2">Cost Per False Alarm</div>
+                        <div className="text-5xl font-bold text-white">$1,000</div>
+                        <div className="text-sm text-white/80 mt-2">in emergency response resources</div>
+                      </div>
+                      <div className="bg-gray-700/50 p-4 rounded text-sm text-gray-300 space-y-2">
+                        <div className="flex justify-between">
+                          <span>Estimated False Alarms:</span>
+                          <span className="font-bold text-red-400">225,674</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>10-Year Total Cost:</span>
+                          <span className="font-bold text-orange-400">$225.7M</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>Annual Average:</span>
+                          <span className="font-bold">$22.6M</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Policy Recommendations */}
                 <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 rounded-lg p-8 border border-blue-500/30">
                   <h2 className="text-2xl font-bold mb-6 text-blue-400">
                     Policy Recommendations
@@ -220,6 +273,28 @@ export default function FireSafetyDashboard() {
                       <span>Annual Average Cost</span>
                       <span className="font-bold text-orange-400">$22.6 Million</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Take Action Today */}
+                <div className="bg-blue-600 rounded-lg p-6 text-center mb-6">
+                  <h3 className="text-2xl font-bold mb-4 text-white">📞 Take Action Today</h3>
+                </div>
+                <div className="grid md:grid-cols-3 gap-4 mb-6">
+                  <div className="bg-gray-800 p-6 rounded-lg border-l-4 border-blue-500 text-center">
+                    <div className="text-3xl mb-3">🏛️</div>
+                    <div className="font-bold text-lg mb-2">Contact Officials</div>
+                    <div className="text-sm text-gray-400">About false alarm reduction programs</div>
+                  </div>
+                  <div className="bg-gray-800 p-6 rounded-lg border-l-4 border-green-500 text-center">
+                    <div className="text-3xl mb-3">💰</div>
+                    <div className="font-bold text-lg mb-2">Support Funding</div>
+                    <div className="text-sm text-gray-400">For community fire prevention initiatives</div>
+                  </div>
+                  <div className="bg-gray-800 p-6 rounded-lg border-l-4 border-orange-500 text-center">
+                    <div className="text-3xl mb-3">📢</div>
+                    <div className="font-bold text-lg mb-2">Share This Story</div>
+                    <div className="text-sm text-gray-400">Raise awareness about fire safety equity</div>
                   </div>
                 </div>
               </>
