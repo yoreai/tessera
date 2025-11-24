@@ -30,7 +30,7 @@ const generateHeatmapData = () => {
                    intensity > 60 ? "#ff5252" :  // Lighter red
                    intensity > 40 ? "#ff6e40" :  // Coral
                    "#ff9e80";                     // Light coral
-      
+
       data.push({
         x: spot.x + offsetX,
         y: spot.y + offsetY,

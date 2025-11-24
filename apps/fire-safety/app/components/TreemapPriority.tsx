@@ -54,9 +54,11 @@ const CustomContent = (props: any) => {
             x={x + width / 2}
             y={y + height / 2 - 10}
             textAnchor="middle"
-            fill="#fff"
-            fontSize={12}
+            fill="#ffffff"
+            fontSize={14}
             fontWeight="bold"
+            stroke="#000"
+            strokeWidth={0.5}
           >
             {name}
           </text>
@@ -64,8 +66,11 @@ const CustomContent = (props: any) => {
             x={x + width / 2}
             y={y + height / 2 + 10}
             textAnchor="middle"
-            fill="#fff"
-            fontSize={10}
+            fill="#ffffff"
+            fontSize={12}
+            fontWeight="600"
+            stroke="#000"
+            strokeWidth={0.3}
           >
             {size?.toLocaleString()}
           </text>
