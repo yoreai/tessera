@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { getFireIncidents, filterIncidents, aggregateByType, aggregateByYear, aggregateBySeason, type FireIncident } from "../../lib/fireData";
+import { getFireIncidents, filterIncidents, aggregateByType, aggregateByYear, aggregateBySeason, type FireIncident } from "../lib/fireData";
 import GradientHeader from "./components/GradientHeader";
 import StorySection from "./components/StorySection";
 import KeyStatsGrid from "./components/KeyStatsGrid";
