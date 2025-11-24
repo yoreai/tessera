@@ -54,7 +54,7 @@ export default function InteractiveIncidentMap({ incidents }: InteractiveInciden
   const validIncidents = sampledIncidents.filter(
     i => !isNaN(parseFloat(i.census_block_group_center__y)) && !isNaN(parseFloat(i.census_block_group_center__x))
   );
-  
+
   const centerLat = validIncidents.length > 0
     ? validIncidents.reduce((sum, i) => sum + parseFloat(i.census_block_group_center__y), 0) / validIncidents.length
     : 40.4406;

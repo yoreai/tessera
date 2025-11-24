@@ -26,7 +26,7 @@ export default function FireSafetyDashboard() {
   const [allData, setAllData] = useState<FireIncident[]>([]);
   const [filteredData, setFilteredData] = useState<FireIncident[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   const [selectedYears, setSelectedYears] = useState<(string | number)[]>([2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]);
   const [selectedTypes, setSelectedTypes] = useState<(string | number)[]>([
     "Fire Alarms",
@@ -49,7 +49,7 @@ export default function FireSafetyDashboard() {
       setLoading(true);
       const data = await getFireIncidents();
       setAllData(data);
-      
+
       // Get top cities
       const cityCounts: { [key: string]: number } = {};
       data.forEach(d => {
@@ -60,7 +60,7 @@ export default function FireSafetyDashboard() {
         .slice(0, 15)
         .map(([city]) => city);
       setSelectedCities(topCities);
-      
+
       setLoading(false);
     }
     loadData();
