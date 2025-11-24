@@ -4,7 +4,7 @@ import { ScatterChart, Scatter, XAxis, YAxis, ZAxis, Tooltip, ResponsiveContaine
 
 // Simulated geographic density data (lat/lng style)
 const generateHeatmapData = () => {
-  const data = [];
+  const data: Array<{ x: number; y: number; z: number }> = [];
   const hotspots = [
     { lat: 40.44, lng: -80.0, baseIntensity: 200 },  // Downtown
     { lat: 40.44, lng: -79.95, baseIntensity: 180 }, // Oakland
