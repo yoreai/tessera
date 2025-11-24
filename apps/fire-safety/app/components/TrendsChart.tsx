@@ -40,10 +40,10 @@ export default function TrendsChart({ filters }: TrendsChartProps) {
         <YAxis stroke="#a0a0a0" />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#2a2a2a",
-            border: "1px solid #444",
+            backgroundColor: "#ffffff",
+            border: "2px solid #1976d2",
             borderRadius: "8px",
-            color: "#f0f0f0",
+            color: "#000000",
           }}
         />
         <Line

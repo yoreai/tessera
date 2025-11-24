@@ -29,10 +29,10 @@ export default function HourlyChart() {
         <YAxis stroke="#a0a0a0" label={{ value: "Avg Incidents", angle: -90, position: "insideLeft" }} />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#2a2a2a",
-            border: "1px solid #444",
+            backgroundColor: "#ffffff",
+            border: "2px solid #1976d2",
             borderRadius: "8px",
-            color: "#f0f0f0",
+            color: "#000000",
           }}
         />
         <ReferenceLine y={200} stroke="#666" strokeDasharray="3 3" label={{ value: "Average", fill: "#999" }} />

@@ -19,10 +19,10 @@ export default function MunicipalityChart() {
         <YAxis type="category" dataKey="name" stroke="#a0a0a0" width={100} />
         <Tooltip
           contentStyle={{
-            backgroundColor: "#2a2a2a",
-            border: "1px solid #444",
+            backgroundColor: "#ffffff",
+            border: "2px solid #1976d2",
             borderRadius: "8px",
-            color: "#f0f0f0",
+            color: "#000000",
           }}
           formatter={(value: number) => [`${value} per 1,000`, "Incident Rate"]}
         />
