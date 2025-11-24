@@ -7,6 +7,7 @@ import StorySection from "./components/StorySection";
 import KeyStatsGrid from "./components/KeyStatsGrid";
 import MultiSelectFilter from "./components/MultiSelectFilter";
 import InteractiveIncidentMap from "./components/InteractiveIncidentMap";
+import AdvancedHotspotMap from "./components/AdvancedHotspotMap";
 import LeadGenModal from "./components/LeadGenModal";
 import { BarChart, Bar, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell, ReferenceDot, Legend } from "recharts";
 
@@ -42,6 +43,7 @@ export default function FireSafetyDashboard() {
   const [selectedCities, setSelectedCities] = useState<(string | number)[]>([]);
 
   const [activeTab, setActiveTab] = useState("temporal");
+  const [mapTab, setMapTab] = useState("incidents");
 
   // Load real data on mount
   useEffect(() => {
@@ -232,11 +234,52 @@ export default function FireSafetyDashboard() {
             {/* Geographic Tab */}
             {activeTab === "geographic" && (
               <div className="space-y-6">
+                {/* Map subtabs */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => setMapTab("incidents")}
+                    className={`px-4 py-2 rounded font-semibold text-sm ${
+                      mapTab === "incidents"
+                        ? "bg-red-600 text-white"
+                        : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                    }`}
+                  >
+                    💥 Incident Distribution
+                  </button>
+                  <button
+                    onClick={() => setMapTab("heatmap")}
+                    className={`px-4 py-2 rounded font-semibold text-sm ${
+                      mapTab === "heatmap"
+                        ? "bg-orange-600 text-white"
+                        : "bg-gray-700 text-gray-400 hover:bg-gray-600"
+                    }`}
+                  >
+                    🔥 Advanced Hotspot Map
+                  </button>
+                </div>
+
                 <div className="bg-gray-800 rounded-lg p-6">
-                  <h3 className="text-xl font-bold mb-4 text-blue-400">
-                    🗺️ Geographic Incident Distribution ({filteredData.length.toLocaleString()} incidents)
-                  </h3>
-                  <InteractiveIncidentMap incidents={filteredData} />
+                  {mapTab === "incidents" ? (
+                    <>
+                      <div className="bg-gradient-to-br from-blue-900/30 to-cyan-900/30 p-4 rounded-xl border-l-4 border-blue-400 mb-4">
+                        <strong className="text-cyan-300">🗺️ Where Fires Happen:</strong>{" "}
+                        <span className="text-gray-200 text-sm">
+                          Geographic distribution of fire incidents across Allegheny County. Each point represents a fire incident, colored by type.
+                        </span>
+                      </div>
+                      <InteractiveIncidentMap incidents={filteredData} />
+                    </>
+                  ) : (
+                    <>
+                      <div className="bg-gradient-to-br from-orange-900/30 to-red-900/30 p-4 rounded-xl border-l-4 border-orange-400 mb-4">
+                        <strong className="text-orange-300">🔍 Fire Hotspot Analysis:</strong>{" "}
+                        <span className="text-gray-200 text-sm">
+                          Municipal density with heatmap analysis to reveal the most critical fire risk areas.
+                        </span>
+                      </div>
+                      <AdvancedHotspotMap incidents={filteredData} />
+                    </>
+                  )}
                 </div>
               </div>
             )}
