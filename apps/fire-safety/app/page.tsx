@@ -6,6 +6,7 @@ import TrendsChart from "./components/TrendsChart";
 import SeasonalChart from "./components/SeasonalChart";
 import HourlyChart from "./components/HourlyChart";
 import PriorityChart from "./components/PriorityChart";
+import TreemapPriority from "./components/TreemapPriority";
 import MunicipalityChart from "./components/MunicipalityChart";
 import FalseAlarmChart from "./components/FalseAlarmChart";
 import LeadGenModal from "./components/LeadGenModal";
@@ -98,11 +99,19 @@ export default function FireSafetyDashboard() {
                   <TrendsChart />
                 </div>
 
-                <div className="bg-gray-800 rounded-lg p-6">
-                  <h2 className="text-2xl font-bold mb-4 text-blue-400">
-                    Priority Distribution by Incident Type
-                  </h2>
-                  <PriorityChart />
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div className="bg-gray-800 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-blue-400">
+                      Priority Distribution
+                    </h2>
+                    <PriorityChart />
+                  </div>
+                  <div className="bg-gray-800 rounded-lg p-6">
+                    <h2 className="text-2xl font-bold mb-4 text-blue-400">
+                      Priority Treemap
+                    </h2>
+                    <TreemapPriority />
+                  </div>
                 </div>
               </>
             )}
