@@ -2,7 +2,11 @@
 
 import Filters from "./Filters";
 
-export default function Sidebar() {
+interface SidebarProps {
+  onFilterChange?: (filters: any) => void;
+}
+
+export default function Sidebar({ onFilterChange }: SidebarProps) {
   return (
     <div className="space-y-6">
       {/* Stats Summary */}
@@ -31,7 +35,7 @@ export default function Sidebar() {
       {/* Filters */}
       <div className="bg-gray-800 rounded-lg p-6">
         <h3 className="text-lg font-bold mb-4 text-blue-400">Filters</h3>
-        <Filters />
+        <Filters onFilterChange={onFilterChange} />
       </div>
 
       {/* Quick Insights */}

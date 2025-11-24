@@ -2,7 +2,15 @@
 
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
 
-const data = [
+interface IncidentChartProps {
+  filters?: {
+    year: string;
+    incidentType: string;
+    municipality: string;
+  };
+}
+
+const baseData = [
   { name: "Fire Alarms", value: 347191, color: "#f44336" },
   { name: "Medical", value: 186524, color: "#64b5f6" },
   { name: "Structure", value: 89342, color: "#ff9800" },
@@ -13,7 +21,17 @@ const data = [
   { name: "Other", value: 125743, color: "#9e9e9e" },
 ];
 
-export default function IncidentChart() {
+export default function IncidentChart({ filters }: IncidentChartProps) {
+  // Apply filters (for demo, scale data based on year filter)
+  const data = baseData.map(item => {
+    if (filters?.year !== "all" && filters?.year) {
+      // Simulate year filtering by adjusting values
+      const yearFactor = parseInt(filters.year) / 2020;
+      return { ...item, value: Math.round(item.value * yearFactor) };
+    }
+    return item;
+  });
+
   return (
     <ResponsiveContainer width="100%" height={300}>
       <BarChart data={data}>
