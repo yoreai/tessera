@@ -35,7 +35,7 @@ export default function AdvancedHotspotMap({ incidents }: AdvancedHotspotMapProp
 
   // Aggregate by city
   const cityData: { [key: string]: { lats: number[]; lngs: number[]; count: number } } = {};
-  
+
   incidents.forEach(i => {
     if (i.city_name && i.census_block_group_center__x && i.census_block_group_center__y) {
       const lat = parseFloat(i.census_block_group_center__y);
@@ -82,7 +82,7 @@ export default function AdvancedHotspotMap({ incidents }: AdvancedHotspotMapProp
             attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
-          
+
           {/* Density points (simulating heatmap) */}
           {densityPoints.map((point, idx) => (
             <CircleMarker
