@@ -19,7 +19,7 @@ const generateHeatmapData = () => {
       const offsetLat = (Math.random() - 0.5) * 0.02;
       const offsetLng = (Math.random() - 0.5) * 0.02;
       const intensity = spot.baseIntensity * (0.5 + Math.random() * 0.5);
-      
+
       data.push({
         x: (spot.lng + offsetLng + 80) * 1000, // Normalize for chart
         y: (spot.lat - 40) * 1000,
@@ -27,7 +27,7 @@ const generateHeatmapData = () => {
       });
     }
   });
-  
+
   return data;
 };
 

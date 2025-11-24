@@ -33,7 +33,7 @@ const data = [
 
 const CustomContent = (props: any) => {
   const { x, y, width, height, name, size, fill } = props;
-  
+
   return (
     <g>
       <rect
