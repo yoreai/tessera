@@ -187,14 +187,14 @@ export default function FireSafetyDashboard() {
                     <div className="bg-gray-800/50 backdrop-blur rounded-xl p-6 border border-gray-700/50">
                       <h3 className="text-lg font-bold text-purple-400 mb-3">💡 Key Insight</h3>
                       <p className="text-gray-300">
-                        Fire alarms dominate our emergency response system. While real structure fires remain 
+                        Fire alarms dominate our emergency response system. While real structure fires remain
                         relatively stable, the volume of alarm calls creates a hidden crisis in resource allocation.
                       </p>
                     </div>
                     <div className="bg-gray-800/50 backdrop-blur rounded-xl p-6 border border-gray-700/50">
                       <h3 className="text-lg font-bold text-orange-400 mb-3">🔍 Critical Finding</h3>
                       <p className="text-gray-300">
-                        Different fire types have distinct seasonal patterns. Understanding these can help deploy 
+                        Different fire types have distinct seasonal patterns. Understanding these can help deploy
                         prevention resources more effectively and prepare communities for higher-risk periods.
                       </p>
                     </div>

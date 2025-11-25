@@ -40,8 +40,11 @@ export default function SearchableMultiSelect({
     onChange(newValue.map((v) => v.value));
   };
 
-  const selectAll = () => onChange(options);
+  const selectAll = () => onChange([...options]);
   const clearAll = () => onChange([]);
+  
+  // If no label provided, hide the header section
+  const showHeader = label.length > 0;
 
   const customStyles: StylesConfig<Option, true> = {
     control: (base, state) => ({
@@ -134,30 +137,34 @@ export default function SearchableMultiSelect({
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <label className="text-sm font-semibold text-gray-300 dark:text-gray-300 light:text-gray-700">
-          {emoji && <span className="mr-2">{emoji}</span>}
-          {label}
-        </label>
-        <span className="text-xs text-gray-500">
-          {selected.length} of {options.length}
-        </span>
-      </div>
+      {showHeader && (
+        <>
+          <div className="flex items-center justify-between">
+            <label className="text-sm font-semibold text-gray-300 dark:text-gray-300 light:text-gray-700">
+              {emoji && <span className="mr-2">{emoji}</span>}
+              {label}
+            </label>
+            <span className="text-xs text-gray-500">
+              {selected.length} of {options.length}
+            </span>
+          </div>
 
-      <div className="flex gap-2 mb-2">
-        <button
-          onClick={selectAll}
-          className="px-3 py-1 text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
-        >
-          Select All
-        </button>
-        <button
-          onClick={clearAll}
-          className="px-3 py-1 text-xs font-medium rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-colors"
-        >
-          Clear All
-        </button>
-      </div>
+          <div className="flex gap-2 mb-2">
+            <button
+              onClick={selectAll}
+              className="px-3 py-1 text-xs font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            >
+              Select All
+            </button>
+            <button
+              onClick={clearAll}
+              className="px-3 py-1 text-xs font-medium rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+            >
+              Clear All
+            </button>
+          </div>
+        </>
+      )}
 
       <Select<Option, true>
         isMulti

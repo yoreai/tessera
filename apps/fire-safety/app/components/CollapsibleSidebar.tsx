@@ -76,14 +76,37 @@ export default function CollapsibleSidebar({
         placeholder="Search incident types..."
       />
 
-      <SearchableMultiSelect
-        label="Municipalities"
-        emoji="🏙️"
-        options={cities}
-        selected={selectedCities}
-        onChange={setSelectedCities}
-        placeholder="Search municipalities..."
-      />
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <label className="text-sm font-semibold text-gray-300">
+            <span className="mr-2">🏙️</span>
+            Municipalities
+          </label>
+          {selectedCities.length === 0 ? (
+            <span className="text-xs text-green-400 font-medium">✓ All cities</span>
+          ) : (
+            <button 
+              onClick={() => setSelectedCities([])}
+              className="text-xs text-blue-400 hover:text-blue-300"
+            >
+              Show all cities
+            </button>
+          )}
+        </div>
+        <SearchableMultiSelect
+          label=""
+          options={cities}
+          selected={selectedCities}
+          onChange={setSelectedCities}
+          placeholder={selectedCities.length === 0 ? "Showing all cities (filter to narrow)" : "Search municipalities..."}
+        />
+        <p className="text-xs text-gray-500 italic">
+          {selectedCities.length === 0 
+            ? "All municipalities included. Select specific cities to filter."
+            : `Filtered to ${selectedCities.length} of ${cities.length} displayed cities`
+          }
+        </p>
+      </div>
 
       {/* Data Note */}
       <div className="bg-amber-900/30 border border-amber-600/30 rounded-xl p-3">
