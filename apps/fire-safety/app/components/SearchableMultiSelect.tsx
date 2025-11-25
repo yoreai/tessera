@@ -42,7 +42,7 @@ export default function SearchableMultiSelect({
 
   const selectAll = () => onChange([...options]);
   const clearAll = () => onChange([]);
-  
+
   // If no label provided, hide the header section
   const showHeader = label.length > 0;
 
@@ -140,11 +140,11 @@ export default function SearchableMultiSelect({
       {showHeader && (
         <>
           <div className="flex items-center justify-between">
-            <label className="text-sm font-semibold text-gray-300 dark:text-gray-300 light:text-gray-700">
+            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
               {emoji && <span className="mr-2">{emoji}</span>}
               {label}
             </label>
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-gray-500 dark:text-gray-500">
               {selected.length} of {options.length}
             </span>
           </div>
@@ -158,7 +158,7 @@ export default function SearchableMultiSelect({
             </button>
             <button
               onClick={clearAll}
-              className="px-3 py-1 text-xs font-medium rounded-lg bg-gray-600 hover:bg-gray-700 text-white transition-colors"
+              className="px-3 py-1 text-xs font-medium rounded-lg bg-gray-500 dark:bg-gray-600 hover:bg-gray-600 dark:hover:bg-gray-700 text-white transition-colors"
             >
               Clear All
             </button>

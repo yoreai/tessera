@@ -24,7 +24,7 @@ interface SectionNavProps {
 
 export default function SectionNav({ activeSection, onSectionChange }: SectionNavProps) {
   return (
-    <div className="sticky top-0 z-40 bg-gray-900/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-700/50 px-4 py-3">
+    <div className="sticky top-0 z-40 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-700/50 px-4 py-3">
       <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
         {sections.map((section) => {
           const isActive = activeSection === section.id;
@@ -35,9 +35,9 @@ export default function SectionNav({ activeSection, onSectionChange }: SectionNa
               className={`
                 relative flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm
                 transition-all duration-300 whitespace-nowrap
-                ${isActive
-                  ? "text-white shadow-lg"
-                  : "text-gray-400 hover:text-white hover:bg-gray-800/50"
+                ${isActive 
+                  ? "text-white shadow-lg" 
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-gray-800/50"
                 }
               `}
             >

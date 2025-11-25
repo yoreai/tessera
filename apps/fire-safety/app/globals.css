@@ -2,5 +2,55 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light theme */
+:root {
+  --background: 249 250 251;
+  --foreground: 17 24 39;
+  --card: 255 255 255;
+  --card-foreground: 17 24 39;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --muted: 243 244 246;
+  --muted-foreground: 107 114 128;
+  --border: 229 231 235;
+}
 
+/* Dark theme */
+.dark {
+  --background: 17 24 39;
+  --foreground: 249 250 251;
+  --card: 31 41 55;
+  --card-foreground: 249 250 251;
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --muted: 55 65 81;
+  --muted-foreground: 156 163 175;
+  --border: 55 65 81;
+}
 
+@layer base {
+  body {
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-50;
+  }
+}
+
+/* Hide scrollbar for section nav */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Smooth transitions for theme changes */
+* {
+  transition-property: background-color, border-color, color;
+  transition-duration: 200ms;
+  transition-timing-function: ease-in-out;
+}
+
+/* Exception for animations that shouldn't be slowed */
+.no-transition {
+  transition: none !important;
+}
