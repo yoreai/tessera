@@ -25,33 +25,30 @@ export default function YearlyTrendsChart({ data, filteredCount }: YearlyTrendsC
       <h3 className="text-xl font-bold mb-4 text-blue-400">
         📊 Fire Emergency Trends (Filtered: {filteredCount.toLocaleString()} incidents)
       </h3>
-      <ResponsiveContainer width="100%" height={500}>
-        <LineChart data={data} margin={{ top: 20, right: 180, left: 20, bottom: 20 }}>
-          <XAxis
-            dataKey="year"
-            stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0" }}
+      
+      {/* Chart */}
+      <ResponsiveContainer width="100%" height={400}>
+        <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+          <XAxis 
+            dataKey="year" 
+            stroke="#a0a0a0" 
+            tick={{ fill: "#a0a0a0", fontSize: 12 }}
           />
-          <YAxis
-            stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0" }}
+          <YAxis 
+            stroke="#a0a0a0" 
+            tick={{ fill: "#a0a0a0", fontSize: 12 }}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
+            width={50}
           />
-          <Tooltip
+          <Tooltip 
             {...brightTooltip}
             formatter={(value: number, name: string) => [value.toLocaleString(), name]}
           />
-          <Legend
-            layout="vertical"
-            align="right"
-            verticalAlign="top"
-            wrapperStyle={{
-              paddingLeft: "20px",
-              backgroundColor: "rgba(26, 37, 47, 0.95)",
-              border: "1px solid rgba(236, 240, 241, 0.2)",
-              borderRadius: "8px",
-              padding: "12px",
-            }}
+          <Legend 
+            layout="horizontal"
+            align="center"
+            verticalAlign="bottom"
+            wrapperStyle={{ paddingTop: "20px" }}
           />
           {FIRE_CATEGORIES.map((category) => (
             <Line
@@ -59,9 +56,9 @@ export default function YearlyTrendsChart({ data, filteredCount }: YearlyTrendsC
               type="monotone"
               dataKey={category}
               stroke={CATEGORY_COLORS[category]}
-              strokeWidth={3}
-              dot={{ r: 4, fill: CATEGORY_COLORS[category] }}
-              activeDot={{ r: 6 }}
+              strokeWidth={2}
+              dot={{ r: 3, fill: CATEGORY_COLORS[category] }}
+              activeDot={{ r: 5 }}
             />
           ))}
         </LineChart>

@@ -25,36 +25,34 @@ export default function MunicipalHotspotsChart({ data, filteredCount }: Municipa
       <h3 className="text-xl font-bold mb-4 text-purple-400">
         📍 Geographic Hotspots (Filtered: {filteredCount.toLocaleString()} incidents)
       </h3>
-      <ResponsiveContainer width="100%" height={500}>
-        <BarChart data={data} margin={{ top: 20, right: 180, left: 20, bottom: 80 }}>
-          <XAxis
-            dataKey="city"
+      
+      {/* Chart */}
+      <ResponsiveContainer width="100%" height={400}>
+        <BarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 80 }}>
+          <XAxis 
+            dataKey="city" 
             stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0", fontSize: 11 }}
+            tick={{ fill: "#a0a0a0", fontSize: 10 }}
             angle={-45}
             textAnchor="end"
             height={80}
+            interval={0}
           />
-          <YAxis
+          <YAxis 
             stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0" }}
+            tick={{ fill: "#a0a0a0", fontSize: 12 }}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
+            width={50}
           />
-          <Tooltip
+          <Tooltip 
             {...brightTooltip}
             formatter={(value: number, name: string) => [value.toLocaleString(), name]}
           />
-          <Legend
-            layout="vertical"
-            align="right"
-            verticalAlign="top"
-            wrapperStyle={{
-              paddingLeft: "20px",
-              backgroundColor: "rgba(26, 37, 47, 0.95)",
-              border: "1px solid rgba(236, 240, 241, 0.2)",
-              borderRadius: "8px",
-              padding: "12px",
-            }}
+          <Legend 
+            layout="horizontal"
+            align="center"
+            verticalAlign="bottom"
+            wrapperStyle={{ paddingTop: "20px" }}
           />
           {FIRE_CATEGORIES.map((category) => (
             <Bar
