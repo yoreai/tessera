@@ -53,10 +53,11 @@ export default function FireSafetyDashboard() {
       const data = await getFireIncidents();
       setAllData(data);
 
-      // Get top 15 cities
+      // Get top 15 cities for the filter options
       const cities = getTopCities(data, 15);
       setTopCities(cities);
-      setSelectedCities(cities);
+      // DON'T set selectedCities - empty array means "all cities" in filterIncidents
+      // setSelectedCities(cities);  // This was filtering out ~200K incidents!
 
       setLoading(false);
     }
