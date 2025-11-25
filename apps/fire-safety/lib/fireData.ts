@@ -172,7 +172,7 @@ export async function getFireIncidents(): Promise<FireIncident[]> {
 
     // Process and classify incidents
     const fireIncidents: FireIncident[] = [];
-    
+
     for (const incident of rawIncidents) {
       const category = classifyFireCategory(incident);
       if (category) {
@@ -337,7 +337,7 @@ export function aggregateByPriority(incidents: FireIncident[]) {
  */
 export function aggregateFalseAlarms(incidents: FireIncident[]) {
   const alarms = incidents.filter(i => i.fire_category === "Fire Alarms");
-  
+
   const pre2020 = alarms.filter(i => parseInt(i.call_year) < 2020);
   const post2019 = alarms.filter(i => parseInt(i.call_year) >= 2020);
 
@@ -365,12 +365,12 @@ export function calculateStats(incidents: FireIncident[]) {
   const total = incidents.length;
   const years = new Set(incidents.map(i => i.call_year));
   const avgPerYear = Math.round(total / (years.size || 1));
-  
+
   const structureFires = incidents.filter(i => i.fire_category === "Structure Fires").length;
   const fireAlarms = incidents.filter(i => i.fire_category === "Fire Alarms").length;
   const alarmPercentage = total > 0 ? ((fireAlarms / total) * 100).toFixed(1) : "0";
-  
-  const highPriorityIncidents = incidents.filter(i => 
+
+  const highPriorityIncidents = incidents.filter(i =>
     i.priority === "F1" || i.priority === "Q0"
   ).length;
 
@@ -394,7 +394,7 @@ export function getTopCities(incidents: FireIncident[], topN: number = 15): stri
       cityCounts[i.city_name] = (cityCounts[i.city_name] || 0) + 1;
     }
   });
-  
+
   return Object.entries(cityCounts)
     .sort((a, b) => b[1] - a[1])
     .slice(0, topN)

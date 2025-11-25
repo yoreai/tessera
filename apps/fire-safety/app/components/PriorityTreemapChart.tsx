@@ -21,11 +21,11 @@ const brightTooltip = {
 // Custom content renderer for treemap cells
 const CustomTreemapContent = (props: any) => {
   const { x, y, width, height, name, count, depth, category } = props;
-  
+
   if (width < 30 || height < 30) return null;
-  
-  const color = depth === 1 
-    ? "#34495e" 
+
+  const color = depth === 1
+    ? "#34495e"
     : CATEGORY_COLORS[category] || "#6B7B7B";
 
   return (
@@ -48,7 +48,7 @@ const CustomTreemapContent = (props: any) => {
             fill="#ffffff"
             fontSize={depth === 1 ? 12 : 11}
             fontWeight="bold"
-            style={{ 
+            style={{
               textShadow: "1px 1px 2px rgba(0,0,0,0.8)",
               paintOrder: "stroke fill",
               stroke: "#000000",
@@ -109,7 +109,7 @@ export default function PriorityTreemapChart({ data }: PriorityTreemapChartProps
           stroke="#1a252f"
           content={<CustomTreemapContent />}
         >
-          <Tooltip 
+          <Tooltip
             {...brightTooltip}
             formatter={(value: number) => [value.toLocaleString(), "Incidents"]}
           />

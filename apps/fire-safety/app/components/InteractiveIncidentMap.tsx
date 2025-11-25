@@ -54,7 +54,7 @@ export default function InteractiveIncidentMap({ incidents }: InteractiveInciden
     return !isNaN(lat) && !isNaN(lng);
   });
 
-  const centerLat = validPoints.length > 0 
+  const centerLat = validPoints.length > 0
     ? validPoints.reduce((sum, i) => sum + parseFloat(i.census_block_group_center__y), 0) / validPoints.length
     : 40.4406;
   const centerLng = validPoints.length > 0

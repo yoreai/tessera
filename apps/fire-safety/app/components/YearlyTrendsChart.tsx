@@ -27,21 +27,21 @@ export default function YearlyTrendsChart({ data, filteredCount }: YearlyTrendsC
       </h3>
       <ResponsiveContainer width="100%" height={500}>
         <LineChart data={data} margin={{ top: 20, right: 180, left: 20, bottom: 20 }}>
-          <XAxis 
-            dataKey="year" 
-            stroke="#a0a0a0" 
+          <XAxis
+            dataKey="year"
+            stroke="#a0a0a0"
             tick={{ fill: "#a0a0a0" }}
           />
-          <YAxis 
-            stroke="#a0a0a0" 
+          <YAxis
+            stroke="#a0a0a0"
             tick={{ fill: "#a0a0a0" }}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
           />
-          <Tooltip 
+          <Tooltip
             {...brightTooltip}
             formatter={(value: number, name: string) => [value.toLocaleString(), name]}
           />
-          <Legend 
+          <Legend
             layout="vertical"
             align="right"
             verticalAlign="top"

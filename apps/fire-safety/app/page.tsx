@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { 
-  getFireIncidents, 
-  filterIncidents, 
-  aggregateByType, 
-  aggregateByYear, 
+import {
+  getFireIncidents,
+  filterIncidents,
+  aggregateByType,
+  aggregateByYear,
   aggregateBySeason,
   aggregateByCity,
   aggregateByPriority,
@@ -13,7 +13,7 @@ import {
   calculateStats,
   getTopCities,
   FIRE_CATEGORIES,
-  type FireIncident 
+  type FireIncident
 } from "../lib/fireData";
 
 // Components
@@ -94,7 +94,7 @@ export default function FireSafetyDashboard() {
     <main className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white">
       <div className="container mx-auto px-4 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          
+
           {/* ===== LEFT SIDEBAR - Filters ===== */}
           <div className="lg:col-span-1">
             <div className="bg-gray-800/90 backdrop-blur-xl rounded-xl p-6 sticky top-6 border border-gray-700 shadow-2xl">
@@ -145,7 +145,7 @@ export default function FireSafetyDashboard() {
 
           {/* ===== MAIN CONTENT ===== */}
           <div className="lg:col-span-3 space-y-8">
-            
+
             {/* Header */}
             <GradientHeader />
 

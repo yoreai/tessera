@@ -41,22 +41,22 @@ export default function FalseAlarmPieChart({ data }: FalseAlarmPieChartProps) {
             labelLine={{ stroke: "#ffffff", strokeWidth: 1 }}
           >
             {data.map((entry, index) => (
-              <Cell 
-                key={`cell-${index}`} 
+              <Cell
+                key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
                 stroke="#1a252f"
                 strokeWidth={2}
               />
             ))}
           </Pie>
-          <Tooltip 
+          <Tooltip
             {...brightTooltip}
             formatter={(value: number, name: string) => [
               `${value.toLocaleString()} (${((value / total) * 100).toFixed(1)}%)`,
               name
             ]}
           />
-          <Legend 
+          <Legend
             layout="horizontal"
             align="center"
             verticalAlign="bottom"

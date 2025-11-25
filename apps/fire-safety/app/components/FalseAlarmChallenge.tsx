@@ -13,7 +13,7 @@ export default function FalseAlarmChallenge() {
         <div className="bg-gray-800 p-6 rounded-xl border-l-4 border-red-500">
           <h4 className="text-lg font-bold text-red-400 mb-3">💰 The Hidden Cost</h4>
           <p className="text-gray-200 leading-relaxed">
-            False alarms don't just waste money—they put lives at risk. When emergency responders 
+            False alarms don't just waste money—they put lives at risk. When emergency responders
             are tied up with preventable calls, response times for real emergencies increase.
           </p>
         </div>
