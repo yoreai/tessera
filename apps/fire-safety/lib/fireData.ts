@@ -3,7 +3,7 @@
 
 const BLOB_URL = "https://lgn0alpssagu0n2c.public.blob.vercel-storage.com/fire_dispatches_fresh.csv";
 
-// Fire categories ordered consistently with Gradio
+// The 9 main fire categories (for charts)
 export const FIRE_CATEGORIES = [
   "Fire Alarms",
   "Structure Fires",
@@ -15,6 +15,9 @@ export const FIRE_CATEGORIES = [
   "Smoke Investigation",
   "Uncategorized Fire",
 ] as const;
+
+// All categories including Other (for filtering and totals - matches Gradio's 550K count)
+export const ALL_CATEGORIES = [...FIRE_CATEGORIES, "Other"] as const;
 
 // Color scheme matching Gradio's dark theme
 export const CATEGORY_COLORS: { [key: string]: string } = {

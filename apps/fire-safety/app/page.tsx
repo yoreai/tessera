@@ -13,6 +13,7 @@ import {
   calculateStats,
   getTopCities,
   FIRE_CATEGORIES,
+  ALL_CATEGORIES,
   type FireIncident
 } from "../lib/fireData";
 
@@ -40,7 +41,7 @@ export default function FireSafetyDashboard() {
   const [topCities, setTopCities] = useState<string[]>([]);
 
   const [selectedYears, setSelectedYears] = useState<(string | number)[]>([2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]);
-  const [selectedTypes, setSelectedTypes] = useState<(string | number)[]>([...FIRE_CATEGORIES]);
+  const [selectedTypes, setSelectedTypes] = useState<(string | number)[]>([...ALL_CATEGORIES]);
   const [selectedCities, setSelectedCities] = useState<(string | number)[]>([]);
 
   const [mapTab, setMapTab] = useState<"incidents" | "heatmap">("incidents");
@@ -114,7 +115,7 @@ export default function FireSafetyDashboard() {
               <MultiSelectFilter
                 label="Incident Types"
                 emoji="🔥"
-                options={[...FIRE_CATEGORIES]}
+                options={[...ALL_CATEGORIES]}
                 defaultSelected={selectedTypes}
                 onChange={setSelectedTypes}
               />
