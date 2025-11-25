@@ -88,12 +88,12 @@ export default function FireSafetyDashboard() {
           {/* Animated Flame */}
           <div className="relative">
             <motion.div
-              animate={{ 
+              animate={{
                 scale: [1, 1.1, 1],
                 opacity: [0.7, 1, 0.7]
               }}
-              transition={{ 
-                duration: 1.5, 
+              transition={{
+                duration: 1.5,
                 repeat: Infinity,
                 ease: "easeInOut"
               }}
@@ -103,7 +103,7 @@ export default function FireSafetyDashboard() {
             {/* Glow effect */}
             <div className="absolute inset-0 w-20 h-20 bg-orange-500/20 rounded-full blur-xl animate-pulse" />
           </div>
-          
+
           <div className="text-center">
             <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Loading fire safety data...

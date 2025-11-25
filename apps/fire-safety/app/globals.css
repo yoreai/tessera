@@ -54,3 +54,19 @@
 .no-transition {
   transition: none !important;
 }
+
+/* Recharts tooltip z-index fix - ensure tooltips appear above axis labels */
+.recharts-tooltip-wrapper {
+  z-index: 1000 !important;
+  pointer-events: none;
+}
+
+.recharts-surface {
+  overflow: visible;
+}
+
+/* Ensure chart axes don't create new stacking contexts */
+.recharts-xAxis,
+.recharts-yAxis {
+  z-index: 1;
+}

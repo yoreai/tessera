@@ -14,7 +14,9 @@ const brightTooltip = {
     borderRadius: "8px",
     color: "#000000",
     padding: "12px",
+    boxShadow: "0 4px 20px rgba(0,0,0,0.25)",
   },
+  wrapperStyle: { zIndex: 1000 },
   itemStyle: { color: "#000000", fontWeight: "600" as const },
 };
 
