@@ -4,23 +4,23 @@ export default function FalseAlarmChallenge() {
   return (
     <div className="space-y-6">
       {/* Section Header */}
-      <div className="bg-gray-800/80 p-5 rounded-xl border-l-4 border-red-500">
-        <h3 className="text-xl font-bold text-white">💡 The False Alarm Challenge</h3>
+      <div className="bg-white dark:bg-gray-800/80 p-5 rounded-xl border-l-4 border-red-500 shadow-md">
+        <h3 className="text-xl font-bold text-gray-900 dark:text-white">💡 The False Alarm Challenge</h3>
       </div>
 
       {/* Two-column cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-gray-800 p-6 rounded-xl border-l-4 border-red-500">
-          <h4 className="text-lg font-bold text-red-400 mb-3">💰 The Hidden Cost</h4>
-          <p className="text-gray-200 leading-relaxed">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-red-500 shadow-md">
+          <h4 className="text-lg font-bold text-red-600 dark:text-red-400 mb-3">💰 The Hidden Cost</h4>
+          <p className="text-gray-600 dark:text-gray-200 leading-relaxed">
             False alarms don't just waste money—they put lives at risk. When emergency responders
             are tied up with preventable calls, response times for real emergencies increase.
           </p>
         </div>
 
-        <div className="bg-gray-800 p-6 rounded-xl border-l-4 border-cyan-500">
-          <h4 className="text-lg font-bold text-cyan-400 mb-3">🔧 Smart Solutions</h4>
-          <p className="text-gray-200 leading-relaxed">
+        <div className="bg-white dark:bg-gray-800 p-6 rounded-xl border-l-4 border-cyan-500 shadow-md">
+          <h4 className="text-lg font-bold text-cyan-600 dark:text-cyan-400 mb-3">🔧 Smart Solutions</h4>
+          <p className="text-gray-600 dark:text-gray-200 leading-relaxed">
             Modern fire detection technology can reduce false alarms by 40-60% while maintaining safety.
             Investment in smart systems could save millions.
           </p>
@@ -36,4 +36,3 @@ export default function FalseAlarmChallenge() {
     </div>
   );
 }
-

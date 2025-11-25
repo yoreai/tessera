@@ -13,56 +13,37 @@ interface KeyStatsGridProps {
 
 export default function KeyStatsGrid({ stats }: KeyStatsGridProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-      {/* Key Statistics Card */}
-      <div className="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl p-6 shadow-xl border border-gray-700">
-        <h3 className="text-xl font-bold mb-6 text-center text-white drop-shadow-md">
-          📊 Key Statistics (2015-2024)
-        </h3>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="bg-white/10 backdrop-blur-xl rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-              {stats.total.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-300">Total Fire Incidents</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-xl rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-              {stats.avgPerYear.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-300">Average Per Year</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-xl rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-              {stats.structureFires.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-300">Structure Fires</div>
-          </div>
-          <div className="bg-white/10 backdrop-blur-xl rounded-lg p-4 text-center">
-            <div className="text-3xl font-bold text-white mb-2 drop-shadow-md">
-              {stats.highPriorityIncidents.toLocaleString()}
-            </div>
-            <div className="text-sm text-gray-300">High Priority</div>
-          </div>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {/* Total Incidents */}
+      <div className="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 shadow-lg">
+        <div className="text-3xl font-bold text-white mb-1">
+          {stats.total.toLocaleString()}
         </div>
+        <div className="text-sm text-blue-100 font-medium">Total Incidents</div>
       </div>
 
-      {/* The Alarm Problem Card */}
-      <div className="bg-gradient-to-br from-gray-900 to-black rounded-xl p-6 shadow-xl border border-gray-700">
-        <h3 className="text-xl font-bold mb-6 text-center text-white drop-shadow-md">
-          🚨 The Alarm Problem
-        </h3>
-        <div className="bg-white/10 backdrop-blur-xl rounded-lg p-6 text-center">
-          <div className="text-5xl font-extrabold text-white mb-3 drop-shadow-lg">
-            {stats.alarmPercentage}%
-          </div>
-          <div className="text-lg font-semibold text-white mb-4">
-            of all incidents are fire alarms
-          </div>
-          <div className="text-sm text-gray-300 italic leading-relaxed">
-            This massive drain on emergency resources costs taxpayers millions and delays response to real emergencies.
-          </div>
+      {/* Avg Per Year */}
+      <div className="bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl p-5 shadow-lg">
+        <div className="text-3xl font-bold text-white mb-1">
+          {stats.avgPerYear.toLocaleString()}
         </div>
+        <div className="text-sm text-purple-100 font-medium">Avg Per Year</div>
+      </div>
+
+      {/* Structure Fires */}
+      <div className="bg-gradient-to-br from-orange-500 to-orange-600 rounded-xl p-5 shadow-lg">
+        <div className="text-3xl font-bold text-white mb-1">
+          {stats.structureFires.toLocaleString()}
+        </div>
+        <div className="text-sm text-orange-100 font-medium">Structure Fires</div>
+      </div>
+
+      {/* High Priority */}
+      <div className="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-5 shadow-lg">
+        <div className="text-3xl font-bold text-white mb-1">
+          {stats.highPriorityIncidents.toLocaleString()}
+        </div>
+        <div className="text-sm text-red-100 font-medium">High Priority</div>
       </div>
     </div>
   );

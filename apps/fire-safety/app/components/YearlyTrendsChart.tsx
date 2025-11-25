@@ -21,22 +21,21 @@ const brightTooltip = {
 
 export default function YearlyTrendsChart({ data, filteredCount }: YearlyTrendsChartProps) {
   return (
-    <div className="bg-gray-800 rounded-lg p-6">
-      <h3 className="text-xl font-bold mb-4 text-blue-400">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-bold mb-4 text-blue-600 dark:text-blue-400">
         📊 Fire Emergency Trends (Filtered: {filteredCount.toLocaleString()} incidents)
       </h3>
 
-      {/* Chart */}
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
           <XAxis
             dataKey="year"
-            stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0", fontSize: 12 }}
+            stroke="#6b7280"
+            tick={{ fill: "#6b7280", fontSize: 12 }}
           />
           <YAxis
-            stroke="#a0a0a0"
-            tick={{ fill: "#a0a0a0", fontSize: 12 }}
+            stroke="#6b7280"
+            tick={{ fill: "#6b7280", fontSize: 12 }}
             tickFormatter={(value) => value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value}
             width={50}
           />
@@ -66,4 +65,3 @@ export default function YearlyTrendsChart({ data, filteredCount }: YearlyTrendsC
     </div>
   );
 }
-

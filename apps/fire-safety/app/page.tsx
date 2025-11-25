@@ -154,11 +154,65 @@ export default function FireSafetyDashboard() {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="space-y-8"
+                  className="space-y-6"
                 >
+                  {/* Hero Section */}
                   <GradientHeader />
-                  <NarrativeSection />
+
+                  {/* Quick Stats Row */}
                   <KeyStatsGrid stats={stats} />
+
+                  {/* The Alarm Problem - Featured */}
+                  <div className="bg-gradient-to-r from-red-500 to-orange-500 rounded-xl p-6 shadow-xl">
+                    <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+                      <div className="text-center md:text-left">
+                        <h3 className="text-2xl font-bold text-white mb-2">🚨 The Hidden Crisis</h3>
+                        <p className="text-red-100 text-lg">
+                          Fire alarms drain emergency resources and delay response to real emergencies
+                        </p>
+                      </div>
+                      <div className="bg-white/20 backdrop-blur rounded-xl px-8 py-4 text-center">
+                        <div className="text-5xl font-extrabold text-white">{stats.alarmPercentage}%</div>
+                        <div className="text-red-100 font-medium">of incidents are alarms</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Story & Insights */}
+                  <NarrativeSection alarmPercentage={stats.alarmPercentage} />
+
+                  {/* Quick Preview of Data */}
+                  <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+                    <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+                      📊 Quick Data Preview
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                      <button
+                        onClick={() => setActiveSection("temporal")}
+                        className="bg-purple-50 dark:bg-purple-900/30 hover:bg-purple-100 dark:hover:bg-purple-900/50 p-4 rounded-lg transition-colors"
+                      >
+                        <div className="text-2xl mb-2">📈</div>
+                        <div className="font-bold text-purple-700 dark:text-purple-300">10+ Years of Data</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Explore temporal trends →</div>
+                      </button>
+                      <button
+                        onClick={() => setActiveSection("geographic")}
+                        className="bg-green-50 dark:bg-green-900/30 hover:bg-green-100 dark:hover:bg-green-900/50 p-4 rounded-lg transition-colors"
+                      >
+                        <div className="text-2xl mb-2">🗺️</div>
+                        <div className="font-bold text-green-700 dark:text-green-300">130+ Municipalities</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">View geographic maps →</div>
+                      </button>
+                      <button
+                        onClick={() => setActiveSection("analysis")}
+                        className="bg-orange-50 dark:bg-orange-900/30 hover:bg-orange-100 dark:hover:bg-orange-900/50 p-4 rounded-lg transition-colors"
+                      >
+                        <div className="text-2xl mb-2">🔍</div>
+                        <div className="font-bold text-orange-700 dark:text-orange-300">Deep Analysis</div>
+                        <div className="text-sm text-gray-600 dark:text-gray-400">Understand the crisis →</div>
+                      </button>
+                    </div>
+                  </div>
                 </motion.div>
               )}
 
@@ -187,14 +241,14 @@ export default function FireSafetyDashboard() {
                     <div className="bg-white dark:bg-gray-800/50 backdrop-blur rounded-xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-sm">
                       <h3 className="text-lg font-bold text-purple-600 dark:text-purple-400 mb-3">💡 Key Insight</h3>
                       <p className="text-gray-600 dark:text-gray-300">
-                        Fire alarms dominate our emergency response system. While real structure fires remain 
+                        Fire alarms dominate our emergency response system. While real structure fires remain
                         relatively stable, the volume of alarm calls creates a hidden crisis in resource allocation.
                       </p>
                     </div>
                     <div className="bg-white dark:bg-gray-800/50 backdrop-blur rounded-xl p-6 border border-gray-200 dark:border-gray-700/50 shadow-sm">
                       <h3 className="text-lg font-bold text-orange-600 dark:text-orange-400 mb-3">🔍 Critical Finding</h3>
                       <p className="text-gray-600 dark:text-gray-300">
-                        Different fire types have distinct seasonal patterns. Understanding these can help deploy 
+                        Different fire types have distinct seasonal patterns. Understanding these can help deploy
                         prevention resources more effectively and prepare communities for higher-risk periods.
                       </p>
                     </div>

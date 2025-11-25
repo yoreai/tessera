@@ -25,7 +25,7 @@ const CustomTreemapContent = (props: any) => {
   if (width < 30 || height < 30) return null;
 
   const color = depth === 1
-    ? "#34495e"
+    ? "#475569"
     : CATEGORY_COLORS[category] || "#6B7B7B";
 
   return (
@@ -36,7 +36,7 @@ const CustomTreemapContent = (props: any) => {
         width={width}
         height={height}
         fill={color}
-        stroke="#1a252f"
+        stroke="#ffffff"
         strokeWidth={2}
       />
       {width > 60 && height > 40 && (
@@ -97,8 +97,8 @@ export default function PriorityTreemapChart({ data }: PriorityTreemapChartProps
   const treemapData = Object.values(priorityGroups);
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6">
-      <h3 className="text-xl font-bold mb-4 text-orange-400">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-bold mb-4 text-orange-600 dark:text-orange-400">
         🎯 Fire Emergency Priorities - Understanding Response Urgency
       </h3>
       <ResponsiveContainer width="100%" height={500}>
@@ -106,7 +106,7 @@ export default function PriorityTreemapChart({ data }: PriorityTreemapChartProps
           data={treemapData}
           dataKey="size"
           aspectRatio={4 / 3}
-          stroke="#1a252f"
+          stroke="#e5e7eb"
           content={<CustomTreemapContent />}
         >
           <Tooltip
@@ -118,4 +118,3 @@ export default function PriorityTreemapChart({ data }: PriorityTreemapChartProps
     </div>
   );
 }
-

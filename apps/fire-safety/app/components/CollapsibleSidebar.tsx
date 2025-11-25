@@ -85,7 +85,7 @@ export default function CollapsibleSidebar({
           {selectedCities.length === 0 ? (
             <span className="text-xs text-green-600 dark:text-green-400 font-medium">✓ All cities</span>
           ) : (
-            <button 
+            <button
               onClick={() => setSelectedCities([])}
               className="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300"
             >
@@ -101,7 +101,7 @@ export default function CollapsibleSidebar({
           placeholder={selectedCities.length === 0 ? "Showing all cities (filter to narrow)" : "Search municipalities..."}
         />
         <p className="text-xs text-gray-500 dark:text-gray-500 italic">
-          {selectedCities.length === 0 
+          {selectedCities.length === 0
             ? "All municipalities included. Select specific cities to filter."
             : `Filtered to ${selectedCities.length} of ${cities.length} displayed cities`
           }

@@ -6,7 +6,7 @@ interface FalseAlarmPieChartProps {
   data: { name: string; value: number }[];
 }
 
-const COLORS = ["#B85450", "#B8577A", "#8B6F8B"];
+const COLORS = ["#dc2626", "#ec4899", "#8b5cf6"];
 
 const brightTooltip = {
   contentStyle: {
@@ -23,8 +23,8 @@ export default function FalseAlarmPieChart({ data }: FalseAlarmPieChartProps) {
   const total = data.reduce((sum, d) => sum + d.value, 0);
 
   return (
-    <div className="bg-gray-800 rounded-lg p-6">
-      <h3 className="text-xl font-bold mb-4 text-red-400">
+    <div className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-lg border border-gray-200 dark:border-gray-700">
+      <h3 className="text-xl font-bold mb-4 text-red-600 dark:text-red-400">
         🚨 Fire Alarm Distribution - A Major Resource Drain? (Corrected Data)
       </h3>
       <ResponsiveContainer width="100%" height={400}>
@@ -37,14 +37,14 @@ export default function FalseAlarmPieChart({ data }: FalseAlarmPieChartProps) {
             outerRadius={120}
             paddingAngle={2}
             dataKey="value"
-            label={({ name, percent }) => `${((percent || 0) * 100).toFixed(1)}%`}
-            labelLine={{ stroke: "#ffffff", strokeWidth: 1 }}
+            label={({ percent }) => `${((percent || 0) * 100).toFixed(1)}%`}
+            labelLine={{ stroke: "#6b7280", strokeWidth: 1 }}
           >
             {data.map((entry, index) => (
               <Cell
                 key={`cell-${index}`}
                 fill={COLORS[index % COLORS.length]}
-                stroke="#1a252f"
+                stroke="#ffffff"
                 strokeWidth={2}
               />
             ))}
@@ -64,10 +64,9 @@ export default function FalseAlarmPieChart({ data }: FalseAlarmPieChartProps) {
           />
         </PieChart>
       </ResponsiveContainer>
-      <p className="text-center text-xs text-gray-400 mt-2 italic">
+      <p className="text-center text-xs text-gray-500 dark:text-gray-400 mt-2 italic">
         *Post-2019 breakdown estimated based on historical patterns due to classification system change
       </p>
     </div>
   );
 }
-
