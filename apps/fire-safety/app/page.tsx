@@ -32,7 +32,7 @@ import FalseAlarmChallenge from "./components/FalseAlarmChallenge";
 import CallToAction from "./components/CallToAction";
 import DashboardFooter from "./components/DashboardFooter";
 import dynamic from "next/dynamic";
-import { Flame, Loader2 } from "lucide-react";
+import { Flame } from "lucide-react";
 
 // Dynamic imports for map components
 const InteractiveIncidentMap = dynamic(() => import("./components/InteractiveIncidentMap"), { ssr: false });
@@ -79,18 +79,55 @@ export default function FireSafetyDashboard() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-gray-100 via-gray-50 to-gray-100 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 flex items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center gap-4"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex flex-col items-center gap-6"
         >
+          {/* Animated Flame */}
           <div className="relative">
-            <Flame className="w-16 h-16 text-orange-500 animate-pulse" />
-            <Loader2 className="absolute inset-0 w-16 h-16 text-blue-500 animate-spin opacity-50" />
+            <motion.div
+              animate={{ 
+                scale: [1, 1.1, 1],
+                opacity: [0.7, 1, 0.7]
+              }}
+              transition={{ 
+                duration: 1.5, 
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+            >
+              <Flame className="w-20 h-20 text-orange-500" />
+            </motion.div>
+            {/* Glow effect */}
+            <div className="absolute inset-0 w-20 h-20 bg-orange-500/20 rounded-full blur-xl animate-pulse" />
           </div>
-          <p className="text-xl font-medium text-gray-900 dark:text-white">Loading fire safety data...</p>
-          <p className="text-gray-600 dark:text-gray-400">Analyzing 550,000+ incidents</p>
+          
+          <div className="text-center">
+            <p className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Loading fire safety data...
+            </p>
+            <p className="text-gray-500 dark:text-slate-400 text-sm">
+              Analyzing 550,000+ incidents
+            </p>
+          </div>
+
+          {/* Progress dots */}
+          <div className="flex gap-2">
+            {[0, 1, 2].map((i) => (
+              <motion.div
+                key={i}
+                className="w-2 h-2 bg-orange-500 rounded-full"
+                animate={{ opacity: [0.3, 1, 0.3] }}
+                transition={{
+                  duration: 1,
+                  repeat: Infinity,
+                  delay: i * 0.2,
+                }}
+              />
+            ))}
+          </div>
         </motion.div>
       </div>
     );

@@ -35,8 +35,8 @@ export default function SectionNav({ activeSection, onSectionChange }: SectionNa
               className={`
                 relative flex items-center gap-2 px-4 py-2.5 rounded-xl font-medium text-sm
                 transition-all duration-300 whitespace-nowrap
-                ${isActive 
-                  ? "text-white shadow-md" 
+                ${isActive
+                  ? "text-white shadow-md"
                   : "text-gray-500 dark:text-slate-400 hover:text-gray-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-slate-800/50"
                 }
               `}
