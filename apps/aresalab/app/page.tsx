@@ -15,11 +15,11 @@ export default function Home() {
               <div className="text-sm text-gray-500 uppercase tracking-wide">Publications</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-400">23</div>
-              <div className="text-sm text-gray-500 uppercase tracking-wide">Visualizations</div>
+              <div className="text-4xl font-bold text-blue-400">1</div>
+              <div className="text-sm text-gray-500 uppercase tracking-wide">Live Dashboard</div>
             </div>
             <div className="text-center">
-              <div className="text-4xl font-bold text-blue-400">930K+</div>
+              <div className="text-4xl font-bold text-blue-400">550K+</div>
               <div className="text-sm text-gray-500 uppercase tracking-wide">Records Analyzed</div>
             </div>
           </div>
@@ -67,23 +67,39 @@ export default function Home() {
           </div>
 
           {/* Fire Safety Card */}
-          <div className="bg-gray-800 rounded-lg p-6 border-t-4 border-red-500 hover:shadow-xl transition">
+          <div className="bg-gray-800 rounded-lg p-6 border-t-4 border-red-500 hover:shadow-xl transition relative">
+            <span className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-orange-500 text-white text-xs px-2 py-1 rounded-full font-bold animate-pulse">
+              LIVE DEMO
+            </span>
             <h2 className="text-2xl font-bold mb-2">Fire Safety Analytics</h2>
-            <p className="text-gray-400 mb-4">930K Emergency Records, Policy Impact</p>
-            <div className="flex gap-4 mb-4">
+            <p className="text-gray-400 mb-4">550K+ Fire Incidents, Policy Impact</p>
+            <div className="flex gap-4 mb-4 flex-wrap">
               <span className="bg-blue-900/30 px-3 py-1 rounded text-sm border border-blue-500">
                 $225M Impact
               </span>
               <span className="bg-blue-900/30 px-3 py-1 rounded text-sm border border-blue-500">
-                5 Charts
+                11 Years
+              </span>
+              <span className="bg-red-900/30 px-3 py-1 rounded text-sm border border-red-500">
+                Interactive
               </span>
             </div>
-            <a
-              href="/publications/fire-safety"
-              className="inline-block bg-blue-500 hover:bg-blue-600 px-6 py-2 rounded font-semibold transition"
-            >
-              View Research →
-            </a>
+            <div className="flex gap-3">
+              <a
+                href="https://usfiresafety.vercel.app"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 px-5 py-2 rounded font-semibold transition"
+              >
+                🚀 Dashboard
+              </a>
+              <a
+                href="/publications/fire-safety"
+                className="inline-block bg-blue-500 hover:bg-blue-600 px-5 py-2 rounded font-semibold transition"
+              >
+                📄 Research
+              </a>
+            </div>
           </div>
 
           {/* Network Card */}

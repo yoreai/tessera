@@ -1,6 +1,16 @@
 import Link from "next/link";
 
-const publications = {
+interface Publication {
+  title: string;
+  subtitle: string;
+  metrics: { label: string; value: string }[];
+  abstract: string;
+  findings: string[];
+  pdfFile: string;
+  liveDemo?: string;
+}
+
+const publications: Record<string, Publication> = {
   spotify: {
     title: "Predicting Song Popularity on Spotify",
     subtitle: "Machine Learning Classification with Genre Interaction Modeling",
@@ -39,18 +49,19 @@ const publications = {
     title: "Data-Driven Fire Safety Analytics",
     subtitle: "Leveraging 930K Emergency Records for Public Policy",
     metrics: [
-      { label: "Records", value: "930,808" },
-      { label: "Timespan", value: "10 Years" },
+      { label: "Records", value: "550K+" },
+      { label: "Timespan", value: "11 Years" },
       { label: "Cost Impact", value: "$225M" },
     ],
-    abstract: "Analysis of decade-long emergency dispatch data reveals critical patterns for fire safety policy. 37.3% of dispatches are fire alarms, costing $225M over 10 years, with geographic disparities and seasonal patterns informing resource allocation.",
+    abstract: "Analysis of decade-long emergency dispatch data (2015-2025) reveals critical patterns for fire safety policy. 37% of fire dispatches are alarms, costing taxpayers an estimated $225M. Geographic disparities and distinct seasonal patterns inform strategic resource allocation. Interactive dashboard enables stakeholders to explore patterns dynamically.",
     findings: [
-      "37.3% of all dispatches are fire alarms - many false (estimated $225M cost)",
-      "Geographic disparities: 3× variation in per-capita incident rates",
-      "Seasonal patterns: +34% winter structure fires, +78% summer outdoor fires",
-      "Three policy recommendations with projected 30-50% false alarm reduction",
+      "37% of all fire dispatches are alarms - many false (estimated $225M cost over 10 years)",
+      "Geographic disparities: Pittsburgh alone accounts for 44% of county incidents",
+      "Seasonal patterns: Structure fires peak in winter (+34%), outdoor fires surge in summer (+78%)",
+      "Three policy recommendations: smart alarm tech, targeted prevention, seasonal resource allocation",
     ],
     pdfFile: "Data-Driven-Fire-Safety-Analytics.pdf",
+    liveDemo: "https://usfiresafety.vercel.app",
   },
   network: {
     title: "Network Centrality in College Football",
@@ -127,7 +138,17 @@ export default function PublicationPage({ params }: { params: { slug: string } }
             </ul>
           </section>
 
-          <div className="flex gap-4 mt-10">
+          <div className="flex gap-4 mt-10 flex-wrap">
+            {pub.liveDemo && (
+              <a
+                href={pub.liveDemo}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 px-8 py-3 rounded-lg font-semibold transition inline-block shadow-lg"
+              >
+                🚀 Live Dashboard
+              </a>
+            )}
             <a
               href={`/publications/${pub.pdfFile}`}
               target="_blank"
