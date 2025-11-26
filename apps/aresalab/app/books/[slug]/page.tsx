@@ -2,7 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, BookOpen, FileText } from "lucide-react";
 import { Navigation } from "../../components/Navigation";
-import { getBookBySlug } from "../../../lib/publications";
+import { getBookBySlug } from "@/lib/publications";
 import { BookContent } from "./BookContent";
 
 // Map slugs to actual filenames

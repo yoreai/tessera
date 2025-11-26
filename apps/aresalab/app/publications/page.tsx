@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { FileText, ArrowRight, ExternalLink, Tag, Clock } from "lucide-react";
 import { Navigation } from "../components/Navigation";
-import { publications } from "../../lib/publications";
+import { publications } from "@/lib/publications";
 
 const gradientMap: Record<string, string> = {
   "geoai-agentic-flow": "from-purple-600 to-indigo-600",

@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, FileText, ExternalLink, Clock, Tag, Building2 } from "lucide-react";
 import { Navigation } from "../../components/Navigation";
-import { getPublicationContent } from "../../../lib/mdx";
-import { getPublicationBySlug } from "../../../lib/publications";
+import { getPublicationContent } from "@/lib/mdx";
+import { getPublicationBySlug } from "@/lib/publications";
 import { PublicationContent } from "./PublicationContent";
 
 interface PageProps {

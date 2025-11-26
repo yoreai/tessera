@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, ArrowRight } from "lucide-react";
 import { Navigation } from "../components/Navigation";
-import { books } from "../../lib/publications";
+import { books } from "@/lib/publications";
 
 export default function BooksPage() {
   return (
