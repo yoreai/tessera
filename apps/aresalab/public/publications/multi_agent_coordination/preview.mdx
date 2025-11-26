@@ -1,6 +1,6 @@
 ## Abstract
 
-Environmental risk assessment at scale requires synthesizing diverse expertise---wildfire behavior, flood hydrology, seismic hazards, infrastructure vulnerability---that no single model can encompass. This paper presents a **Multi-Agent Geospatial Coordination Protocol (MACP)** that distributes risk assessment across 128 specialized agents organized into domain-specific pools, achieving both high accuracy and robust fault tolerance.
+Environmental risk assessment at scale requires synthesizing diverse expertise—wildfire behavior, flood hydrology, seismic hazards, infrastructure vulnerability—that no single model can encompass. This paper presents a **Multi-Agent Geospatial Coordination Protocol (MACP)** that distributes risk assessment across 128 specialized agents organized into domain-specific pools, achieving both high accuracy and robust fault tolerance.
 
 Our theoretical contributions establish:
 
@@ -12,9 +12,9 @@ Our theoretical contributions establish:
 
 4. **Communication Complexity**: We analyze message and bandwidth complexity, showing that MACP achieves $O(n)$ messages and $O(n \cdot m)$ bandwidth per assessment round.
 
-Experimental evaluation on California fire hazard data demonstrates that the 128-agent MACP achieves **89.7% classification accuracy**---6.3 percentage points better than single-model baselines---with **93% scaling efficiency** up to 256 agents. Real-world deployment processes 546,000+ addresses in under 35 seconds.
+Experimental evaluation on California fire hazard data demonstrates that the 128-agent MACP achieves **89.7% classification accuracy**—6.3 percentage points better than single-model baselines—with **93% scaling efficiency** up to 256 agents. Real-world deployment processes 546,000+ addresses in under 35 seconds.
 
----
+—
 
 **Keywords:** Multi-Agent Systems, Consensus Protocols, Byzantine Fault Tolerance, Environmental Risk Assessment, Distributed Computing
 
@@ -28,7 +28,7 @@ Experimental evaluation on California fire hazard data demonstrates that the 128
 
 On October 9, 2017, multiple wildfires ignited simultaneously across Northern California wine country. Within hours, the Tubbs Fire alone had destroyed 5,636 structures in Santa Rosa. Post-incident analysis revealed that the fires exploited a convergence of factors: dry vegetation from prolonged drought, extreme Diablo winds channeled through Sonoma Valley's terrain, aging power infrastructure prone to ignition, and a road network that created fuel breaks in some areas while funneling evacuees through bottlenecks in others.
 
-No single expert---not a fire behavior specialist, not a meteorologist, not an infrastructure engineer---possessed the comprehensive knowledge needed to predict which addresses faced the highest risk. The challenge was fundamentally one of coordination: how to synthesize diverse domain expertise into unified risk assessments at the speed required for effective emergency response.
+No single expert—not a fire behavior specialist, not a meteorologist, not an infrastructure engineer—possessed the comprehensive knowledge needed to predict which addresses faced the highest risk. The challenge was fundamentally one of coordination: how to synthesize diverse domain expertise into unified risk assessments at the speed required for effective emergency response.
 
 This coordination challenge motivates our work on multi-agent systems for geospatial risk assessment. Rather than building a monolithic model that attempts to capture all relevant factors, we propose distributing expertise across specialized agents that collaborate through a principled consensus protocol.
 
