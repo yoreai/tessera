@@ -14,8 +14,6 @@ Our theoretical contributions establish:
 
 Experimental evaluation on 546,247 California addresses demonstrates that CEF achieves distance preservation error (DPE) of 0.089—4× better than prior methods—while maintaining 20,000 embeddings/second throughput. These results establish CEF as a rigorous foundation for geospatial representation learning with provable guarantees.
 
-—
-
 **Keywords:** Coordinate Embedding, Geospatial Representation Learning, Bi-Lipschitz Maps, Feature Extraction, Metric Geometry
 
 **Mathematics Subject Classification:** 68T05 (Learning and Adaptive Systems), 51F99 (Metric Geometry), 86A30 (Geodesy)
@@ -30,19 +28,19 @@ Geographic coordinates—latitude and longitude pairs—are the fundamental atom
 
 This representational poverty creates a fundamental challenge for machine learning on geospatial data. Standard neural network architectures process vectors through continuous transformations, learning to extract patterns from high-dimensional representations. When geographic data enters these systems as raw coordinate pairs, the networks must learn from scratch that (38.4404, -122.7141) and (38.4405, -122.7140)—separated by approximately 15 meters—share virtually identical environmental contexts, while (38.4404, -122.7141) and (38.4404, -122.9141)—separated by 18 kilometers—may have dramatically different risk profiles.
 
-The success of embedding methods in natural language processing [@mikolov2013word2vec; @pennington2014glove] and graph learning [@grover2016node2vec] suggests a solution: transform coordinates into dense vector representations that encode semantic relationships. A well-designed embedding would place geographically proximate locations close together in vector space while also capturing relevant contextual features like terrain, infrastructure, and environmental conditions.
+The success of embedding methods in natural language processing [@mikolov2013word2vec; @pennington2014glove] and graph learning  suggests a solution: transform coordinates into dense vector representations that encode semantic relationships. A well-designed embedding would place geographically proximate locations close together in vector space while also capturing relevant contextual features like terrain, infrastructure, and environmental conditions.
 
 ## Limitations of Existing Approaches
 
 Prior work on geographic embedding has proceeded largely empirically, without rigorous theoretical foundations:
 
-**Positional Encoding Methods** [@vaswani2017attention] apply sinusoidal transformations to coordinates, providing distinguishability but no semantic enrichment. Two coordinates in different contexts receive identical positional encodings.
+**Positional Encoding Methods**  apply sinusoidal transformations to coordinates, providing distinguishability but no semantic enrichment. Two coordinates in different contexts receive identical positional encodings.
 
 **Learned Grid Embeddings** discretize geographic space into cells, each assigned a learned vector. This approach loses precision at cell boundaries and cannot generalize to unseen locations.
 
-**Graph-Based Embeddings** [@grover2016node2vec] treat locations as graph nodes, learning representations from network structure. However, the graph topology is often arbitrary, and spatial distances are not explicitly preserved.
+**Graph-Based Embeddings**  treat locations as graph nodes, learning representations from network structure. However, the graph topology is often arbitrary, and spatial distances are not explicitly preserved.
 
-**Satellite Image Embeddings** [@jean2016satellite] extract features from overhead imagery. While rich in visual information, these embeddings are expensive to compute and may not capture underground or infrastructure features.
+**Satellite Image Embeddings**  extract features from overhead imagery. While rich in visual information, these embeddings are expensive to compute and may not capture underground or infrastructure features.
 
 Critically, none of these approaches provide formal guarantees about distance preservation. An embedding might place distant locations close together or nearby locations far apart, leading to spatial reasoning errors in downstream applications.
 
