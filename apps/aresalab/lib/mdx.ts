@@ -61,20 +61,21 @@ export function getAllPublicationSlugs(): string[] {
     return [];
   }
 
-  const files = fs.readdirSync(PUBLICATIONS_DIR);
-  return files
-    .filter((file) => file.endsWith(".mdx"))
-    .map((file) => file.replace(/\.mdx$/, ""));
+  const dirs = fs.readdirSync(PUBLICATIONS_DIR);
+  return dirs
+    .filter((dir) => {
+      const dirPath = path.join(PUBLICATIONS_DIR, dir);
+      return fs.statSync(dirPath).isDirectory() && dir !== 'pdf' && dir !== '__pycache__';
+    })
+    .filter((dir) => {
+      // Only include if preview.mdx exists
+      const previewPath = path.join(PUBLICATIONS_DIR, dir, "preview.mdx");
+      return fs.existsSync(previewPath);
+    });
 }
 
 export function getAllBookSlugs(): string[] {
-  if (!fs.existsSync(BOOKS_DIR)) {
-    return [];
-  }
-
-  const files = fs.readdirSync(BOOKS_DIR);
-  return files
-    .filter((file) => file.endsWith(".md"))
-    .map((file) => file.replace(/\.md$/, ""));
+  // Books are now also in publications/ directory
+  // Just filter for books from the publications list
+  return [];  // We'll use publications.ts for book slugs instead
 }
-
