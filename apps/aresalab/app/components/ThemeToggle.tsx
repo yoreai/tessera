@@ -5,6 +5,7 @@ import { useTheme } from "../utils/theme-context";
 export function ThemeToggle() {
   const { theme, toggleTheme, mounted } = useTheme();
 
+  // Don't render anything until mounted to prevent hydration mismatch
   if (!mounted) {
     return (
       <div className="w-10 h-10 rounded-xl bg-gray-700 animate-pulse" />
@@ -29,22 +30,32 @@ export function ThemeToggle() {
       `}
       aria-label={`Switch to ${theme === "light" ? "dark" : "light"} mode`}
     >
-      <div className="relative w-5 h-5 flex items-center justify-center">
+      <div className="relative w-4 h-4 flex items-center justify-center">
+        {/* Sun Icon */}
         <Sun
           className={`
-            absolute w-5 h-5 transition-all duration-300 ease-in-out
-            ${theme === "light" ? "opacity-100 rotate-0 scale-100" : "opacity-0 rotate-90 scale-0"}
+            absolute w-4 h-4 transition-all duration-300 ease-in-out
+            ${
+              theme === "light"
+                ? "opacity-100 rotate-0 scale-100"
+                : "opacity-0 rotate-90 scale-0"
+            }
           `}
         />
+
+        {/* Moon Icon */}
         <Moon
           className={`
-            absolute w-5 h-5 transition-all duration-300 ease-in-out
-            ${theme === "dark" ? "opacity-100 rotate-0 scale-100" : "opacity-0 -rotate-90 scale-0"}
+            absolute w-4 h-4 transition-all duration-300 ease-in-out
+            ${
+              theme === "dark"
+                ? "opacity-100 rotate-0 scale-100"
+                : "opacity-0 -rotate-90 scale-0"
+            }
           `}
         />
       </div>
     </button>
   );
 }
-
 

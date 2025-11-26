@@ -1,6 +1,6 @@
 # ARESA
 
-**Autonomous Research & Engineering Synthesis Agent**
+**Autonomous Research Engineering & Synthesis Architecture**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Quarto](https://img.shields.io/badge/Made%20with-Quarto-blue)](https://quarto.org)
@@ -11,13 +11,20 @@
 
 ## 🎯 Vision
 
-ARESA is a **self-improving research synthesis agent** that transforms raw analytical work into publication-quality research and deployable engineering solutions. It bridges the gap between exploration and production—autonomously drafting papers, generating visualizations, and building applications from experimental code.
+**Building self-improving, self-evaluating AI systems that advance STEM research autonomously.**
+
+As AI capabilities advance with world models and cutting-edge research, humans are becoming the bottleneck of research progress. ARESA is building the scaffolding for scientifically controlled, empirically proven autonomous research—starting with human-in-the-loop collaboration and evolving toward independent discovery.
+
+**Why This Matters:**
+- AI augmentation of research is already happening (as proven here and in labs worldwide)
+- Humans will become guiders and validators, not primary authors
+- Every proof, architecture, and method must be empirically validated and openly shared
 
 **Dual Mandate:**
-- **Open Science**: Publishing research and tools that advance human knowledge
-- **Engineering Solutions**: Deploying validated discoveries as production systems
+- **Open Science**: Publishing validated research and tools that advance human knowledge
+- **Engineering Solutions**: Deploying discoveries as production-ready systems
 
-The architecture is domain-agnostic, designed to scale from data science to biomedical research, manufacturing optimization, pharmaceutical development, and beyond.
+The architecture is domain-agnostic, designed to scale across STEM fields—from data science and machine learning to biomedical research, manufacturing optimization, and beyond.
 
 ---
 

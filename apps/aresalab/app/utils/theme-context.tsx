@@ -13,28 +13,33 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark"); // Default to dark for this dashboard
+  const [theme, setTheme] = useState<Theme>("dark");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("fire-dashboard-theme") as Theme;
-    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches
+    // Check for saved theme in localStorage or default to system preference
+    const savedTheme = localStorage.getItem("theme") as Theme;
+    const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
+      .matches
       ? "dark"
       : "light";
     const initialTheme = savedTheme || systemTheme;
+
     setTheme(initialTheme);
     setMounted(true);
   }, []);
 
   useEffect(() => {
     if (!mounted) return;
+
+    // Update document class and localStorage
     const root = document.documentElement;
     if (theme === "dark") {
       root.classList.add("dark");
     } else {
       root.classList.remove("dark");
     }
-    localStorage.setItem("fire-dashboard-theme", theme);
+    localStorage.setItem("theme", theme);
   }, [theme, mounted]);
 
   const toggleTheme = () => {
@@ -51,6 +56,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
+    // Provide fallback values for SSR/hydration
     return {
       theme: "dark" as Theme,
       toggleTheme: () => {},
@@ -60,5 +66,4 @@ export function useTheme() {
   }
   return context;
 }
-
 

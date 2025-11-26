@@ -1,185 +1,154 @@
+import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, FileText, ExternalLink, Clock, Tag, Building2 } from "lucide-react";
+import { Navigation } from "../../components/Navigation";
+import { getPublicationContent } from "../../../lib/mdx";
+import { getPublicationBySlug } from "../../../lib/publications";
+import { PublicationContent } from "./PublicationContent";
 
-interface Publication {
-  title: string;
-  subtitle: string;
-  metrics: { label: string; value: string }[];
-  abstract: string;
-  findings: string[];
-  pdfFile: string;
-  liveDemo?: string;
+interface PageProps {
+  params: Promise<{ slug: string }>;
 }
 
-const publications: Record<string, Publication> = {
-  spotify: {
-    title: "Predicting Song Popularity on Spotify",
-    subtitle: "Machine Learning Classification with Genre Interaction Modeling",
-    metrics: [
-      { label: "ROC AUC", value: "0.675" },
-      { label: "Models", value: "6 Progressive" },
-      { label: "Charts", value: "7" },
-    ],
-    abstract: "This study investigates the predictability of song popularity on Spotify using machine learning techniques. We developed multiple logistic regression models to predict binary popularity outcomes across six genres, achieving ROC AUC of 0.675 with robust cross-validation.",
-    findings: [
-      "Genre emerged as the strongest predictor (pop/rock 1.97× and 1.72× higher odds)",
-      "Instrumentalness shows strong negative effect (-0.22) - vocal tracks more popular",
-      "Genre×audio interactions reveal context-specific effects (danceability critical for rap +0.33)",
-      "Cross-validation confirms robust generalization (training vs CV AUC < 0.004)",
-    ],
-    pdfFile: "Predicting-Song-Popularity-on-Spotify.pdf",
-  },
-  manufacturing: {
-    title: "Manufacturing Process Analytics",
-    subtitle: "Multi-Source Data Integration for Operational Intelligence",
-    metrics: [
-      { label: "Sources", value: "5 CSVs" },
-      { label: "Observations", value: "45K" },
-      { label: "Charts", value: "8" },
-    ],
-    abstract: "Demonstrates data engineering for manufacturing analytics through multi-source integration. Analyzed 45,000 observations from three machines, discovering systematic quality patterns and supplier performance differences.",
-    findings: [
-      "Discovered cyclical 8-batch failure pattern across all machines/suppliers",
-      "PCA reduced 4 variables to 2 components retaining 73% variance",
-      "K-means identified 5 distinct operational regimes (elbow method)",
-      "Supplier B shows tighter clustering indicating better material consistency",
-    ],
-    pdfFile: "Manufacturing-Process-Analytics.pdf",
-  },
-  "fire-safety": {
-    title: "Data-Driven Fire Safety Analytics",
-    subtitle: "Leveraging 930K Emergency Records for Public Policy",
-    metrics: [
-      { label: "Records", value: "550K+" },
-      { label: "Timespan", value: "11 Years" },
-      { label: "Cost Impact", value: "$225M" },
-    ],
-    abstract: "Analysis of decade-long emergency dispatch data (2015-2025) reveals critical patterns for fire safety policy. 37% of fire dispatches are alarms, costing taxpayers an estimated $225M. Geographic disparities and distinct seasonal patterns inform strategic resource allocation. Interactive dashboard enables stakeholders to explore patterns dynamically.",
-    findings: [
-      "37% of all fire dispatches are alarms - many false (estimated $225M cost over 10 years)",
-      "Geographic disparities: Pittsburgh alone accounts for 44% of county incidents",
-      "Seasonal patterns: Structure fires peak in winter (+34%), outdoor fires surge in summer (+78%)",
-      "Three policy recommendations: smart alarm tech, targeted prevention, seasonal resource allocation",
-    ],
-    pdfFile: "Data-Driven-Fire-Safety-Analytics.pdf",
-    liveDemo: "https://usfiresafety.vercel.app",
-  },
-  network: {
-    title: "Network Centrality in College Football",
-    subtitle: "Applying Graph Theory to Sports Competition",
-    metrics: [
-      { label: "Teams", value: "115" },
-      { label: "Games", value: "613" },
-      { label: "Charts", value: "3" },
-    ],
-    abstract: "Applies network science to analyze competitive relationships in college football. Demonstrates how degree and betweenness centrality reveal different dimensions of team importance, with methods generalizable to business and biological networks.",
-    findings: [
-      "Only 12 teams exceed median degree centrality vs 57 for betweenness",
-      "Penn State: High degree (0.421) - breadth of connections",
-      "Ohio State: High betweenness (0.152) - critical bridge position",
-      "Methods apply to business partnerships, protein interactions, supply chains",
-    ],
-    pdfFile: "Network-Centrality-in-College-Football.pdf",
-  },
-};
+export default async function PublicationPage({ params }: PageProps) {
+  const { slug } = await params;
+  const publication = getPublicationBySlug(slug);
+  const content = await getPublicationContent(slug);
 
-export default function PublicationPage({ params }: { params: { slug: string } }) {
-  const pub = publications[params.slug as keyof typeof publications];
-
-  if (!pub) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Publication Not Found</h1>
-          <Link href="/" className="text-blue-400 hover:underline">
-            ← Back to Home
-          </Link>
-        </div>
-      </div>
-    );
+  if (!publication) {
+    notFound();
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white">
-      <div className="container mx-auto px-4 py-12 max-w-4xl">
-        <Link href="/" className="text-blue-400 hover:underline mb-6 inline-block">
-          ← Back to Publications
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 dark:from-gray-900 dark:via-slate-800 dark:to-gray-900 transition-colors duration-300">
+      <Navigation />
 
-        <article className="bg-gray-800 rounded-lg p-8 mt-6">
-          <header className="border-b border-gray-700 pb-6 mb-8">
-            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-              {pub.title}
+      <main className="pt-24 pb-16">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Back link */}
+          <Link
+            href="/"
+            className="inline-flex items-center text-gray-600 dark:text-gray-400 hover:text-purple-600 dark:hover:text-purple-400 transition-colors mb-8"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Publications
+          </Link>
+
+          {/* Header */}
+          <header className="mb-12">
+            {publication.badge && (
+              <span className="inline-block px-3 py-1 text-xs font-bold text-white bg-gradient-to-r from-purple-500 to-indigo-500 rounded-full mb-4">
+                {publication.badge}
+              </span>
+            )}
+
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-gray-100 mb-4">
+              {publication.title}
             </h1>
-            <p className="text-xl text-gray-400 italic">{pub.subtitle}</p>
-            <div className="flex gap-4 mt-6 flex-wrap">
-              {pub.metrics.map((metric, i) => (
-                <div key={i} className="bg-gray-700 px-4 py-2 rounded">
-                  <span className="text-gray-400 text-sm">{metric.label}: </span>
-                  <span className="font-bold text-blue-400">{metric.value}</span>
-                </div>
+
+            {/* Metadata */}
+            <div className="flex flex-wrap gap-4 text-sm text-gray-600 dark:text-gray-400 mb-6">
+              <div className="flex items-center">
+                <Clock className="w-4 h-4 mr-2" />
+                {publication.date}
+              </div>
+              <div className="flex items-center">
+                <Building2 className="w-4 h-4 mr-2" />
+                {publication.institution}
+              </div>
+            </div>
+
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              <strong>Authors:</strong> {publication.authors.join(", ")}
+            </p>
+
+            {/* Keywords */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              {publication.keywords.map((keyword) => (
+                <span
+                  key={keyword}
+                  className="inline-flex items-center px-3 py-1 text-sm bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-full"
+                >
+                  <Tag className="w-3 h-3 mr-1" />
+                  {keyword}
+                </span>
               ))}
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex flex-wrap gap-4">
+              {publication.pdfUrl && (
+                <a
+                  href={publication.pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:shadow-lg transition-all duration-300"
+                >
+                  <FileText className="w-4 h-4 mr-2" />
+                  Download PDF
+                </a>
+              )}
+              {publication.demoUrl && (
+                <a
+                  href={publication.demoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg hover:shadow-lg transition-all duration-300"
+                >
+                  <ExternalLink className="w-4 h-4 mr-2" />
+                  Live Demo
+                </a>
+              )}
             </div>
           </header>
 
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-blue-400">Abstract</h2>
-            <p className="text-gray-300 leading-relaxed">{pub.abstract}</p>
-          </section>
-
-          <section className="mb-8">
-            <h2 className="text-2xl font-bold mb-4 text-blue-400">Key Findings</h2>
-            <ul className="space-y-3">
-              {pub.findings.map((finding, i) => (
-                <li key={i} className="flex items-start">
-                  <span className="text-green-400 mr-3 mt-1">✓</span>
-                  <span className="text-gray-300">{finding}</span>
-                </li>
+          {/* Key Metrics */}
+          <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-6 mb-12">
+            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">Key Metrics</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {publication.metrics.map((metric) => (
+                <div key={metric.label} className="text-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-xl">
+                  <div className="text-2xl font-bold text-purple-600 dark:text-purple-400 mb-1">
+                    {metric.value}
+                  </div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">
+                    {metric.label}
+                  </div>
+                </div>
               ))}
-            </ul>
-          </section>
-
-          <div className="flex gap-4 mt-10 flex-wrap">
-            {pub.liveDemo && (
-              <a
-                href={pub.liveDemo}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 px-8 py-3 rounded-lg font-semibold transition inline-block shadow-lg"
-              >
-                🚀 Live Dashboard
-              </a>
-            )}
-            <a
-              href={`/publications/${pub.pdfFile}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-blue-500 hover:bg-blue-600 px-8 py-3 rounded-lg font-semibold transition inline-block"
-            >
-              📄 View PDF
-            </a>
-            <a
-              href={`https://github.com/yoreai/aresa/tree/main/publications/${params.slug.replace("-", "_")}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="border border-blue-500 text-blue-400 hover:bg-blue-900/20 px-8 py-3 rounded-lg font-semibold transition inline-block"
-            >
-              📁 Source Code
-            </a>
+            </div>
           </div>
-        </article>
-      </div>
-    </main>
+
+          {/* Content */}
+          {content ? (
+            <PublicationContent source={content.source} />
+          ) : (
+            <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-xl rounded-2xl border border-gray-200/50 dark:border-gray-700/50 p-8">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">Abstract</h2>
+              <p className="text-gray-600 dark:text-gray-400 leading-relaxed">
+                {publication.abstract}
+              </p>
+
+              {publication.pdfUrl && (
+                <div className="mt-8 p-6 bg-purple-50 dark:bg-purple-900/20 rounded-xl">
+                  <p className="text-gray-700 dark:text-gray-300 mb-4">
+                    The full paper is available as a PDF download.
+                  </p>
+                  <a
+                    href={publication.pdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg hover:shadow-lg transition-all duration-300"
+                  >
+                    <FileText className="w-4 h-4 mr-2" />
+                    Download Full Paper
+                  </a>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </main>
+    </div>
   );
 }
-
-export async function generateStaticParams() {
-  return [
-    { slug: "spotify" },
-    { slug: "manufacturing" },
-    { slug: "fire-safety" },
-    { slug: "network" },
-  ];
-}
-
-
-
