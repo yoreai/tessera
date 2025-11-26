@@ -1,0 +1,1367 @@
+# Chapter 6: Advanced Linear Algebra – Eigenvectors, Eigenvalues & Matrix Decompositions
+
+## The Hidden Structure in Every Matrix
+
+You've mastered the basics of linear algebra — vectors, matrices, and transformations. But now we're going to unveil the **deepest secrets** hidden inside every matrix!
+
+This chapter reveals:
+
+- **Special directions** that every matrix preserves
+- How to **break apart any matrix** into simpler, more understandable pieces
+- The mathematical tools behind **Google's PageRank**, **Netflix recommendations**, and **image compression**
+- Why **quantum mechanics** and **data science** both depend on the same mathematical concepts
+
+### 🔍 The Big Question: What Don't Matrices Change?
+
+When a matrix transforms a vector, it usually **rotates** and **stretches** it in complex ways. But here's the amazing insight:
+
+**Every matrix has special directions where it ONLY stretches (or shrinks) — no rotation at all!**
+
+These **special directions** are called **eigenvectors**, and the **stretch factors** are called **eigenvalues**.
+
+### 🎯 Why This Matters
+
+**Eigenvectors and eigenvalues reveal the "natural behavior" of any system**:
+
+- **Google Search**: Which web pages are most important? (PageRank eigenvector)
+- **Face Recognition**: What are the most important facial features? (PCA eigenvectors)
+- **Quantum Physics**: What are the possible energy levels? (Hamiltonian eigenvalues)
+- **Netflix**: What are the hidden preference patterns? (SVD/eigenanalysis)
+- **Stability Analysis**: Will this bridge oscillate dangerously? (Vibration eigenfrequencies)
+
+### 🌟 What You'll Master
+
+**Eigenvectors & Eigenvalues**: The "soul" of every matrix
+
+- Intuitive understanding through geometric visualization
+- How to find them computationally
+- Why they reveal hidden structure
+
+**Matrix Decompositions**: Taking matrices apart
+
+- **Eigendecomposition**: Breaking matrices into rotation + scaling + rotation
+- **SVD**: The ultimate tool that works on ANY matrix
+- **Applications**: Compression, noise reduction, pattern recognition
+
+**Real-World Power**:
+
+- **Principal Component Analysis**: Finding the most important patterns in data
+- **Recommender Systems**: How Netflix knows what you'll like
+- **Image Processing**: How JPEG compression works
+- **Quantum Mechanics**: Understanding the fundamental nature of reality
+
+**By the end, you'll understand the mathematical principles behind some of the most powerful algorithms in computer science and physics!** ✨
+
+---
+
+## Eigenvectors & Eigenvalues: The Special Directions That Don't Rotate
+
+### 🎪 The Magic Transformation Analogy
+
+Imagine you have a **magical stretching machine** (our matrix) that transforms every vector you put into it. Most vectors get both **stretched AND rotated** in complex ways.
+
+But there are **special vectors** that this machine can only **stretch or shrink** — it **cannot rotate them at all!** No matter how complex the machine, these special directions remain **perfectly aligned** with themselves.
+
+**These are eigenvectors** — the magical directions that every matrix respects!
+
+### 🧮 Mathematical Definition
+
+An **eigenvector** $\mathbf{v}$ of matrix $A$ satisfies:
+
+$$A\mathbf{v} = \lambda\mathbf{v}$$
+
+Where:
+
+- $\mathbf{v}$ = **eigenvector** (the special direction)
+- $\lambda$ = **eigenvalue** (how much it stretches in that direction)
+- $A\mathbf{v}$ = transformed vector
+- $\lambda\mathbf{v}$ = same vector, just scaled
+
+**In words**: "When matrix $A$ transforms eigenvector $\mathbf{v}$, the result is just $\mathbf{v}$ scaled by factor $\lambda$."
+
+### 🎯 Building Intuition: What Does This Really Mean?
+
+**Case 1: Eigenvalue λ > 1**
+
+- Vector gets **stretched** (made longer)
+- Direction stays the same
+- Example: λ = 2 means "double the length"
+
+**Case 2: Eigenvalue 0 < λ < 1**
+
+- Vector gets **compressed** (made shorter)
+- Direction stays the same
+- Example: λ = 0.5 means "half the length"
+
+**Case 3: Eigenvalue λ < 0**
+
+- Vector gets **flipped** AND scaled
+- Points in opposite direction
+- Example: λ = -1 means "flip direction, keep length"
+
+**Case 4: Eigenvalue λ = 0**
+
+- Vector gets **collapsed to zero**
+- Matrix has no inverse (singular)
+
+### 🎨 Visual Discovery: Finding Eigenvectors Geometrically
+
+Let's build intuition by watching eigenvectors in action:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+def visualize_eigenvector_discovery():
+    # Define a matrix transformation
+    A = np.array([[3, 1],
+                  [0, 2]])
+
+    # Create a grid of test vectors (like throwing darts in all directions)
+    angles = np.linspace(0, 2*np.pi, 16)
+    test_vectors = np.array([[np.cos(angle), np.sin(angle)] for angle in angles]).T
+
+    # Transform all test vectors
+    transformed_vectors = A @ test_vectors
+
+    # Calculate actual eigenvectors and eigenvalues
+    eigenvalues, eigenvectors = np.linalg.eig(A)
+
+    # Create visualization
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Plot 1: Original vectors (unit circle)
+    ax1 = axes[0]
+    for i in range(test_vectors.shape[1]):
+        ax1.arrow(0, 0, test_vectors[0, i], test_vectors[1, i],
+                 head_width=0.05, head_length=0.05, fc='blue', ec='blue', alpha=0.6)
+
+    ax1.set_xlim(-2, 2)
+    ax1.set_ylim(-2, 2)
+    ax1.set_aspect('equal')
+    ax1.grid(True, alpha=0.3)
+    ax1.set_title('Original Vectors\n(Unit Circle)')
+    ax1.axhline(y=0, color='k', linewidth=0.5)
+    ax1.axvline(x=0, color='k', linewidth=0.5)
+
+    # Plot 2: Transformed vectors
+    ax2 = axes[1]
+    for i in range(test_vectors.shape[1]):
+        # Original vector (faded)
+        ax2.arrow(0, 0, test_vectors[0, i], test_vectors[1, i],
+                 head_width=0.05, head_length=0.05, fc='blue', ec='blue', alpha=0.2)
+        # Transformed vector
+        ax2.arrow(0, 0, transformed_vectors[0, i], transformed_vectors[1, i],
+                 head_width=0.05, head_length=0.05, fc='red', ec='red', alpha=0.8)
+
+    ax2.set_xlim(-4, 4)
+    ax2.set_ylim(-2, 4)
+    ax2.set_aspect('equal')
+    ax2.grid(True, alpha=0.3)
+    ax2.set_title('After Transformation A\n(Ellipse)')
+    ax2.axhline(y=0, color='k', linewidth=0.5)
+    ax2.axvline(x=0, color='k', linewidth=0.5)
+
+    # Plot 3: Highlight the eigenvectors
+    ax3 = axes[2]
+    # Show transformation effect
+    for i in range(test_vectors.shape[1]):
+        ax3.arrow(0, 0, transformed_vectors[0, i], transformed_vectors[1, i],
+                 head_width=0.05, head_length=0.05, fc='gray', ec='gray', alpha=0.3)
+
+    # Highlight eigenvectors and their transformations
+    colors = ['red', 'green']
+    for i, (eigenval, eigenvec) in enumerate(zip(eigenvalues, eigenvectors.T)):
+        # Original eigenvector
+        ax3.arrow(0, 0, eigenvec[0], eigenvec[1],
+                 head_width=0.1, head_length=0.1, fc=colors[i], ec=colors[i],
+                 linewidth=3, alpha=0.7, label=f'Eigenvector {i+1}')
+
+        # Transformed eigenvector (should be scaled version)
+        transformed_eigenvec = A @ eigenvec
+        ax3.arrow(0, 0, transformed_eigenvec[0], transformed_eigenvec[1],
+                 head_width=0.1, head_length=0.1, fc=colors[i], ec=colors[i],
+                 linewidth=3, linestyle='--', alpha=0.9,
+                 label=f'λ{i+1}={eigenval:.1f} × eigenvec{i+1}')
+
+    ax3.set_xlim(-4, 4)
+    ax3.set_ylim(-2, 4)
+    ax3.set_aspect('equal')
+    ax3.grid(True, alpha=0.3)
+    ax3.set_title('Eigenvectors: Special Directions\n(No Rotation!)')
+    ax3.legend(fontsize=8)
+    ax3.axhline(y=0, color='k', linewidth=0.5)
+    ax3.axvline(x=0, color='k', linewidth=0.5)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Print the mathematical verification
+    print("🔍 Mathematical Verification:")
+    print(f"Matrix A:\n{A}")
+    print(f"\nEigenvalues: {eigenvalues}")
+    print(f"\nEigenvectors:\n{eigenvectors}")
+    print("\n" + "="*50)
+
+    for i, (eigenval, eigenvec) in enumerate(zip(eigenvalues, eigenvectors.T)):
+        print(f"\nEigenvector {i+1}: {eigenvec}")
+        print(f"Eigenvalue {i+1}: {eigenval:.3f}")
+
+        # Verify the eigenvalue equation: A*v = λ*v
+        Av = A @ eigenvec
+        lambda_v = eigenval * eigenvec
+
+        print(f"A × v = {Av}")
+        print(f"λ × v = {lambda_v}")
+        print(f"Equal? {np.allclose(Av, lambda_v)}")
+
+visualize_eigenvector_discovery()
+```
+
+### 🔍 The Eigenvalue Equation: A Deeper Look
+
+The equation $A\mathbf{v} = \lambda\mathbf{v}$ can be rewritten as:
+
+$$A\mathbf{v} - \lambda\mathbf{v} = \mathbf{0}$$
+$$(A - \lambda I)\mathbf{v} = \mathbf{0}$$
+
+**This means**: The matrix $(A - \lambda I)$ transforms eigenvector $\mathbf{v}$ to the zero vector.
+
+**Key insight**: This only happens when $(A - \lambda I)$ has **no inverse** — i.e., when its determinant is zero:
+
+$$\det(A - \lambda I) = 0$$
+
+This equation is called the **characteristic equation**, and solving it gives us the eigenvalues!
+
+### 🧮 Step-by-Step Example: Finding Eigenvectors by Hand
+
+Let's find the eigenvectors of $A = \begin{bmatrix} 3 & 1 \\ 0 & 2 \end{bmatrix}$:
+
+**Step 1**: Find eigenvalues by solving $\det(A - \lambda I) = 0$
+
+$$A - \lambda I = \begin{bmatrix} 3-\lambda & 1 \\ 0 & 2-\lambda \end{bmatrix}$$
+
+$$\det(A - \lambda I) = (3-\lambda)(2-\lambda) - 0 \cdot 1 = (3-\lambda)(2-\lambda) = 0$$
+
+**Solutions**: $\lambda_1 = 3$, $\lambda_2 = 2$
+
+**Step 2**: Find eigenvectors by solving $(A - \lambda I)\mathbf{v} = \mathbf{0}$ for each eigenvalue
+
+**For λ₁ = 3**:
+$$\begin{bmatrix} 0 & 1 \\ 0 & -1 \end{bmatrix}\begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
+This gives us: $v_2 = 0$ and $0 = 0$, so $\mathbf{v_1} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}$ (or any scalar multiple)
+
+**For λ₂ = 2**:
+$$\begin{bmatrix} 1 & 1 \\ 0 & 0 \end{bmatrix}\begin{bmatrix} v_1 \\ v_2 \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \end{bmatrix}$$
+
+This gives us: $v_1 + v_2 = 0$, so $\mathbf{v_2} = \begin{bmatrix} 1 \\ -1 \end{bmatrix}$ (or any scalar multiple)
+
+**Verification**:
+
+- $A\begin{bmatrix} 1 \\ 0 \end{bmatrix} = \begin{bmatrix} 3 \\ 0 \end{bmatrix} = 3\begin{bmatrix} 1 \\ 0 \end{bmatrix}$ ✓
+- $A\begin{bmatrix} 1 \\ -1 \end{bmatrix} = \begin{bmatrix} 2 \\ -2 \end{bmatrix} = 2\begin{bmatrix} 1 \\ -1 \end{bmatrix}$ ✓
+
+### 🎯 Geometric Interpretation
+
+**Eigenvalues and eigenvectors reveal the "principal axes" of a transformation**:
+
+- **Eigenvector 1**: $\begin{bmatrix} 1 \\ 0 \end{bmatrix}$ (horizontal direction)
+  - **Eigenvalue 1**: $\lambda = 3$ (stretches by factor 3)
+
+- **Eigenvector 2**: $\begin{bmatrix} 1 \\ -1 \end{bmatrix}$ (diagonal direction)
+  - **Eigenvalue 2**: $\lambda = 2$ (stretches by factor 2)
+
+**Visual meaning**: This matrix stretches things more in the horizontal direction than in the diagonal direction, but both directions remain unchanged in their orientation!
+
+**Understanding eigenvectors and eigenvalues is like having X-ray vision into the soul of any linear transformation** — you can see exactly how it behaves in its most natural coordinate system! 🔍✨
+
+---
+
+## Real-World Applications: Why Eigenvectors Matter
+
+### 🔍 Google's PageRank: The Web as a Giant Matrix
+
+**The problem**: With billions of web pages, how does Google decide which ones are most important?
+
+**The insight**: Model the web as a **huge matrix** where entry $A_{ij}$ represents a link from page $j$ to page $i$.
+
+**The solution**: The **eigenvector** of this matrix with eigenvalue 1 gives the **importance ranking** of all web pages!
+
+```python
+def simplified_pagerank_demo():
+    # Simplified web with 4 pages
+    # Page connections:
+    # Page 0 → Pages 1,2,3
+    # Page 1 → Page 2
+    # Page 2 → Page 0
+    # Page 3 → Pages 0,2
+
+    # Create link matrix (who links to whom)
+    links = np.array([
+        [0,   0,   1,   1],  # Page 0 receives links from pages 2,3
+        [1/3, 0,   0,   0],  # Page 1 receives link from page 0
+        [1/3, 1,   0,   1],  # Page 2 receives links from pages 0,1,3
+        [1/3, 0,   0,   0]   # Page 3 receives link from page 0
+    ])
+
+    # Add damping factor (probability of random jump)
+    damping = 0.85
+    n = links.shape[0]
+    pagerank_matrix = damping * links + (1 - damping) / n * np.ones((n, n))
+
+    # Find the dominant eigenvector (PageRank vector)
+    eigenvalues, eigenvectors = np.linalg.eig(pagerank_matrix)
+
+    # Find eigenvector corresponding to eigenvalue ≈ 1
+    dominant_idx = np.argmax(eigenvalues.real)
+    pagerank_vector = np.abs(eigenvectors[:, dominant_idx].real)
+    pagerank_vector = pagerank_vector / np.sum(pagerank_vector)  # Normalize
+
+    # Visualize the results
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Show the network
+    ax1.imshow(links, cmap='Blues')
+    for i in range(n):
+        for j in range(n):
+            if links[i, j] > 0:
+                ax1.text(j, i, f'{links[i, j]:.2f}', ha='center', va='center',
+                        fontweight='bold', color='white' if links[i, j] > 0.3 else 'black')
+
+    ax1.set_xticks(range(n))
+    ax1.set_yticks(range(n))
+    ax1.set_xticklabels([f'Page {i}' for i in range(n)])
+    ax1.set_yticklabels([f'Page {i}' for i in range(n)])
+    ax1.set_title('Link Matrix\n(who links to whom)')
+    ax1.set_xlabel('From Page')
+    ax1.set_ylabel('To Page')
+
+    # Show PageRank scores
+    pages = [f'Page {i}' for i in range(n)]
+    bars = ax2.bar(pages, pagerank_vector, color=['red', 'blue', 'green', 'orange'])
+    ax2.set_ylabel('PageRank Score')
+    ax2.set_title('Page Importance Rankings\n(Eigenvector of Link Matrix)')
+
+    # Add scores as text
+    for bar, score in zip(bars, pagerank_vector):
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{score:.3f}', ha='center', va='bottom', fontweight='bold')
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🔍 PageRank Analysis:")
+    print("=" * 40)
+    for i, score in enumerate(pagerank_vector):
+        print(f"Page {i}: PageRank = {score:.3f}")
+
+    print(f"\nMost important page: Page {np.argmax(pagerank_vector)}")
+    print(f"Dominant eigenvalue: {eigenvalues[dominant_idx]:.6f} (should be ≈ 1)")
+
+simplified_pagerank_demo()
+```
+
+### 🎭 Face Recognition: Eigenfaces
+
+**The problem**: How can a computer recognize faces with different lighting, angles, and expressions?
+
+**The insight**: Represent each face as a **vector** of pixel values, then find the **eigenvectors** of the face covariance matrix.
+
+**The solution**: These eigenvectors (called **eigenfaces**) capture the most important facial variations!
+
+```python
+def eigenfaces_simplified_demo():
+    # Create simplified "face" data (8x8 pixel faces)
+    np.random.seed(42)
+
+    # Generate synthetic face data with variations
+    n_faces = 100
+    face_size = 64  # 8x8 = 64 pixels
+
+    # Base face pattern
+    base_face = np.random.rand(face_size) * 0.5 + 0.3
+
+    # Create variations (different people, lighting, etc.)
+    faces = []
+    for i in range(n_faces):
+        # Add random variations to base face
+        variation = base_face + np.random.normal(0, 0.1, face_size)
+        faces.append(variation)
+
+    faces = np.array(faces)
+
+    # Compute eigenfaces (eigenvectors of covariance matrix)
+    # Center the data first
+    mean_face = np.mean(faces, axis=0)
+    centered_faces = faces - mean_face
+
+    # Covariance matrix
+    cov_matrix = np.cov(centered_faces.T)
+
+    # Find eigenvectors (eigenfaces)
+    eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+
+    # Sort by eigenvalue (most important first)
+    idx = np.argsort(eigenvalues)[::-1]
+    eigenvalues = eigenvalues[idx]
+    eigenfaces = eigenvectors[:, idx]
+
+    # Visualize results
+    fig, axes = plt.subplots(2, 4, figsize=(12, 6))
+
+    # Show first few faces
+    for i in range(4):
+        ax = axes[0, i]
+        face_image = faces[i].reshape(8, 8)
+        ax.imshow(face_image, cmap='gray')
+        ax.set_title(f'Face {i+1}')
+        ax.axis('off')
+
+    # Show first few eigenfaces
+    for i in range(4):
+        ax = axes[1, i]
+        eigenface_image = eigenfaces[:, i].reshape(8, 8)
+        ax.imshow(eigenface_image, cmap='RdBu')
+        ax.set_title(f'Eigenface {i+1}\n(λ={eigenvalues[i]:.2f})')
+        ax.axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Show variance explanation
+    variance_explained = eigenvalues / np.sum(eigenvalues) * 100
+
+    plt.figure(figsize=(10, 6))
+    plt.subplot(1, 2, 1)
+    plt.bar(range(1, 11), variance_explained[:10])
+    plt.xlabel('Eigenface Number')
+    plt.ylabel('Variance Explained (%)')
+    plt.title('Importance of Each Eigenface')
+
+    plt.subplot(1, 2, 2)
+    plt.plot(range(1, 11), np.cumsum(variance_explained[:10]), 'bo-')
+    plt.xlabel('Number of Eigenfaces')
+    plt.ylabel('Cumulative Variance Explained (%)')
+    plt.title('Cumulative Variance Explained')
+    plt.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎭 Eigenface Analysis:")
+    print("=" * 40)
+    print(f"Top 5 eigenfaces explain {np.sum(variance_explained[:5]):.1f}% of variation")
+    print(f"Top 10 eigenfaces explain {np.sum(variance_explained[:10]):.1f}% of variation")
+
+eigenfaces_simplified_demo()
+```
+
+### 🏗️ Structural Engineering: Vibration Analysis
+
+**The problem**: Will this bridge oscillate dangerously in the wind?
+
+**The insight**: The structure's vibration behavior is determined by the **eigenvectors** (vibration modes) and **eigenvalues** (natural frequencies) of the stiffness matrix.
+
+```python
+def vibration_analysis_demo():
+    # Simplified bridge model: mass-spring system
+    # 3 masses connected by springs
+
+    # Mass matrix (diagonal - each mass independent)
+    M = np.array([[2, 0, 0],    # Mass 1: 2 kg
+                  [0, 1, 0],    # Mass 2: 1 kg
+                  [0, 0, 3]])   # Mass 3: 3 kg
+
+    # Stiffness matrix (how springs connect masses)
+    K = np.array([[3, -1,  0],   # Spring connections
+                  [-1, 2, -1],   # between masses
+                  [0, -1,  1]])
+
+    # Solve generalized eigenvalue problem: K*v = λ*M*v
+    # This gives us natural frequencies and mode shapes
+    eigenvalues, eigenvectors = np.linalg.eig(np.linalg.inv(M) @ K)
+
+    # Natural frequencies (square root of eigenvalues)
+    frequencies = np.sqrt(eigenvalues.real)
+    mode_shapes = eigenvectors.real
+
+    # Sort by frequency
+    idx = np.argsort(frequencies)
+    frequencies = frequencies[idx]
+    mode_shapes = mode_shapes[:, idx]
+
+    # Visualize the vibration modes
+    fig, axes = plt.subplots(1, 3, figsize=(15, 5))
+
+    x_positions = [0, 1, 2]  # Position of masses along bridge
+
+    for mode in range(3):
+        ax = axes[mode]
+
+        # Static position
+        ax.plot(x_positions, [0, 0, 0], 'ko-', linewidth=2, markersize=8,
+                label='Rest position', alpha=0.5)
+
+        # Vibration mode shape
+        displacements = mode_shapes[:, mode]
+        ax.plot(x_positions, displacements, 'ro-', linewidth=3, markersize=10,
+                label=f'Mode {mode+1}')
+
+        # Draw springs
+        for i in range(len(x_positions)-1):
+            ax.plot([x_positions[i], x_positions[i+1]],
+                   [displacements[i], displacements[i+1]],
+                   'r--', alpha=0.7, linewidth=2)
+
+        ax.set_xlim(-0.5, 2.5)
+        ax.set_ylim(-1.5, 1.5)
+        ax.grid(True, alpha=0.3)
+        ax.set_xlabel('Position along bridge')
+        ax.set_ylabel('Displacement')
+        ax.set_title(f'Vibration Mode {mode+1}\nFrequency: {frequencies[mode]:.2f} Hz')
+        ax.legend()
+        ax.axhline(y=0, color='k', linewidth=0.5, alpha=0.5)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🏗️ Structural Analysis:")
+    print("=" * 40)
+    for i, freq in enumerate(frequencies):
+        print(f"Mode {i+1}: Natural frequency = {freq:.3f} Hz")
+        print(f"         Mode shape = {mode_shapes[:, i]}")
+
+    print(f"\nLowest frequency: {frequencies[0]:.3f} Hz")
+    print("💡 If wind frequency matches natural frequency → DANGEROUS RESONANCE!")
+
+vibration_analysis_demo()
+```
+
+**These examples show the incredible power of eigenvectors and eigenvalues** — they reveal the fundamental patterns and behaviors hidden within complex systems, from web page importance to facial recognition to structural safety! 🚀
+
+---
+
+## Visualization of Eigenvectors
+
+```python
+import matplotlib.pyplot as plt
+
+origin = np.zeros(2)
+plt.figure(figsize=(6,6))
+
+# Plot transformation of unit vectors
+x = np.array([1, 0])
+y = np.array([0, 1])
+
+Ax = A @ x
+Ay = A @ y
+
+plt.quiver(*origin, *x, color='blue', scale=5, label='x-axis (original)')
+plt.quiver(*origin, *y, color='green', scale=5, label='y-axis (original)')
+plt.quiver(*origin, *Ax, color='blue', alpha=0.5, scale=5, linestyle='dashed', label='x-axis (transformed)')
+plt.quiver(*origin, *Ay, color='green', alpha=0.5, scale=5, linestyle='dashed', label='y-axis (transformed)')
+
+# Plot eigenvectors
+for eig_vec in eigenvectors.T:
+    plt.quiver(*origin, *eig_vec, scale=3, color='red', linewidth=2, label='Eigenvector')
+
+plt.xlim(-1,4)
+plt.ylim(-1,4)
+plt.legend()
+plt.grid(True)
+plt.title("Eigenvectors as Special Directions")
+plt.show()
+```
+
+---
+
+## Applications in Physics
+
+### Vibrational Modes:
+
+Eigenvectors in physics represent **normal modes** in vibration problems, and eigenvalues correspond to their natural frequencies.
+
+### Chapter 6: Quantum Mechanics
+
+Quantum states are represented by eigenvectors, and observable quantities (energy levels, momentum) are eigenvalues of operators.
+
+---
+
+## Eigendecomposition: Taking Matrices Apart
+
+### 🔧 The Matrix Disassembly Process
+
+**The fundamental insight**: Every matrix can be "factored" into simpler pieces!
+
+**Eigendecomposition formula**:
+$$A = PDP^{-1}$$
+
+Where:
+
+- $P$ = **Matrix of eigenvectors** (new coordinate system)
+- $D$ = **Diagonal matrix of eigenvalues** (pure scaling)
+- $P^{-1}$ = **Inverse of eigenvector matrix** (back to original coordinates)
+
+**What this means**:
+
+1. $P^{-1}$: Change to eigenvector coordinate system
+2. $D$: Apply pure scaling along each eigenvector direction
+3. $P$: Change back to original coordinate system
+
+### 🎯 Why This Decomposition Is Magical
+
+**Matrix powers become trivial**:
+$$A^n = (PDP^{-1})^n = PD^nP^{-1}$$
+
+Since $D$ is diagonal, $D^n$ is just each eigenvalue raised to the $n$th power!
+
+**Applications**:
+
+- **Population dynamics**: How will populations evolve over time?
+- **PageRank**: Iterative computation becomes easy
+- **Quantum mechanics**: Time evolution operators
+- **Data analysis**: Principal component analysis
+
+### 🧮 Complete Eigendecomposition Example
+
+```python
+def comprehensive_eigendecomposition_demo():
+    # Example matrix (represents some transformation)
+    A = np.array([[5, 4],
+                  [1, 2]])
+
+    print("🔍 Complete Eigendecomposition Analysis")
+    print("=" * 50)
+    print(f"Original matrix A:\n{A}")
+
+    # Step 1: Find eigenvalues and eigenvectors
+    eigenvalues, eigenvectors = np.linalg.eig(A)
+
+    print(f"\nEigenvalues: {eigenvalues}")
+    print(f"Eigenvectors:\n{eigenvectors}")
+
+    # Step 2: Construct the decomposition
+    P = eigenvectors                    # Matrix of eigenvectors
+    D = np.diag(eigenvalues)           # Diagonal matrix of eigenvalues
+    P_inv = np.linalg.inv(P)           # Inverse of eigenvector matrix
+
+    print(f"\nP (eigenvector matrix):\n{P}")
+    print(f"\nD (eigenvalue matrix):\n{D}")
+    print(f"\nP⁻¹ (inverse):\n{P_inv}")
+
+    # Step 3: Verify the decomposition
+    A_reconstructed = P @ D @ P_inv
+    print(f"\nReconstructed A = PDP⁻¹:\n{A_reconstructed}")
+    print(f"Reconstruction error: {np.linalg.norm(A - A_reconstructed):.2e}")
+
+    # Step 4: Demonstrate the power of decomposition
+    # Compute A^10 the hard way vs easy way
+    A_power_10_hard = np.linalg.matrix_power(A, 10)
+    A_power_10_easy = P @ np.diag(eigenvalues**10) @ P_inv
+
+    print(f"\nA¹⁰ (computed directly):\n{A_power_10_hard}")
+    print(f"\nA¹⁰ (using eigendecomposition):\n{A_power_10_easy}")
+    print(f"Difference: {np.linalg.norm(A_power_10_hard - A_power_10_easy):.2e}")
+
+    # Step 5: Visualize the geometric meaning
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+
+    # Original transformation
+    angles = np.linspace(0, 2*np.pi, 100)
+    unit_circle = np.array([np.cos(angles), np.sin(angles)])
+    transformed_circle = A @ unit_circle
+
+    ax1 = axes[0, 0]
+    ax1.plot(unit_circle[0], unit_circle[1], 'b-', label='Unit circle', linewidth=2)
+    ax1.plot(transformed_circle[0], transformed_circle[1], 'r-', label='A × circle', linewidth=2)
+    ax1.set_aspect('equal')
+    ax1.grid(True, alpha=0.3)
+    ax1.legend()
+    ax1.set_title('Original Transformation A')
+
+    # Step 1: P^(-1) transformation (change coordinates)
+    step1_circle = P_inv @ unit_circle
+
+    ax2 = axes[0, 1]
+    ax2.plot(unit_circle[0], unit_circle[1], 'b-', label='Original', linewidth=2, alpha=0.5)
+    ax2.plot(step1_circle[0], step1_circle[1], 'g-', label='P⁻¹ × circle', linewidth=2)
+    # Show eigenvector directions
+    for i, eigenval in enumerate(eigenvalues):
+        direction = P_inv @ P[:, i]
+        ax2.arrow(0, 0, direction[0]*3, direction[1]*3, head_width=0.1,
+                 color=f'C{i}', alpha=0.7, label=f'Eigen-direction {i+1}')
+    ax2.set_aspect('equal')
+    ax2.grid(True, alpha=0.3)
+    ax2.legend()
+    ax2.set_title('Step 1: P⁻¹ (Change to eigenbasis)')
+
+    # Step 2: D transformation (pure scaling)
+    step2_circle = D @ step1_circle
+
+    ax3 = axes[0, 2]
+    ax3.plot(step1_circle[0], step1_circle[1], 'g-', label='Before scaling', linewidth=2, alpha=0.5)
+    ax3.plot(step2_circle[0], step2_circle[1], 'm-', label='D × (P⁻¹ × circle)', linewidth=2)
+    ax3.set_aspect('equal')
+    ax3.grid(True, alpha=0.3)
+    ax3.legend()
+    ax3.set_title('Step 2: D (Pure scaling)')
+
+    # Step 3: P transformation (back to original coordinates)
+    step3_circle = P @ step2_circle
+
+    ax4 = axes[1, 0]
+    ax4.plot(step2_circle[0], step2_circle[1], 'm-', label='Before rotation back', linewidth=2, alpha=0.5)
+    ax4.plot(step3_circle[0], step3_circle[1], 'r-', label='Final result', linewidth=2)
+    ax4.set_aspect('equal')
+    ax4.grid(True, alpha=0.3)
+    ax4.legend()
+    ax4.set_title('Step 3: P (Back to original coordinates)')
+
+    # Verification
+    ax5 = axes[1, 1]
+    ax5.plot(transformed_circle[0], transformed_circle[1], 'r--', label='Direct: A × circle', linewidth=3, alpha=0.7)
+    ax5.plot(step3_circle[0], step3_circle[1], 'b:', label='Decomposed: PDP⁻¹ × circle', linewidth=3, alpha=0.7)
+    ax5.set_aspect('equal')
+    ax5.grid(True, alpha=0.3)
+    ax5.legend()
+    ax5.set_title('Verification: Both methods identical')
+
+    # Show eigenvalue powers
+    powers = range(1, 6)
+    eigenval_powers = [[eigenval**p for p in powers] for eigenval in eigenvalues]
+
+    ax6 = axes[1, 2]
+    for i, eigenval in enumerate(eigenvalues):
+        ax6.plot(powers, eigenval_powers[i], 'o-', label=f'λ{i+1} = {eigenval:.2f}', linewidth=2)
+    ax6.set_xlabel('Power n')
+    ax6.set_ylabel('λⁿ')
+    ax6.set_title('Eigenvalue Powers\n(Computing Aⁿ becomes easy!)')
+    ax6.legend()
+    ax6.grid(True, alpha=0.3)
+    ax6.set_yscale('log')
+
+    plt.tight_layout()
+    plt.show()
+
+comprehensive_eigendecomposition_demo()
+```
+
+### 🚀 Applications of Eigendecomposition
+
+**1. Fibonacci Sequence (Matrix Powers)**:
+
+```python
+# The Fibonacci recurrence can be written as a matrix equation
+# [F(n+1)]   [1 1] [F(n)  ]
+# [F(n)  ] = [1 0] [F(n-1)]
+
+fib_matrix = np.array([[1, 1], [1, 0]])
+eigenvals, eigenvecs = np.linalg.eig(fib_matrix)
+
+# The nth Fibonacci number can be computed directly!
+def fibonacci_fast(n):
+    if n <= 1:
+        return n
+    P = eigenvecs
+    D_n = np.diag(eigenvals**n)
+    P_inv = np.linalg.inv(P)
+
+    # F(n) is the first component of the result
+    result = P @ D_n @ P_inv @ np.array([1, 0])
+    return int(round(result[0].real))
+
+print("🔢 Fast Fibonacci Computation:")
+for n in range(10):
+    print(f"F({n}) = {fibonacci_fast(n)}")
+```
+
+**2. Population Dynamics**:
+
+```python
+# Population growth model: adults and juveniles
+# [adults(t+1)  ]   [0.8  2.0] [adults(t)  ]
+# [juveniles(t+1)] = [0.3  0.5] [juveniles(t)]
+
+population_matrix = np.array([[0.8, 2.0], [0.3, 0.5]])
+eigenvals, eigenvecs = np.linalg.eig(population_matrix)
+
+print("🐾 Population Analysis:")
+print(f"Growth rates (eigenvalues): {eigenvals}")
+print(f"Stable age distribution: {eigenvecs[:, 0].real}")
+print(f"Long-term growth rate: {max(eigenvals.real):.3f}")
+```
+
+**Eigendecomposition reveals the hidden structure that makes complex computations simple!** ✨
+
+---
+
+## Singular Value Decomposition (SVD): The Ultimate Matrix Tool
+
+### 🌟 SVD: More Powerful Than Eigendecomposition
+
+**The limitation of eigendecomposition**: Only works for square matrices.
+
+**The power of SVD**: Works for **ANY** matrix — tall, wide, square, doesn't matter!
+
+**SVD formula**:
+$$A = U\Sigma V^T$$
+
+Where:
+
+- $U$ = **Left singular vectors** (orthogonal matrix)
+- $\Sigma$ = **Singular values** (diagonal matrix, non-negative)
+- $V^T$ = **Right singular vectors** (orthogonal matrix)
+
+### 🎯 The Geometric Interpretation
+
+**SVD reveals that ANY linear transformation is actually**:
+
+1. **Rotation** (by $V^T$)
+2. **Scaling** (by $\Sigma$)
+3. **Another rotation** (by $U$)
+
+**Key insight**: SVD finds the **optimal coordinate systems** for both the input space (columns of $V$) and output space (columns of $U$).
+
+### 🔍 Building Intuition: What SVD Actually Does
+
+```python
+def svd_geometric_intuition():
+    # Create a simple rectangular matrix
+    A = np.array([[3, 1, 1],
+                  [-1, 3, 1],
+                  [1, 1, 2]])
+
+    # Perform SVD
+    U, sigma, VT = np.linalg.svd(A)
+
+    print("🔍 SVD Decomposition Analysis")
+    print("=" * 50)
+    print(f"Original matrix A shape: {A.shape}")
+    print(f"U shape: {U.shape} (left singular vectors)")
+    print(f"Σ shape: {sigma.shape} (singular values)")
+    print(f"V^T shape: {VT.shape} (right singular vectors)")
+
+    # Reconstruct the matrix
+    Sigma_full = np.zeros_like(A, dtype=float)
+    Sigma_full[:len(sigma), :len(sigma)] = np.diag(sigma)
+    A_reconstructed = U @ Sigma_full @ VT
+
+    print(f"\nSingular values: {sigma}")
+    print(f"Reconstruction error: {np.linalg.norm(A - A_reconstructed):.2e}")
+
+    # Visualize the decomposition geometrically
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+
+    # Create unit vectors to see transformation
+    n_vectors = 20
+    angles = np.linspace(0, 2*np.pi, n_vectors)
+    unit_vectors = np.array([np.cos(angles), np.sin(angles), np.zeros(n_vectors)])
+
+    # Apply each step of SVD
+    step1 = VT @ unit_vectors               # V^T: rotate input
+    step2 = np.diag(sigma[:2]) @ step1[:2]  # Σ: scale (only first 2 dims)
+    step3 = U[:, :2] @ step2                # U: rotate output
+
+    # Plot original unit circle
+    ax1 = axes[0, 0]
+    ax1.plot(unit_vectors[0], unit_vectors[1], 'bo-', alpha=0.7, label='Unit circle')
+    ax1.set_aspect('equal')
+    ax1.grid(True, alpha=0.3)
+    ax1.set_title('1. Original Unit Circle\n(Input space)')
+    ax1.legend()
+
+    # Plot after V^T
+    ax2 = axes[0, 1]
+    ax2.plot(unit_vectors[0], unit_vectors[1], 'bo-', alpha=0.3, label='Original')
+    ax2.plot(step1[0], step1[1], 'go-', alpha=0.7, label='After V^T')
+    ax2.set_aspect('equal')
+    ax2.grid(True, alpha=0.3)
+    ax2.set_title('2. After V^T\n(Rotate to optimal input basis)')
+    ax2.legend()
+
+    # Plot after Σ
+    ax3 = axes[0, 2]
+    ax3.plot(step1[0], step1[1], 'go-', alpha=0.3, label='Before scaling')
+    ax3.plot(step2[0], step2[1], 'mo-', alpha=0.7, label='After Σ')
+    ax3.set_aspect('equal')
+    ax3.grid(True, alpha=0.3)
+    ax3.set_title('3. After Σ\n(Scale along principal directions)')
+    ax3.legend()
+
+    # Plot after U
+    ax4 = axes[1, 0]
+    ax4.plot(step2[0], step2[1], 'mo-', alpha=0.3, label='Before final rotation')
+    ax4.plot(step3[0], step3[1], 'ro-', alpha=0.7, label='After U')
+    ax4.set_aspect('equal')
+    ax4.grid(True, alpha=0.3)
+    ax4.set_title('4. After U\n(Rotate to output space)')
+    ax4.legend()
+
+    # Compare with direct transformation
+    ax5 = axes[1, 1]
+    direct_transform = A @ unit_vectors
+    ax5.plot(direct_transform[0], direct_transform[1], 'r--', alpha=0.7, linewidth=3,
+             label='Direct: A × vectors')
+    ax5.plot(step3[0], step3[1], 'b:', alpha=0.7, linewidth=3,
+             label='SVD: UΣV^T × vectors')
+    ax5.set_aspect('equal')
+    ax5.grid(True, alpha=0.3)
+    ax5.set_title('5. Verification\n(Both methods identical)')
+    ax5.legend()
+
+    # Show singular value importance
+    ax6 = axes[1, 2]
+    ax6.bar(range(1, len(sigma)+1), sigma, alpha=0.7)
+    ax6.set_xlabel('Singular Value Index')
+    ax6.set_ylabel('Magnitude')
+    ax6.set_title('6. Singular Values\n(Importance of each direction)')
+    ax6.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Show the connection to eigendecomposition
+    print("\n🔗 Connection to Eigendecomposition:")
+    print("=" * 40)
+
+    # A^T A has the same eigenvectors as V
+    ATA = A.T @ A
+    eigenvals_ATA, eigenvecs_ATA = np.linalg.eig(ATA)
+    print("Eigenvalues of A^T A:", np.sort(eigenvals_ATA)[::-1])
+    print("Singular values squared:", sigma**2)
+    print("Connection: σ² = eigenvalues of A^T A")
+
+svd_geometric_intuition()
+```
+
+### 🖼️ SVD for Image Compression: A Practical Masterpiece
+
+**The idea**: Images have lots of redundancy. SVD can capture the most important patterns with just a few singular values!
+
+```python
+def svd_image_compression_demo():
+    # Create a synthetic image (or load a real one)
+    # Let's create a simple geometric image
+    x = np.linspace(-5, 5, 100)
+    y = np.linspace(-5, 5, 100)
+    X, Y = np.meshgrid(x, y)
+
+    # Create an interesting pattern
+    image = np.sin(X) * np.cos(Y) + 0.5 * np.sin(2*X + Y)
+    image = (image - image.min()) / (image.max() - image.min())  # Normalize
+
+    # Apply SVD
+    U, sigma, VT = np.linalg.svd(image)
+
+    # Try different levels of compression
+    compression_levels = [1, 5, 10, 20, 50]
+
+    fig, axes = plt.subplots(2, 3, figsize=(15, 10))
+    axes = axes.flatten()
+
+    # Original image
+    axes[0].imshow(image, cmap='gray')
+    axes[0].set_title('Original Image\n(100×100 = 10,000 values)')
+    axes[0].axis('off')
+
+    # Compressed versions
+    for i, k in enumerate(compression_levels):
+        if i >= 5:
+            break
+
+        # Reconstruct using only first k singular values
+        compressed = U[:, :k] @ np.diag(sigma[:k]) @ VT[:k, :]
+
+        # Calculate compression ratio
+        original_size = image.size
+        compressed_size = U[:, :k].size + k + VT[:k, :].size
+        compression_ratio = original_size / compressed_size
+
+        # Calculate quality (as correlation with original)
+        quality = np.corrcoef(image.flatten(), compressed.flatten())[0, 1]
+
+        axes[i+1].imshow(compressed, cmap='gray')
+        axes[i+1].set_title(f'k={k} components\nCompression: {compression_ratio:.1f}:1\nQuality: {quality:.3f}')
+        axes[i+1].axis('off')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Show singular value decay
+    plt.figure(figsize=(12, 5))
+
+    plt.subplot(1, 2, 1)
+    plt.plot(sigma, 'bo-', alpha=0.7)
+    plt.xlabel('Singular Value Index')
+    plt.ylabel('Magnitude')
+    plt.title('Singular Value Decay')
+    plt.yscale('log')
+    plt.grid(True, alpha=0.3)
+
+    plt.subplot(1, 2, 2)
+    cumulative_energy = np.cumsum(sigma**2) / np.sum(sigma**2)
+    plt.plot(cumulative_energy, 'ro-', alpha=0.7)
+    plt.axhline(y=0.95, color='g', linestyle='--', alpha=0.7, label='95% energy')
+    plt.xlabel('Number of Components')
+    plt.ylabel('Cumulative Energy Captured')
+    plt.title('Energy Capture vs. Components')
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("📊 Compression Analysis:")
+    print("=" * 40)
+    for k in compression_levels:
+        if k <= len(sigma):
+            compressed = U[:, :k] @ np.diag(sigma[:k]) @ VT[:k, :]
+            original_size = image.size
+            compressed_size = U[:, :k].size + k + VT[:k, :].size
+            compression_ratio = original_size / compressed_size
+            energy_captured = np.sum(sigma[:k]**2) / np.sum(sigma**2)
+
+            print(f"k={k:2d}: Compression {compression_ratio:4.1f}:1, Energy {energy_captured:.1%}")
+
+svd_image_compression_demo()
+```
+
+### 🎵 SVD for Recommender Systems: Netflix-Style Predictions
+
+**The problem**: Users rate only a few movies, but we want to predict ratings for all movies.
+
+**The insight**: User preferences and movie characteristics live in a **low-dimensional space**. SVD finds this hidden structure!
+
+```python
+def svd_recommender_demo():
+    # Create synthetic user-movie rating matrix
+    np.random.seed(42)
+
+    # 6 users, 8 movies
+    users = ['Alice', 'Bob', 'Carol', 'Dave', 'Eve', 'Frank']
+    movies = ['Action1', 'Action2', 'Comedy1', 'Comedy2', 'Drama1', 'Drama2', 'Horror1', 'Horror2']
+
+    # Simulate user preferences (some users like action, others comedy, etc.)
+    # True underlying preferences (hidden factors)
+    user_factors_true = np.array([
+        [1, 0],    # Alice: likes action
+        [0, 1],    # Bob: likes comedy
+        [1, 0],    # Carol: likes action
+        [0, 1],    # Dave: likes comedy
+        [0.7, 0.3], # Eve: mostly action
+        [0.3, 0.7]  # Frank: mostly comedy
+    ])
+
+    movie_factors_true = np.array([
+        [1, 0],    # Action1: pure action
+        [0.8, 0.2], # Action2: mostly action
+        [0, 1],    # Comedy1: pure comedy
+        [0.2, 0.8], # Comedy2: mostly comedy
+        [0.5, 0.5], # Drama1: mixed
+        [0.4, 0.6], # Drama2: mixed
+        [0.9, 0.1], # Horror1: action-like
+        [0.1, 0.9]  # Horror2: comedy-like
+    ])
+
+    # Generate ratings based on user-movie compatibility
+    ratings_complete = user_factors_true @ movie_factors_true.T * 4 + 1  # Scale to 1-5
+    ratings_complete += np.random.normal(0, 0.2, ratings_complete.shape)  # Add noise
+    ratings_complete = np.clip(ratings_complete, 1, 5)
+
+    # Create sparse rating matrix (users only rate some movies)
+    ratings_observed = ratings_complete.copy()
+    mask = np.random.random(ratings_observed.shape) > 0.6  # 60% missing
+    ratings_observed[mask] = 0  # 0 means "not rated"
+
+    # Apply SVD to the observed ratings
+    U, sigma, VT = np.linalg.svd(ratings_observed)
+
+    # Reconstruct using only top k factors
+    k = 2  # Number of latent factors
+    ratings_predicted = U[:, :k] @ np.diag(sigma[:k]) @ VT[:k, :]
+
+    # Visualize results
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+
+    # True complete ratings
+    im1 = axes[0, 0].imshow(ratings_complete, cmap='RdYlBu_r', vmin=1, vmax=5)
+    axes[0, 0].set_title('True Complete Ratings')
+    axes[0, 0].set_xticks(range(len(movies)))
+    axes[0, 0].set_yticks(range(len(users)))
+    axes[0, 0].set_xticklabels(movies, rotation=45)
+    axes[0, 0].set_yticklabels(users)
+    plt.colorbar(im1, ax=axes[0, 0])
+
+    # Observed (sparse) ratings
+    im2 = axes[0, 1].imshow(ratings_observed, cmap='RdYlBu_r', vmin=1, vmax=5)
+    axes[0, 1].set_title('Observed Ratings\n(40% of entries)')
+    axes[0, 1].set_xticks(range(len(movies)))
+    axes[0, 1].set_yticks(range(len(users)))
+    axes[0, 1].set_xticklabels(movies, rotation=45)
+    axes[0, 1].set_yticklabels(users)
+    plt.colorbar(im2, ax=axes[0, 1])
+
+    # SVD predictions
+    im3 = axes[0, 2].imshow(ratings_predicted, cmap='RdYlBu_r', vmin=1, vmax=5)
+    axes[0, 2].set_title('SVD Predictions\n(All entries filled)')
+    axes[0, 2].set_xticks(range(len(movies)))
+    axes[0, 2].set_yticks(range(len(users)))
+    axes[0, 2].set_xticklabels(movies, rotation=45)
+    axes[0, 2].set_yticklabels(users)
+    plt.colorbar(im3, ax=axes[0, 2])
+
+    # User factors discovered by SVD
+    axes[1, 0].scatter(U[:, 0], U[:, 1], s=100, c=range(len(users)), cmap='tab10')
+    for i, user in enumerate(users):
+        axes[1, 0].annotate(user, (U[i, 0], U[i, 1]), xytext=(5, 5), textcoords='offset points')
+    axes[1, 0].set_xlabel('Factor 1 (Action preference)')
+    axes[1, 0].set_ylabel('Factor 2 (Comedy preference)')
+    axes[1, 0].set_title('User Factors\n(Discovered Preferences)')
+    axes[1, 0].grid(True, alpha=0.3)
+
+    # Movie factors discovered by SVD
+    axes[1, 1].scatter(VT[0, :], VT[1, :], s=100, c=range(len(movies)), cmap='tab10')
+    for i, movie in enumerate(movies):
+        axes[1, 1].annotate(movie, (VT[0, i], VT[1, i]), xytext=(5, 5), textcoords='offset points')
+    axes[1, 1].set_xlabel('Factor 1 (Action-ness)')
+    axes[1, 1].set_ylabel('Factor 2 (Comedy-ness)')
+    axes[1, 1].set_title('Movie Factors\n(Discovered Attributes)')
+    axes[1, 1].grid(True, alpha=0.3)
+
+    # Prediction accuracy
+    observed_mask = ratings_observed > 0
+    missing_mask = ~observed_mask
+
+    # Accuracy on observed ratings
+    obs_error = np.mean((ratings_predicted[observed_mask] - ratings_observed[observed_mask])**2)
+
+    # How well do we predict missing ratings?
+    true_missing = ratings_complete[missing_mask]
+    pred_missing = ratings_predicted[missing_mask]
+    missing_error = np.mean((pred_missing - true_missing)**2)
+
+    axes[1, 2].scatter(true_missing, pred_missing, alpha=0.6)
+    axes[1, 2].plot([1, 5], [1, 5], 'r--', label='Perfect prediction')
+    axes[1, 2].set_xlabel('True Ratings')
+    axes[1, 2].set_ylabel('Predicted Ratings')
+    axes[1, 2].set_title(f'Prediction Accuracy\nMSE = {missing_error:.3f}')
+    axes[1, 2].legend()
+    axes[1, 2].grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎬 Recommendation System Analysis:")
+    print("=" * 50)
+    print(f"Observed ratings error: {obs_error:.3f}")
+    print(f"Missing ratings error: {missing_error:.3f}")
+    print(f"Improvement over random: {1 - missing_error/np.var(true_missing):.1%}")
+
+    print("\n📊 Sample Recommendations for Alice:")
+    alice_idx = 0
+    alice_ratings = ratings_predicted[alice_idx]
+    alice_observed = ratings_observed[alice_idx]
+
+    for i, (movie, pred, obs) in enumerate(zip(movies, alice_ratings, alice_observed)):
+        if obs == 0:  # Unrated movie
+            print(f"  {movie}: Predicted rating = {pred:.2f}")
+
+svd_recommender_demo()
+```
+
+### 🌟 Why SVD Is the Ultimate Tool
+
+**1. Universality**: Works on any matrix (unlike eigendecomposition)
+**2. Optimality**: Gives the best low-rank approximation (provably optimal)
+**3. Interpretability**: Reveals hidden patterns and structures
+**4. Computational efficiency**: Handles huge, sparse matrices
+**5. Noise robustness**: Separates signal from noise
+
+**SVD is the Swiss Army knife of linear algebra** — it solves an incredible range of problems from image compression to recommendation systems to data analysis! 🔧✨
+
+---
+
+## Mini-project: PCA via Eigen-decomposition & SVD
+
+Apply PCA using Eigen-decomposition and SVD on a dataset and compare results.
+
+```python
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+
+data = load_iris().data
+data = StandardScaler().fit_transform(data)
+
+# PCA via SVD
+U, S, VT = np.linalg.svd(data)
+principal_components_svd = VT[:2].T
+
+# PCA via Eigen-decomposition (covariance matrix)
+cov_mat = np.cov(data, rowvar=False)
+eigvals, eigvecs = np.linalg.eig(cov_mat)
+principal_components_eig = eigvecs[:, :2]
+
+print("Principal components (SVD):\n", principal_components_svd)
+print("\nPrincipal components (Eigen-decomposition):\n", principal_components_eig)
+```
+
+---
+
+# Chapter 6 Summary
+
+### 🎯 The Mathematical X-Ray Vision You've Gained
+
+You've just unlocked the **deepest secrets hidden inside every matrix**! Advanced linear algebra isn't just about mathematical formulas — it's about **seeing the invisible structure** that governs everything from Google's search algorithm to Netflix's recommendations to the fundamental nature of quantum reality.
+
+### 🔑 Key Concepts Mastered
+
+**1. Eigenvectors & Eigenvalues - The Matrix "Soul"**
+
+- **Beyond basic definition**: Special directions that matrices can only stretch, never rotate
+- **Geometric insight**: Reveal the "natural coordinate system" of any transformation
+- **Computational power**: Solve complex problems like PageRank, facial recognition, and structural analysis
+- **Physical meaning**: Vibration modes, energy levels, principal axes of motion
+
+**2. Eigendecomposition - Matrix Disassembly**
+
+- **The formula**: $A = PDP^{-1}$ (change coordinates → scale → change back)
+- **Matrix powers**: $A^n = PD^nP^{-1}$ (exponentially faster computation)
+- **Applications**: Population dynamics, Fibonacci sequences, quantum time evolution
+- **Limitation**: Only works for square matrices
+
+**3. SVD - The Universal Matrix Tool**
+
+- **The ultimate decomposition**: $A = U\Sigma V^T$ (works on ANY matrix!)
+- **Geometric interpretation**: Any transformation = rotation + scaling + rotation
+- **Optimality**: Provably gives the best low-rank approximation
+- **Applications**: Image compression, recommender systems, noise reduction, data analysis
+
+### 🌟 Real-World Superpowers Unlocked
+
+**🔍 Google's PageRank Algorithm**
+
+- **Problem**: Rank billions of web pages by importance
+- **Solution**: The dominant eigenvector of the web link matrix
+- **Impact**: Made Google the most valuable company on Earth
+
+**🎭 Face Recognition & Computer Vision**
+
+- **Problem**: Recognize faces despite lighting, angle, expression changes
+- **Solution**: Eigenfaces (eigenvectors of face covariance matrix)
+- **Impact**: Security systems, photo tagging, augmented reality
+
+**🏗️ Structural Engineering & Safety**
+
+- **Problem**: Will this bridge collapse in the wind?
+- **Solution**: Eigenfrequencies reveal dangerous resonance modes
+- **Impact**: Prevents catastrophic failures like the Tacoma Narrows Bridge
+
+**🎬 Netflix Recommendations**
+
+- **Problem**: Predict what movies users will like
+- **Solution**: SVD discovers hidden preference patterns
+- **Impact**: Billions in revenue from better user engagement
+
+**🖼️ Image & Data Compression**
+
+- **Problem**: Store/transmit massive amounts of data efficiently
+- **Solution**: SVD captures essential patterns with few components
+- **Impact**: JPEG compression, satellite imagery, medical imaging
+
+### 🔗 Connections Across Mathematics
+
+**Building on Previous Chapters**:
+
+- **Chapter 1**: Functions now become matrix transformations (multiple inputs/outputs)
+- **Chapter 2**: Derivatives become eigenvalues of Jacobian matrices
+- **Chapter 3**: Integration connects to matrix exponentials and spectral theory
+- **Chapter 4**: Gradients and Hessians reveal optimization landscapes through their eigenvalues
+- **Chapter 5**: Basic linear algebra transforms into deep structural analysis
+
+**Preparing for Advanced Topics**:
+
+- **Machine Learning**: Neural networks are chains of matrix multiplications
+- **Quantum Physics**: All quantum mechanics is eigenvalue problems
+- **Data Science**: PCA, factor analysis, dimensionality reduction
+- **Signal Processing**: Fourier transforms, wavelets, compression
+
+### 🧮 Essential Formulas & Insights
+
+$$
+\begin{aligned}
+\text{Eigenvalue equation: } &A\mathbf{v} = \lambda\mathbf{v} \\
+\text{Characteristic equation: } &\det(A - \lambda I) = 0 \\
+\text{Eigendecomposition: } &A = PDP^{-1} \\
+\text{Matrix powers: } &A^n = PD^nP^{-1} \\
+\text{SVD: } &A = U\Sigma V^T \\
+\text{Low-rank approximation: } &A_k = U_k\Sigma_k V_k^T
+\end{aligned}
+$$
+
+### 🎯 Practical Problem-Solving Arsenal
+
+**When to Use Eigendecomposition**:
+
+- Square matrices only
+- Want to understand long-term behavior (powers of matrices)
+- Physical systems with natural modes
+- Stability analysis
+
+**When to Use SVD**:
+
+- ANY matrix (rectangular, square, sparse, dense)
+- Data compression and noise reduction
+- Dimensionality reduction and pattern discovery
+- Optimal low-rank approximations
+- Solving overdetermined linear systems
+
+**When to Use Both**:
+
+- Principal Component Analysis (PCA)
+- Understanding matrix structure from multiple perspectives
+- Robustness checks and validation
+
+### 🚀 The Bigger Picture
+
+**You now possess mathematical superpowers that:**
+
+1. **Reveal hidden structure** in complex data and systems
+2. **Predict long-term behavior** of dynamical systems
+3. **Compress and process** massive datasets efficiently
+4. **Solve optimization problems** that seem impossible
+5. **Understand the mathematics** behind modern AI and machine learning
+
+**From Web Search to Quantum Computing**: The eigenvector and SVD concepts you've mastered are the **mathematical foundation** underlying:
+
+- Search engines and information retrieval
+- Recommendation systems and personalization
+- Image and video processing
+- Machine learning and artificial intelligence
+- Quantum computing and cryptography
+- Financial modeling and risk analysis
+- Scientific computing and simulation
+
+### 🌌 The Mathematical Universe
+
+**Advanced linear algebra reveals a profound truth**:
+
+**Complex, high-dimensional systems often have surprisingly simple underlying structure.** Whether it's the web's link patterns, user preferences in movies, vibrational modes of bridges, or quantum energy levels — the mathematics is the same.
+
+**You've learned to see through the complexity to the elegant mathematical patterns that govern our world.**
+
+**This is more than just mathematics — it's a new way of understanding reality through the lens of linear transformations, eigenspaces, and singular value decompositions.** 🌟✨
+
+### 🔥 Ready for What's Next?
+
+With advanced linear algebra mastered, you're now equipped to:
+
+- **Understand cutting-edge research papers** in AI and machine learning
+- **Implement sophisticated algorithms** from first principles
+- **Tackle real-world data science problems** with confidence
+- **See the mathematical beauty** underlying complex technological systems
+
+**You've gained the mathematical vision to understand how the digital world really works!** 🎓🚀
+
+---

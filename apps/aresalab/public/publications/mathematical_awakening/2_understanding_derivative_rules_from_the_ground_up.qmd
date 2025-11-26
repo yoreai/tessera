@@ -1,0 +1,605 @@
+# Chapter 2: Understanding Derivative Rules from the Ground Up
+
+## Chapter Introduction: Differential Calculus & Rates of Change
+
+Differential calculus explores **rates of change** — how one quantity changes as another varies. This core idea underlies much of physics (velocity, acceleration), machine learning (gradient descent), economics (marginal cost), and even biology (rates of infection or decay). In this chapter, we take a complete beginner-friendly journey into understanding **what a derivative is**, **why it matters**, and **how to compute it using basic rules**. We'll build from the ground up, ensuring nothing is assumed, and every rule is deeply connected to real-world phenomena.
+
+We'll begin with the most basic derivative — a function that never changes — and work our way toward more dynamic, interactive systems of change.
+
+---
+
+## What is a Derivative?
+
+Let's start at the very beginning. Suppose you're observing a system where one thing depends on another:
+
+- The temperature depends on the time of day.
+- Your speed depends on how long you've been accelerating.
+- The cost of manufacturing depends on how many items you make.
+
+In all these cases, we have a function: something where one value (the output) depends on another (the input).
+
+Now imagine the input changes slightly — what happens to the output?
+
+- Does it change a lot?
+- A little?
+- Not at all?
+
+The **derivative** answers that exact question: how much the output changes in response to a small change in the input.
+
+Mathematically, the derivative is written as:
+
+$$
+f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}
+$$
+
+This formula calculates the "instantaneous rate of change" at a point — how the function behaves if you zoom in infinitely close. But don't worry — we'll build up to that intuition through examples and basic rules.
+
+Let's now begin with the simplest case.
+
+---
+
+## 1. The Constant Rule: When Nothing Changes
+
+### What is a Constant Function?
+
+A **constant** is a fixed value. It does not depend on anything. For example:
+
+- The number 5 is a constant.
+- The number 200, representing a flat fee for a subscription service, is a constant.
+
+When we write a constant **function**, we mean that the output never changes, no matter what the input is. For example:
+
+$$
+f(x) = 7
+$$
+
+This function says, "No matter what value of $x$ you input, the output will always be 7."
+
+### What Does It Mean to Take the Derivative of a Constant?
+
+The **derivative** measures **how much a function changes as its input changes**.
+
+So let's ask:
+
+- As $x$ changes, does $f(x) = 7$ change?
+- No. It stays the same.
+
+Then what is the rate of change?
+
+- Zero. There is no change.
+
+So:
+
+$$
+f'(x) = 0
+$$
+
+This is the **Constant Rule**:
+
+> If a function is constant, its derivative is 0.
+
+### Real-World Example: Constant Speed
+
+Imagine you're in a car that is moving at exactly **60 miles per hour**, every hour. The speed doesn't go up or down. It's locked in by cruise control. If we define:
+
+$$
+v(t) = 60
+$$
+
+Here, $v(t)$ is the velocity (in miles per hour) at time $t$. This is a **constant function**.
+
+Now, what is the **acceleration**? Acceleration is how fast your velocity is changing.
+
+But since the velocity is always 60, and never changes, the acceleration is:
+
+$$
+a(t) = v'(t) = 0
+$$
+
+Because the velocity is constant, its rate of change is zero. This is not just a math idea — it describes your _experience_ in the car. There's no feeling of speeding up or slowing down. You're gliding.
+
+### Other Real-World Applications:
+
+- **Economics**: A fixed cost of production, such as a flat tax or licensing fee, does not change with the number of goods produced. The rate of change is zero.
+- **Medicine**: A resting baseline level of a hormone in the bloodstream (before medication or stimulus) remains steady. Its change over time is zero until disturbed.
+- **Machine Learning**: The "bias" term in a linear model (e.g. $y = wx + b$) is constant. The derivative of the bias term with respect to $x$ is zero because it doesn't depend on $x$.
+
+### Graphical View
+
+If you draw $f(x) = 7$, you get a **horizontal line**.
+
+- The line doesn't go up or down as $x$ increases.
+- That's why its slope is 0.
+- The slope of a function's graph = its derivative.
+
+So once again:
+
+- The function is flat.
+- The rate of change is zero.
+- The derivative is zero.
+
+This concludes our foundational understanding of the Constant Rule. We've now built a real intuition for the idea of change — or, in this case, _lack_ of change — and how it connects a symbolic rule to the physical world.
+
+---
+
+## 2. The Power Rule: Predictable Curves of Change
+
+Imagine a function like:
+
+$$
+f(x) = x^2
+$$
+
+This says, "Take any input $x$, square it, and that's the output." As $x$ changes, $f(x)$ changes too — and not just in a straight line. This is **nonlinear** change.
+
+Let's look at some examples of how the output changes:
+
+- When $x = 1$, $f(x) = 1$
+- When $x = 2$, $f(x) = 4$
+- When $x = 3$, $f(x) = 9$
+
+You can see that each time $x$ increases by 1, the jump in $f(x)$ gets bigger.
+
+This is the essence of **curved growth** — and the Power Rule helps us find out exactly how fast $f(x)$ is growing at any given $x$.
+
+### Power Rule Formula
+
+If:
+
+$$
+f(x) = x^n
+$$
+
+Then:
+
+$$
+f'(x) = nx^{n-1}
+$$
+
+This is the **Power Rule**, and it works for any real number $n$: whole numbers, fractions, negatives, and even irrational numbers.
+
+### Why Does This Rule Work?
+
+Think of $x^n$ as a machine that magnifies input. The larger $n$, the more sensitive $f(x)$ becomes to changes in $x$. The Power Rule quantifies this sensitivity.
+
+Each time you apply the Power Rule:
+
+- You bring the exponent $n$ down front.
+- You reduce the exponent by one.
+
+That tells you the slope of the curve $f(x)$ at any point $x$.
+
+### Step-by-Step Examples
+
+1. $f(x) = x^3 \Rightarrow f'(x) = 3x^2$
+2. $f(x) = x^5 \Rightarrow f'(x) = 5x^4$
+3. $f(x) = x^{-1} \Rightarrow f'(x) = -x^{-2}$
+4. $f(x) = x^{1/2} \Rightarrow f'(x) = \frac{1}{2}x^{-1/2}$
+
+### Real-World Applications
+
+- **Physics**: If an object's position is $x(t) = t^2$, then velocity is $x'(t) = 2t$, and acceleration is $x''(t) = 2$.
+- **Economics**: A cost function $C(x) = 5x^2$ means marginal cost is $C'(x) = 10x$.
+- **Machine Learning**: The squared loss $L(w) = (y - \hat{y})^2$ uses the Power Rule during gradient computation.
+
+### Why This Makes Intuitive Sense
+
+Consider $f(x) = x^2$. When $x$ is small, small changes in $x$ don't affect $x^2$ much. But when $x$ is large, the same small change in $x$ creates a much bigger change in $x^2$.
+
+The derivative $f'(x) = 2x$ captures exactly this: when $x$ is small, the rate of change is small. When $x$ is large, the rate of change is large.
+
+This is the beauty of the Power Rule — it tells you not just that a function is changing, but **how the rate of change itself changes**.
+
+---
+
+## 3. The Sum Rule: Adding Up Changes
+
+### When Is This Used?
+
+Very often in real life — and in math — functions are made up of multiple parts added together. For example:
+
+$$
+f(x) = x^2 + 3x + 5
+$$
+
+This function combines three smaller functions:
+
+- $x^2$, which curves upward,
+- $3x$, which is a straight, sloping line,
+- and 5, which is constant.
+
+When functions are **added**, their **rates of change also add**. That's the heart of the **Sum Rule**.
+
+### The Sum Rule Formula
+
+If:
+
+$$
+f(x) = g(x) + h(x)
+$$
+
+Then:
+
+$$
+f'(x) = g'(x) + h'(x)
+$$
+
+In words:
+
+> The derivative of a sum is the sum of the derivatives.
+
+This is beautifully simple, but incredibly powerful.
+
+### Why Does This Work?
+
+Think of two people walking east, side-by-side:
+
+- Person A walks at 2 mph.
+- Person B walks at 3 mph.
+
+Together, they cover ground at 5 mph. Each contributes their own rate. Likewise, when two functions are changing together (added together), their individual rates of change add up.
+
+### Step-by-Step Example
+
+Let's differentiate:
+
+$$
+f(x) = x^3 + 2x^2 - 5x + 4
+$$
+
+We break it into parts:
+
+- Derivative of $x^3$ is $3x^2$
+- Derivative of $2x^2$ is $4x$
+- Derivative of $-5x$ is $-5$
+- Derivative of $4$ (a constant) is $0$
+
+Now sum them:
+
+$$
+f'(x) = 3x^2 + 4x - 5
+$$
+
+Done!
+
+### Real-World Applications
+
+- **Economics**: Total cost = fixed cost + variable cost. Derivative gives marginal cost.
+- **ML**: Combined loss = model error + regularization penalty. Derivatives applied separately.
+- **Biology**: Total rate of change in population = birth rate – death rate + immigration rate.
+
+Each component's rate is calculated, then added.
+
+### Graphical Intuition
+
+When you graph a function that's a sum of several parts, the overall **slope** at each point is just the sum of the slopes of those parts.
+
+- You can see this by sketching $x^2 + x$ vs. $x^2$ and $x$ separately.
+
+This rule lets you easily build up complex models from simple ones.
+
+---
+
+## 4. The Product Rule: When Two Things Are Changing Together
+
+### When Is This Used?
+
+Imagine you're dealing with two quantities, both of which are changing — and you're multiplying them together.
+
+For example:
+
+- The **area** of a rectangle = length × width. If both are growing, how fast is the area growing?
+- The **revenue** of a company = price × quantity sold. What if price and quantity are both changing?
+
+In these kinds of situations, you **can't** just take the derivative of one part and ignore the other. The two moving parts interact. That's when we need the **Product Rule**.
+
+### The Product Rule Formula
+
+If:
+
+$$
+f(x) = g(x) \cdot h(x)
+$$
+
+Then:
+
+$$
+f'(x) = g'(x) \cdot h(x) + g(x) \cdot h'(x)
+$$
+
+In words:
+
+> The derivative of a product = (derivative of the first × second) + (first × derivative of the second)
+
+### Why Does This Work?
+
+Let's return to the rectangle example.
+
+Suppose:
+
+- Length $L(t)$ and width $W(t)$ are both changing over time.
+- The area is defined as $A(t) = L(t) \cdot W(t)$.
+
+We want to understand how fast the area is changing at any moment in time.
+
+Let's imagine that time increases slightly — what happens?
+
+1. If **only the length increases**, the area increases proportionally to the current width.
+2. If **only the width increases**, the area increases proportionally to the current length.
+3. If **both increase**, the effect is compounded — and we must account for both changes happening at once.
+
+So, to calculate the true rate of change of area, we need to include:
+
+- The change in length while keeping width momentarily fixed, **plus**
+- The change in width while keeping length momentarily fixed.
+
+That's exactly what the **Product Rule** gives us:
+
+$$
+f'(x) = g'(x) \cdot h(x) + g(x) \cdot h'(x)
+$$
+
+Each term captures one direction of change while holding the other part steady.
+
+### A Key Conceptual Insight
+
+Here's what makes this rule different from the Sum Rule:
+
+Even though $L(t)$ and $W(t)$ may be **independently changing** (that is, they are not functions of each other), the **way they combine** to produce area is not additive — it's **multiplicative**. That's the critical distinction.
+
+- In the **Sum Rule**, each function contributes **independently and directly** to the final quantity, without scaling or amplifying each other.
+- In the **Product Rule**, each function influences not only the output, but **how much the other function contributes** to the output.
+
+So, the difference isn't in how the functions themselves behave, but in how the **quantity you care about is constructed**.
+
+> In summary:
+>
+> - Use the **Sum Rule** when the final result is the simple sum of effects.
+> - Use the **Product Rule** when the final result is the result of **interacting** quantities, even if those quantities are independently changing.
+
+### Step-by-Step Example
+
+Let's differentiate:
+
+$$
+f(x) = x^2 \cdot \sin(x)
+$$
+
+Step 1: Identify the parts.
+
+- Let $g(x) = x^2$
+- Let $h(x) = \sin(x)$
+
+Step 2: Differentiate each part.
+
+- $g'(x) = 2x$
+- $h'(x) = \cos(x)$
+
+Step 3: Apply the formula.
+
+$$
+f'(x) = 2x \cdot \sin(x) + x^2 \cdot \cos(x)
+$$
+
+That's your derivative.
+
+### Real-World Applications
+
+- **Economics**: If revenue = price × quantity sold, and both change over time, the rate of change of revenue requires the product rule.
+- **Physics**: Work = force × distance. If both vary with time (like in lifting a spring), use the product rule to find power output.
+- **Machine Learning**: Neural networks often multiply input features by dynamic weights — and both can vary when taking gradients.
+
+### Graphical Intuition
+
+Imagine one wave rising, while another curve is bending. Their product looks complex. But the rate at which their product rises or falls can be understood as:
+
+- One pushing the change,
+- The other amplifying or modulating that push,
+- And vice versa.
+
+The product rule helps untangle how those changes combine.
+
+---
+
+## 5. The Chain Rule: When Change Happens Inside of Change
+
+### When Is This Used?
+
+The Chain Rule is used when one function is **nested inside** another — that is, when your input is being **transformed**, and then **transformed again**.
+
+For example:
+
+- $f(x) = \sin(x^2)$
+- $f(x) = (3x + 1)^4$
+- $f(x) = \sqrt{5x^2 + 2}$
+
+In each case, there's a function **inside** another — and we need to understand how the outer and inner changes combine.
+
+### The Chain Rule Formula
+
+If:
+
+$$
+f(x) = g(h(x))
+$$
+
+Then:
+
+$$
+f'(x) = g'(h(x)) \cdot h'(x)
+$$
+
+In words:
+
+> The derivative of a composite function = derivative of the **outer function**, evaluated at the **inner function**, multiplied by the derivative of the **inner function**.
+
+### Why Does This Work?
+
+Imagine you're driving up a mountain trail.
+
+- The **steepness of the trail** (how fast your height increases) depends on where you are **along the path**.
+- But your position along the trail depends on how long you've been walking.
+
+So your **height** is a function of **distance**, which is itself a function of **time**.
+
+To figure out how your **height is changing with respect to time**, you have to:
+
+1. Measure how steep the trail is at your current position (derivative of outer function),
+2. Multiply that by how fast you're walking along the trail (derivative of inner function).
+
+That's the chain rule in action.
+
+### Step-by-Step Example
+
+Let's differentiate:
+
+$$
+f(x) = (2x + 3)^5
+$$
+
+Step 1: Identify inner and outer functions:
+
+- Inner: $h(x) = 2x + 3$
+- Outer: $g(u) = u^5$
+
+Step 2: Differentiate each part:
+
+- $g'(u) = 5u^4$
+- $h'(x) = 2$
+
+Step 3: Apply the chain rule:
+
+$$
+f'(x) = g'(h(x)) \cdot h'(x) = 5(2x + 3)^4 \cdot 2 = 10(2x + 3)^4
+$$
+
+### Real-World Applications
+
+- **Biology**: Drug effect = function of concentration, which is a function of time. You need the chain rule to understand how effect changes over time.
+- **Physics**: Angular position depends on angle, which depends on time.
+- **Machine Learning**: Backpropagation is essentially applying the chain rule across many layers of functions.
+
+### Graphical Intuition
+
+When the input is first **curved** or **warped**, and then passed through another function, the result bends even more unpredictably.
+
+The Chain Rule unpacks the transformation layer by layer:
+
+- First, see how a small change affects the inside.
+- Then, see how that inner change affects the outer result.
+
+It's like gears nested inside each other — the outer gear turns in response to the inner gear, which itself is turning from an input.
+
+---
+
+## 6. Rule Combinations and Choosing the Right Tool
+
+Now that you've learned the five foundational rules — constant, power, sum, product, and chain — it's time to understand how they show up **together**, and how to decide **which rule(s) to use** when tackling a derivative in the wild.
+
+### The Real World Isn't Rule-by-Rule
+
+Most real-world functions you'll encounter are not neatly built from one rule. Instead, they are **combinations**:
+
+- A product of two expressions, one of which is a sum.
+- A composition of a power and a trigonometric function.
+- A chain inside a product, inside a sum.
+
+To navigate these, you must:
+
+1. **Break down the function** into parts.
+2. **Recognize the structure** (sum, product, nested/composite).
+3. **Apply the appropriate rule(s)** in the correct order.
+
+### A Working Strategy
+
+Ask yourself the following questions in order:
+
+1. **Is the function a sum or difference of simpler terms?**
+   - Use the **Sum Rule** to break it apart.
+
+2. **Are any terms multiplied together?**
+   - Use the **Product Rule** on those.
+
+3. **Is any term a function inside another?**
+   - That's a job for the **Chain Rule**.
+
+4. **Are there basic powers of $x$?**
+   - Apply the **Power Rule**.
+
+5. **Are there constants?**
+   - Use the **Constant Rule** — their derivative is 0.
+
+You may need to apply several rules **in sequence** or even **nested** within each other.
+
+### Example 1: Mixed Application
+
+Differentiate:
+
+$$
+f(x) = x^2 \cdot \sin(3x)
+$$
+
+Step 1: It's a product → use the **Product Rule**:
+
+Let:
+
+- $g(x) = x^2$
+- $h(x) = \sin(3x)$
+
+Then:
+
+- $g'(x) = 2x$
+- $h'(x) = \cos(3x) \cdot 3$ (using **Chain Rule** inside!)
+
+Final result:
+
+$$
+f'(x) = 2x \cdot \sin(3x) + x^2 \cdot 3\cos(3x)
+$$
+
+### Example 2: Layered Composition
+
+Differentiate:
+
+$$
+f(x) = (x^2 + 1)^4
+$$
+
+This is a function inside a function → **Chain Rule**.
+
+- Outer: $u^4$
+- Inner: $x^2 + 1$
+
+Derivative:
+
+$$
+f'(x) = 4(x^2 + 1)^3 \cdot 2x = 8x(x^2 + 1)^3
+$$
+
+### Rule Summary Table
+
+| Rule     | Use When...                           | Structure Identified     |
+| -------- | ------------------------------------- | ------------------------ |
+| Constant | You see a number with no variable     | $f(x) = c$               |
+| Power    | A single term like $x^n$              | $x^n$                    |
+| Sum      | You're adding/subtracting expressions | $f(x) = a(x) + b(x)$     |
+| Product  | Two expressions multiplied            | $f(x) = g(x) \cdot h(x)$ |
+| Chain    | One function inside another           | $f(x) = g(h(x))$         |
+
+---
+
+### Final Tip: Look for the Shape
+
+Every rule reflects a **shape** in how the output changes:
+
+- Constant: flat
+- Power: curves
+- Sum: combined movements
+- Product: intertwined effects
+- Chain: cascaded transformations
+
+The more you practice identifying these patterns, the more fluent you become in choosing the right tool.
+
+---
+
+(Next: Chapter Summary & Practice Problems)

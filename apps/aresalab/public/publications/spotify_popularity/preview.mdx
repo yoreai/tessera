@@ -1,0 +1,41 @@
+## Abstract
+
+This study investigates the predictability of song popularity on Spotify using machine learning techniques applied to audio feature data. We developed and evaluated multiple logistic regression models to predict binary popularity outcomes (high vs. low) for songs across six genres. Our analysis combines exploratory data analysis, unsupervised clustering, and supervised learning to identify the audio characteristics and genre-specific patterns that influence song popularity.
+
+The dataset comprises Spotify songs with 14 audio features including danceability, energy, loudness, instrumentalness, and genre classification. We employed a systematic modeling approach, progressively adding complexity through feature interactions to capture nuanced relationships between audio characteristics and popularity across different musical genres.
+
+**Key Findings:**
+
+Genre emerged as the strongest predictor of song popularity, with pop and rock genres showing consistently higher success rates. Among audio features, instrumentalness demonstrated a strong negative relationship with popularity (coefficient -0.22), while loudness showed a positive effect (coefficient 0.29). Importantly, our best-performing model revealed significant genre-audio feature interactions, indicating that the impact of audio characteristics varies substantially across musical genres. For instance, danceability positively influences popularity in pop (0.19) and rap (0.33) genres but shows negligible effects in others.
+
+The final model achieved a ROC AUC of 0.675 with robust cross-validation performance, suggesting that while audio features and genre provide meaningful signal, external factors like artist fame and marketing likely play substantial roles in determining popularity. This research demonstrates the value of interaction modeling in music analytics and provides actionable insights for music producers and streaming platforms seeking to understand popularity drivers across diverse musical styles.
+
+---
+
+## Introduction
+
+## Background and Motivation
+
+The digital music streaming industry has transformed how millions of people discover and consume music globally. Spotify, with over 500 million active users, generates massive amounts of listening data that reflect collective musical preferences. Understanding what makes a song popular on such platforms has significant implications for multiple stakeholders: artists seeking to optimize their creative output, record labels allocating marketing resources, and streaming platforms curating personalized recommendations [@spotify2024].
+
+Previous research in music information retrieval has established that audio features can predict various aspects of musical preference [@bertin2011]. However, the relationship between technical audio characteristics and mainstream popularity remains complex and context-dependent. Genre-specific listening patterns, cultural trends, and non-acoustic factors like artist reputation all contribute to a song's success on streaming platforms.
+
+## Research Questions
+
+This study addresses three primary research questions:
+
+1. **Predictive Power**: To what extent can audio features predict song popularity on Spotify?
+2. **Feature Importance**: Which specific audio characteristics most strongly influence popularity?
+3. **Genre Interactions**: How do the effects of audio features vary across different musical genres?
+
+## Approach Overview
+
+Our methodology integrates three complementary analytical approaches:
+
+**Exploratory Data Analysis**: We first examined distributions of audio features, their correlations, and genre-specific patterns to develop initial hypotheses about popularity drivers.
+
+**Unsupervised Learning**: K-means clustering revealed natural groupings of songs based on audio characteristics, allowing us to identify distinct musical profiles and their associated popularity rates.
+
+**Supervised Modeling**: We systematically developed six logistic regression models of increasing complexity, culminating in an interaction model that captures genre-specific effects of audio features. Stratified k-fold cross-validation ensured our findings generalize beyond the training data.
+
+This multi-method approach allows us to triangulate findings across different analytical perspectives, strengthening the reliability of our conclusions about what drives song popularity on Spotify.

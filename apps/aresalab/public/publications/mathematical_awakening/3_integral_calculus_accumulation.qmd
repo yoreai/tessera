@@ -1,0 +1,599 @@
+# Chapter 3: Integral Calculus & Accumulation
+
+## Why This Chapter Matters
+
+In Chapter 2, we learned how to measure **instantaneous change** using derivatives. But what if we want to go the other direction? What if we know how fast something is changing and want to find out **how much it has accumulated over time**?
+
+This is exactly what integrals solve. They answer questions like:
+
+- If I know my velocity at every moment, how far did I travel?
+- If I know the rate at which water flows into a tank, how much water accumulated?
+- If I know how a drug is metabolized, what's the total amount in my system?
+- If I know the probability density, what's the chance of an outcome in a range?
+
+Integration is the mathematical tool for **accumulation** — and it's everywhere in physics, statistics, machine learning, and engineering.
+
+---
+
+## What is Accumulation?
+
+Let's start with an intuitive example that everyone can relate to.
+
+### 🚰 The Water Tank Analogy
+
+Imagine you have a tank and water is flowing into it. The **rate** at which water flows changes over time:
+
+- **Hour 1**: 10 gallons/hour
+- **Hour 2**: 15 gallons/hour
+- **Hour 3**: 8 gallons/hour
+- **Hour 4**: 12 gallons/hour
+
+**Question**: How much total water accumulated after 4 hours?
+
+**Answer**: Simply add up: 10 + 15 + 8 + 12 = **45 gallons**
+
+This is **discrete accumulation** — we're adding up rates over time intervals.
+
+### 🌊 But What About Continuous Change?
+
+In the real world, flow rates don't jump suddenly from one value to another. They change **continuously**.
+
+Suppose the flow rate is described by a smooth function $f(t)$ (gallons per hour). Now the question becomes:
+
+> How do we add up **infinitely many** tiny contributions over a continuous time period?
+
+This is exactly what an **integral** does — it's continuous addition.
+
+---
+
+## From Sums to Integrals: Building the Intuition
+
+### Step 1: Chopping Time into Small Pieces
+
+Let's say the flow rate is $f(t) = 2t + 3$ gallons per hour, and we want to know the total accumulation from $t = 0$ to $t = 4$ hours.
+
+We can approximate by chopping the 4-hour period into small intervals:
+
+- **Hour 0-1**: Rate ≈ $f(0.5) = 4$ gal/hr → Contribution ≈ $4 \times 1 = 4$ gallons
+- **Hour 1-2**: Rate ≈ $f(1.5) = 6$ gal/hr → Contribution ≈ $6 \times 1 = 6$ gallons
+- **Hour 2-3**: Rate ≈ $f(2.5) = 8$ gal/hr → Contribution ≈ $8 \times 1 = 8$ gallons
+- **Hour 3-4**: Rate ≈ $f(3.5) = 10$ gal/hr → Contribution ≈ $10 \times 1 = 10$ gallons
+
+**Total** ≈ 4 + 6 + 8 + 10 = **28 gallons**
+
+### Step 2: Make the Pieces Smaller
+
+What if we use **half-hour intervals** instead?
+
+- **0-0.5 hr**: Rate ≈ $f(0.25) = 3.5$ → Contribution ≈ $3.5 \times 0.5 = 1.75$
+- **0.5-1 hr**: Rate ≈ $f(0.75) = 4.5$ → Contribution ≈ $4.5 \times 0.5 = 2.25$
+- And so on...
+
+The more intervals we use, the **more accurate** our approximation becomes.
+
+### Step 3: Take the Limit
+
+As we make the intervals **infinitesimally small**, we get the exact answer. This limiting process is called **integration**:
+
+$$
+\text{Total accumulation} = \int_0^4 f(t) \, dt = \int_0^4 (2t + 3) \, dt
+$$
+
+The $dt$ represents an infinitesimally small time interval, and $f(t) \, dt$ represents the infinitesimally small contribution during that interval.
+
+### 🎯 Geometric Interpretation
+
+Graphically, this is the **area under the curve** $f(t) = 2t + 3$ from $t = 0$ to $t = 4$.
+
+---
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Define the function
+t = np.linspace(0, 4, 1000)
+f = 2*t + 3
+
+# Plot the function
+plt.figure(figsize=(10, 6))
+plt.plot(t, f, 'b-', linewidth=2, label='f(t) = 2t + 3')
+plt.fill_between(t, f, alpha=0.3, label='Area = Total Accumulation')
+plt.xlabel('Time (hours)')
+plt.ylabel('Flow Rate (gallons/hour)')
+plt.title('Integration as Area Under the Curve')
+plt.legend()
+plt.grid(True)
+plt.show()
+```
+
+---
+
+## Understanding Riemann Sums
+
+The process we just described — chopping the interval into small pieces and summing up — is called a **Riemann sum**.
+
+### Mathematical Formulation
+
+For a function $f(x)$ on interval $[a, b]$:
+
+1. **Divide** the interval into $n$ equal pieces of width $\Delta x = \frac{b-a}{n}$
+2. **Sample** the function at points $x_i = a + i \Delta x$
+3. **Sum** up the contributions: $\sum_{i=0}^{n-1} f(x_i) \Delta x$
+
+As $n \to \infty$ (and $\Delta x \to 0$), this sum approaches the **definite integral**:
+
+$$
+\lim_{n \to \infty} \sum_{i=0}^{n-1} f(x_i) \Delta x = \int_a^b f(x) \, dx
+$$
+
+### 🔍 Visualizing Riemann Sums
+
+```python
+def riemann_sum_visualization():
+    # Function to integrate
+    def f(x):
+        return 2*x + 3
+
+    a, b = 0, 4
+
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+    n_values = [4, 8, 16, 50]
+
+    for idx, n in enumerate(n_values):
+        ax = axes[idx//2, idx%2]
+
+        # Function curve
+        x = np.linspace(a, b, 1000)
+        y = f(x)
+        ax.plot(x, y, 'r-', linewidth=2, label='f(x) = 2x + 3')
+
+        # Riemann rectangles
+        dx = (b - a) / n
+        x_vals = np.linspace(a, b-dx, n)
+        y_vals = f(x_vals + dx/2)  # Midpoint rule
+
+        for i in range(n):
+            ax.bar(x_vals[i] + dx/2, y_vals[i], width=dx, alpha=0.6,
+                   edgecolor='black', linewidth=0.5)
+
+        riemann_sum = np.sum(y_vals * dx)
+        ax.set_title(f'n = {n}, Riemann Sum ≈ {riemann_sum:.3f}')
+        ax.set_xlabel('x')
+        ax.set_ylabel('f(x)')
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+riemann_sum_visualization()
+```
+
+**Key Insight**: As we use more rectangles, the approximation gets better and approaches the exact value!
+
+---
+
+## The Fundamental Theorem of Calculus
+
+This is one of the most beautiful and important theorems in mathematics. It connects derivatives and integrals in a profound way.
+
+### 🎯 The Big Idea
+
+**If derivatives measure instantaneous change, and integrals measure accumulation, then they should be inverse operations.**
+
+### Statement of the Theorem
+
+The Fundamental Theorem of Calculus has two parts:
+
+**Part 1**: If $F(x) = \int_a^x f(t) \, dt$, then $F'(x) = f(x)$
+
+**Part 2**: If $F'(x) = f(x)$, then $\int_a^b f(x) \, dx = F(b) - F(a)$
+
+### Why This Makes Perfect Sense
+
+Let's think about our water tank example:
+
+- $f(t)$ = flow rate at time $t$
+- $F(t) = \int_0^t f(s) \, ds$ = total water accumulated from time 0 to time $t$
+
+**Question**: What's the rate at which the total water is changing at time $t$?
+
+**Answer**: It's exactly the flow rate $f(t)$! So $F'(t) = f(t)$.
+
+This is **Part 1** of the theorem in action.
+
+### 🔧 Practical Application
+
+**Part 2** gives us a powerful computational tool. Instead of computing difficult Riemann sums, we can:
+
+1. Find an **antiderivative** $F(x)$ where $F'(x) = f(x)$
+2. Evaluate $F(b) - F(a)$
+
+### Example: Our Water Tank
+
+$$
+\int_0^4 (2t + 3) \, dt
+$$
+
+**Step 1**: Find antiderivative of $2t + 3$
+
+- $\frac{d}{dt}[t^2] = 2t$, so antiderivative of $2t$ is $t^2$
+- $\frac{d}{dt}[3t] = 3$, so antiderivative of $3$ is $3t$
+- Therefore: $F(t) = t^2 + 3t$ (ignoring the constant for definite integrals)
+
+**Step 2**: Apply the theorem
+
+$$
+\int_0^4 (2t + 3) \, dt = F(4) - F(0) = (16 + 12) - (0 + 0) = 28
+$$
+
+**Result**: 28 gallons — exactly matching our intuitive expectation!
+
+---
+
+## Basic Integration Techniques
+
+Now that we understand **why** integration works, let's learn **how** to do it systematically.
+
+### 1. Power Rule for Integration
+
+**If we know**: $\frac{d}{dx}[x^{n+1}] = (n+1)x^n$
+
+**Then**: $\int x^n \, dx = \frac{x^{n+1}}{n+1} + C$ (for $n \neq -1$)
+
+The $+C$ is the **constant of integration** — remember, derivatives of constants are zero, so when we go backwards, we need to account for any possible constant.
+
+#### Examples:
+
+- $\int x^3 \, dx = \frac{x^4}{4} + C$
+- $\int x^{1/2} \, dx = \frac{x^{3/2}}{3/2} + C = \frac{2x^{3/2}}{3} + C$
+- $\int \frac{1}{x^2} \, dx = \int x^{-2} \, dx = \frac{x^{-1}}{-1} + C = -\frac{1}{x} + C$
+
+### 2. Sum Rule
+
+Just like with derivatives, we can integrate term by term:
+
+$$
+\int [f(x) + g(x)] \, dx = \int f(x) \, dx + \int g(x) \, dx
+$$
+
+#### Example:
+
+$$
+\int (3x^2 - 8x + 6) \, dx = 3 \cdot \frac{x^3}{3} - 8 \cdot \frac{x^2}{2} + 6x + C = x^3 - 4x^2 + 6x + C
+$$
+
+### 3. Exponential and Logarithmic Functions
+
+- $\int e^x \, dx = e^x + C$
+- $\int \frac{1}{x} \, dx = \ln|x| + C$ (this is the special case where $n = -1$)
+
+### 4. Trigonometric Functions
+
+- $\int \sin(x) \, dx = -\cos(x) + C$
+- $\int \cos(x) \, dx = \sin(x) + C$
+
+### 🧮 Practice Example
+
+Let's integrate: $\int (4x^3 - 2x + 5) \, dx$
+
+**Solution**:
+
+- $\int 4x^3 \, dx = 4 \cdot \frac{x^4}{4} = x^4$
+- $\int -2x \, dx = -2 \cdot \frac{x^2}{2} = -x^2$
+- $\int 5 \, dx = 5x$
+
+**Final answer**: $x^4 - x^2 + 5x + C$
+
+---
+
+## Applications in Physics: Motion and Work
+
+### 🚗 Position, Velocity, and Acceleration
+
+In physics, these three quantities are connected by derivatives and integrals:
+
+- **Position**: $s(t)$
+- **Velocity**: $v(t) = s'(t)$
+- **Acceleration**: $a(t) = v'(t) = s''(t)$
+
+**Going backwards**:
+
+- If we know acceleration, we can find velocity: $v(t) = \int a(t) \, dt$
+- If we know velocity, we can find position: $s(t) = \int v(t) \, dt$
+
+#### Example: Free Fall
+
+When you drop an object, it accelerates downward at $a(t) = -9.8$ m/s² (negative because downward).
+
+**Find velocity**: $v(t) = \int -9.8 \, dt = -9.8t + C$
+
+If the object starts from rest, $v(0) = 0$, so $C = 0$. Thus: $v(t) = -9.8t$
+
+**Find position**: $s(t) = \int -9.8t \, dt = -4.9t^2 + C$
+
+If we drop from height $h$, then $s(0) = h$, so $C = h$. Thus: $s(t) = h - 4.9t^2$
+
+### ⚡ Work and Energy
+
+**Work** is force applied over a distance. If the force varies with position, we need integration:
+
+$$
+W = \int_a^b F(x) \, dx
+$$
+
+#### Example: Spring Force
+
+A spring exerts force $F(x) = -kx$ (Hooke's Law). To stretch it from 0 to distance $d$:
+
+$$
+W = \int_0^d kx \, dx = k \cdot \frac{x^2}{2} \Big|_0^d = \frac{kd^2}{2}
+$$
+
+This is the famous formula for **elastic potential energy**!
+
+---
+
+## Applications in Statistics and Machine Learning
+
+### 📊 Probability Distributions
+
+For a continuous random variable $X$ with probability density function (PDF) $f(x)$:
+
+$$
+P(a \leq X \leq b) = \int_a^b f(x) \, dx
+$$
+
+#### Example: Normal Distribution
+
+The famous bell curve has PDF:
+
+$$
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}
+$$
+
+The probability that $X$ falls within one standard deviation of the mean is:
+
+$$
+P(\mu - \sigma \leq X \leq \mu + \sigma) = \int_{\mu-\sigma}^{\mu+\sigma} f(x) \, dx \approx 0.68
+$$
+
+```python
+import scipy.stats as stats
+
+# Normal distribution with mean=0, std=1
+mu, sigma = 0, 1
+x = np.linspace(-4, 4, 1000)
+pdf = stats.norm.pdf(x, mu, sigma)
+
+plt.figure(figsize=(10, 6))
+plt.plot(x, pdf, 'b-', linewidth=2, label='PDF')
+
+# Shade the area within 1 standard deviation
+x_shade = x[(x >= mu-sigma) & (x <= mu+sigma)]
+pdf_shade = stats.norm.pdf(x_shade, mu, sigma)
+plt.fill_between(x_shade, pdf_shade, alpha=0.3, color='red',
+                label=f'P({mu-sigma} ≤ X ≤ {mu+sigma}) ≈ 0.68')
+
+plt.xlabel('x')
+plt.ylabel('Probability Density')
+plt.title('Normal Distribution: Area Under Curve = Probability')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+```
+
+### 🎯 Expected Value
+
+The **expected value** (average) of a continuous random variable is:
+
+$$
+E[X] = \int_{-\infty}^{\infty} x \cdot f(x) \, dx
+$$
+
+This is a **weighted average** where each value $x$ is weighted by its probability density $f(x)$.
+
+### 📈 ROC-AUC in Machine Learning
+
+The **Receiver Operating Characteristic (ROC)** curve plots True Positive Rate vs False Positive Rate for different classification thresholds.
+
+The **Area Under the Curve (AUC)** is literally an integral:
+
+$$
+\text{AUC} = \int_0^1 \text{TPR}(\text{FPR}) \, d(\text{FPR})
+$$
+
+- **AUC = 0.5**: Random classifier (no better than coin flip)
+- **AUC = 1.0**: Perfect classifier
+- **Higher AUC**: Better classification performance
+
+```python
+from sklearn.metrics import roc_curve, auc
+from sklearn.datasets import make_classification
+from sklearn.linear_model import LogisticRegression
+from sklearn.model_selection import train_test_split
+
+# Generate sample data
+X, y = make_classification(n_samples=1000, n_classes=2, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Train classifier
+clf = LogisticRegression()
+clf.fit(X_train, y_train)
+y_scores = clf.predict_proba(X_test)[:, 1]
+
+# Compute ROC curve
+fpr, tpr, _ = roc_curve(y_test, y_scores)
+roc_auc = auc(fpr, tpr)
+
+# Plot
+plt.figure(figsize=(8, 6))
+plt.plot(fpr, tpr, linewidth=2, label=f'ROC Curve (AUC = {roc_auc:.3f})')
+plt.fill_between(fpr, tpr, alpha=0.3, label='Area Under Curve')
+plt.plot([0, 1], [0, 1], 'k--', label='Random Classifier (AUC = 0.5)')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
+plt.title('ROC Curve: Integration in Machine Learning')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f"AUC = {roc_auc:.3f}")
+```
+
+---
+
+## Numerical Integration: When Analytical Methods Fail
+
+Many real-world integrals cannot be solved analytically. That's where **numerical integration** comes in.
+
+### 🎲 Monte Carlo Integration
+
+The idea: Use random sampling to approximate integrals.
+
+For $\int_a^b f(x) \, dx$:
+
+1. Generate random points $(x_i, y_i)$ in rectangle $[a,b] \times [0, \max f(x)]$
+2. Count how many fall under the curve
+3. Estimate: $\int_a^b f(x) \, dx \approx \frac{\text{points under curve}}{\text{total points}} \times \text{rectangle area}$
+
+#### Example: Estimating π
+
+The area of a unit circle is $\pi$. We can estimate this by Monte Carlo:
+
+```python
+def estimate_pi(n_points=100000):
+    # Generate random points in [-1,1] x [-1,1] square
+    x = np.random.uniform(-1, 1, n_points)
+    y = np.random.uniform(-1, 1, n_points)
+
+    # Check which points are inside unit circle
+    inside_circle = (x**2 + y**2) <= 1
+
+    # π/4 = (area of quarter circle) / (area of unit square)
+    # So π = 4 * (points inside circle) / (total points)
+    pi_estimate = 4 * np.sum(inside_circle) / n_points
+
+    return pi_estimate, x, y, inside_circle
+
+# Run simulation
+pi_est, x, y, inside = estimate_pi(10000)
+
+# Visualize
+plt.figure(figsize=(8, 8))
+plt.scatter(x[inside], y[inside], s=0.5, alpha=0.6, label='Inside circle')
+plt.scatter(x[~inside], y[~inside], s=0.5, alpha=0.6, label='Outside circle')
+
+# Draw circle
+theta = np.linspace(0, 2*np.pi, 1000)
+circle_x, circle_y = np.cos(theta), np.sin(theta)
+plt.plot(circle_x, circle_y, 'r-', linewidth=2)
+
+plt.xlim(-1.1, 1.1)
+plt.ylim(-1.1, 1.1)
+plt.gca().set_aspect('equal')
+plt.title(f'Monte Carlo Estimation: π ≈ {pi_est:.4f} (True: {np.pi:.4f})')
+plt.legend()
+plt.grid(True, alpha=0.3)
+plt.show()
+
+print(f"Estimated π = {pi_est:.6f}")
+print(f"Actual π    = {np.pi:.6f}")
+print(f"Error       = {abs(pi_est - np.pi):.6f}")
+```
+
+### 📏 Trapezoidal Rule
+
+A simpler numerical method: approximate the curve with trapezoids.
+
+```python
+def trapezoidal_rule(f, a, b, n):
+    """Approximate integral using trapezoidal rule"""
+    h = (b - a) / n
+    x = np.linspace(a, b, n+1)
+    y = f(x)
+
+    # Trapezoidal rule: h * (y0/2 + y1 + y2 + ... + yn-1 + yn/2)
+    integral = h * (np.sum(y) - 0.5*y[0] - 0.5*y[-1])
+    return integral
+
+# Example: integrate x² from 0 to 2
+def f(x):
+    return x**2
+
+analytical_result = 2**3/3  # ∫x²dx from 0 to 2 = x³/3 |₀² = 8/3
+
+n_values = [4, 8, 16, 32, 64]
+for n in n_values:
+    numerical_result = trapezoidal_rule(f, 0, 2, n)
+    error = abs(numerical_result - analytical_result)
+    print(f"n={n:2d}: Numerical={numerical_result:.6f}, Error={error:.6f}")
+
+print(f"Analytical result: {analytical_result:.6f}")
+```
+
+---
+
+## Chapter 3 Summary
+
+### 🎯 Key Concepts Mastered
+
+**1. What Integration Really Means**
+
+- **Accumulation** of quantities over time/space
+- **Area under curves** as geometric interpretation
+- **Inverse of differentiation** via Fundamental Theorem
+
+**2. From Discrete to Continuous**
+
+- **Riemann sums** as approximation method
+- **Limiting process** gives exact integral
+- **Infinite sum** of infinitesimal contributions
+
+**3. Computational Techniques**
+
+- **Power rule**: $\int x^n dx = \frac{x^{n+1}}{n+1} + C$
+- **Sum rule**: integrate term by term
+- **Fundamental Theorem**: $\int_a^b f(x)dx = F(b) - F(a)$
+
+**4. Real-World Applications**
+
+- **Physics**: position from velocity, work from force
+- **Statistics**: probability from density functions
+- **Machine Learning**: expected values, ROC-AUC
+
+**5. When Analytical Fails**
+
+- **Monte Carlo methods** for complex integrals
+- **Numerical integration** techniques
+- **Approximation vs exact** solutions
+
+### 🔗 Connections to Previous Chapters
+
+- **Chapter 1**: Exponential/logarithmic functions appear in integrals
+- **Chapter 2**: Integration is the inverse of differentiation
+- **Future chapters**: Integrals are essential for probability, statistics, and ML
+
+### 🎯 Applications Preview
+
+**Coming up in later chapters**:
+
+- **Multivariable calculus**: Double and triple integrals
+- **Probability**: Continuous distributions and expected values
+- **Statistics**: Confidence intervals and hypothesis testing
+- **Machine Learning**: Loss functions and optimization
+
+### 🧮 Key Formulas to Remember
+
+$$
+\begin{aligned}
+\int x^n \, dx &= \frac{x^{n+1}}{n+1} + C \\
+\int e^x \, dx &= e^x + C \\
+\int \frac{1}{x} \, dx &= \ln|x| + C \\
+\int_a^b f(x) \, dx &= F(b) - F(a) \text{ where } F'(x) = f(x)
+\end{aligned}
+$$
+
+**You now have the tools to handle accumulation problems across physics, statistics, and machine learning!** 🚀
+
+---

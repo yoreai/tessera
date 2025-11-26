@@ -7,6 +7,16 @@ book:
   subtitle: "A Deep Dive into Linear Algebra"
   chapters:
     - index.qmd
+    - 1_building_intuition_for_functions_exponents_and_log.qmd
+    - 2_understanding_derivative_rules_from_the_ground_up.qmd
+    - 3_integral_calculus_accumulation.qmd
+    - 4_multivariable_calculus_gradients.qmd
+    - 5_linear_algebra_the_language_of_modern_mathematics.qmd
+    - 6_advanced_linear_algebra_eigenvectors_eigenvalues_m.qmd
+    - 7_probability_random_variables_making_sense_of_uncer.qmd
+    - 8_from_probability_to_evidence_mastering_statistical.qmd
+    - 9_the_ai_revolution_mastering_the_mathematical_found.qmd
+    - 10_mathematical_mastery_in_action_from_theory_to_tril.qmd
 
 format:
   pdf:

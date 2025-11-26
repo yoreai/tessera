@@ -7,6 +7,8 @@ book:
   subtitle: "From Theory to Production"
   chapters:
     - index.qmd
+    - 2_bioinformatics_genomic_ai_8_projects.qmd
+    - 3_computer_vision_robotics_12_projects.qmd
 
 format:
   pdf:

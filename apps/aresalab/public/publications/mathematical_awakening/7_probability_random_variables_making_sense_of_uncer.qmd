@@ -1,0 +1,3307 @@
+# Chapter 7: Probability & Random Variables – Making Sense of Uncertainty
+
+## Embracing the Unknown: Why Probability Rules Everything
+
+You've mastered the mathematics of **certainty** — functions, derivatives, integrals, and linear algebra all deal with **precise, deterministic** relationships. But the real world is **full of uncertainty**!
+
+- **Will it rain tomorrow?** (Weather prediction)
+- **Will this patient recover?** (Medical diagnosis)
+- **Will this stock go up?** (Financial modeling)
+- **Will this user click this ad?** (Machine learning)
+- **Where is this electron?** (Quantum mechanics)
+
+**This chapter transforms you from someone who can only handle perfect information to someone who can make intelligent decisions under uncertainty.**
+
+### 🌊 The Probability Revolution
+
+**The profound insight**: **Uncertainty follows patterns!**
+
+Even though we can't predict individual outcomes, we can:
+
+- **Quantify uncertainty** mathematically
+- **Make optimal decisions** despite incomplete information
+- **Extract signal from noise** in data
+- **Model complex systems** probabilistically
+- **Build AI systems** that handle real-world uncertainty
+
+### 🎯 What You'll Master
+
+**Probability Fundamentals**: The mathematics of uncertainty
+
+- **Intuitive understanding**: What probability really means
+- **Real-world modeling**: How to translate uncertainty into math
+- **Computational tools**: Simulating and analyzing random phenomena
+
+**Random Variables**: The bridge between abstract probability and concrete measurements
+
+- **Discrete variables**: Counting outcomes (dice, coins, defects)
+- **Continuous variables**: Measuring quantities (heights, times, temperatures)
+- **Distributions**: The "shapes" of uncertainty
+
+**Famous Distributions**: The mathematical patterns underlying real phenomena
+
+- **Binomial**: Success/failure experiments (A/B testing, quality control)
+- **Poisson**: Rare events (earthquakes, website crashes, radioactive decay)
+- **Normal (Gaussian)**: The "universal" distribution (measurements, errors, natural phenomena)
+
+**Bayesian Thinking**: Updating beliefs with evidence
+
+- **Prior knowledge** + **new evidence** = **updated beliefs**
+- **The foundation of machine learning and AI**
+
+### 🌟 Applications That Will Amaze You
+
+**🎰 Casino Mathematics**: Why the house always wins (and how to beat them legally)
+**🏥 Medical Diagnosis**: How doctors combine symptoms to make diagnoses
+**📊 A/B Testing**: How companies optimize websites and apps
+**🤖 Machine Learning**: How AI systems handle uncertainty and make predictions
+**⚛️ Quantum Mechanics**: How uncertainty is fundamental to reality itself
+**🎯 Risk Assessment**: From insurance to space missions
+
+### 🎪 The Magic of Randomness
+
+**Counterintuitive truth**: Adding **more randomness** often leads to **more predictable** behavior!
+
+- **Individual coin flip**: Completely unpredictable
+- **1000 coin flips**: Very predictable average behavior
+
+**This paradox is the foundation of**:
+
+- **Statistical mechanics** (how billions of random molecules create predictable temperature and pressure)
+- **Machine learning** (how random data reveals stable patterns)
+- **Quality control** (how random sampling ensures product reliability)
+- **Opinion polling** (how surveying 1000 people predicts millions of votes)
+
+**By the end of this chapter, you'll see uncertainty not as an obstacle, but as a powerful tool for understanding and predicting the complex world around us!** 🚀✨
+
+---
+
+## The Fundamental Language of Uncertainty
+
+### 🎲 Building Intuition: What Is Probability Really?
+
+**Most people think**: "Probability is just percentages and gambling."
+
+**The deeper truth**: **Probability is a mathematical framework for reasoning about any situation where we have incomplete information.**
+
+**Three interpretations of probability**:
+
+1. **Classical (Symmetric)**: Equal outcomes are equally likely
+   - **Example**: Fair die → each face has probability 1/6
+   - **When to use**: Perfect symmetry, theoretical situations
+
+2. **Frequentist (Long-run)**: Probability = long-run relative frequency
+   - **Example**: "30% chance of rain" means in similar weather conditions, it rains 30% of the time
+   - **When to use**: Repeatable experiments, scientific studies
+
+3. **Bayesian (Subjective)**: Probability = degree of belief based on evidence
+   - **Example**: "80% chance this patient has disease X" based on symptoms and test results
+   - **When to use**: One-time events, updating beliefs with new information
+
+### 🧮 The Mathematical Foundation
+
+**Probability Scale**: Every event gets a number between 0 and 1
+
+- **P(Event) = 0**: Impossible (will never happen)
+- **P(Event) = 1**: Certain (will always happen)
+- **P(Event) = 0.5**: Equally likely to happen or not
+- **P(Event) = 0.8**: Very likely (4:1 odds in favor)
+
+**The probability of all possible outcomes must sum to 1**:
+$$\sum_{\text{all outcomes}} P(\text{outcome}) = 1$$
+
+### 🎯 Essential Vocabulary: The Building Blocks
+
+**🔬 Experiment**: Any process that produces an uncertain outcome
+
+- Rolling dice, measuring height, testing a drug, clicking an ad, electron spin
+
+**📊 Sample Space (S)**: The set of ALL possible outcomes
+
+- **Die roll**: $S = \{1, 2, 3, 4, 5, 6\}$
+- **Coin flip**: $S = \{\text{Heads}, \text{Tails}\}$
+- **Height measurement**: $S = \{x : x > 0\}$ (all positive real numbers)
+
+**🎭 Event**: Any subset of the sample space (what we're interested in)
+
+- **Rolling even number**: $\{2, 4, 6\}$
+- **Height above 6 feet**: $\{x : x > 72 \text{ inches}\}$
+- **Patient recovery**: $\{\text{Recovered}\}$
+
+**⚡ Outcome**: A single, specific result of an experiment
+
+- Rolling a 4, measuring 68.5 inches, patient recovered
+
+### 🎪 Interactive Probability Exploration
+
+Let's build intuition with hands-on examples:
+
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy import stats
+import random
+
+def probability_foundations_demo():
+    # Simulate the Law of Large Numbers
+    print("🎲 Discovering the Law of Large Numbers")
+    print("=" * 50)
+
+    # Simulate fair coin flips
+    n_experiments = [10, 100, 1000, 10000, 100000]
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+
+    for i, n in enumerate(n_experiments):
+        if i >= 5:
+            break
+
+        # Simulate coin flips (1 = heads, 0 = tails)
+        flips = np.random.binomial(1, 0.5, n)
+        cumulative_avg = np.cumsum(flips) / np.arange(1, n+1)
+
+        ax = axes[i//3, i%3]
+        ax.plot(cumulative_avg, linewidth=2, alpha=0.8)
+        ax.axhline(y=0.5, color='red', linestyle='--', alpha=0.7,
+                  label='True probability (0.5)')
+        ax.set_ylim(0, 1)
+        ax.set_xlabel('Number of flips')
+        ax.set_ylabel('Proportion of heads')
+        ax.set_title(f'n = {n:,} flips\nFinal average: {cumulative_avg[-1]:.4f}')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+    # Sample space exploration
+    ax = axes[1, 2]
+
+    # Visualize sample space for two dice
+    outcomes_x = []
+    outcomes_y = []
+    sums = []
+
+    for die1 in range(1, 7):
+        for die2 in range(1, 7):
+            outcomes_x.append(die1)
+            outcomes_y.append(die2)
+            sums.append(die1 + die2)
+
+    scatter = ax.scatter(outcomes_x, outcomes_y, c=sums, s=100, cmap='viridis', alpha=0.8)
+    ax.set_xlabel('Die 1')
+    ax.set_ylabel('Die 2')
+    ax.set_title('Sample Space: Two Dice\n(Color = Sum)')
+    ax.set_xticks(range(1, 7))
+    ax.set_yticks(range(1, 7))
+    ax.grid(True, alpha=0.3)
+    plt.colorbar(scatter, ax=ax, label='Sum')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Analyze the dice example
+    print("\n🎯 Sample Space Analysis: Two Dice")
+    print("=" * 40)
+    print(f"Total possible outcomes: {len(outcomes_x)}")
+    print(f"Sample space: All pairs (die1, die2) where die1, die2 ∈ {{1,2,3,4,5,6}}")
+
+    # Count outcomes by sum
+    sum_counts = {}
+    for s in sums:
+        sum_counts[s] = sum_counts.get(s, 0) + 1
+
+    print("\nProbability of each sum:")
+    for s in sorted(sum_counts.keys()):
+        prob = sum_counts[s] / len(sums)
+        print(f"P(Sum = {s:2d}) = {sum_counts[s]:2d}/36 = {prob:.4f} = {prob*100:5.1f}%")
+
+    # Visualize sum probabilities
+    plt.figure(figsize=(10, 6))
+    sums_sorted = sorted(sum_counts.keys())
+    probs = [sum_counts[s] / len(sums) for s in sums_sorted]
+
+    bars = plt.bar(sums_sorted, probs, alpha=0.7, color='skyblue', edgecolor='navy')
+    plt.xlabel('Sum of Two Dice')
+    plt.ylabel('Probability')
+    plt.title('Probability Distribution: Sum of Two Fair Dice')
+    plt.grid(True, alpha=0.3)
+
+    # Add probability labels on bars
+    for bar, prob in zip(bars, probs):
+        height = bar.get_height()
+        plt.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                f'{prob:.3f}', ha='center', va='bottom', fontweight='bold')
+
+    plt.tight_layout()
+    plt.show()
+
+probability_foundations_demo()
+```
+
+### 🔍 The Three Fundamental Rules
+
+**Rule 1: Non-negativity**
+$$P(A) \geq 0 \quad \text{for any event } A$$
+_Probabilities are never negative_
+
+**Rule 2: Normalization**
+$$P(S) = 1 \quad \text{where } S \text{ is the sample space}$$
+_The probability of "something happening" is 1_
+
+**Rule 3: Additivity**
+$$P(A \cup B) = P(A) + P(B) \quad \text{if } A \text{ and } B \text{ are mutually exclusive}$$
+_For non-overlapping events, probabilities add_
+
+### 🎨 Visualizing Key Probability Operations
+
+```python
+def probability_operations_demo():
+    print("🎨 Probability Operations: Unions, Intersections, Complements")
+    print("=" * 60)
+
+    # Create Venn diagram style visualization
+    fig, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+    # Event A and B for demonstration
+    # Let's say we're drawing cards from a deck
+    # A = "Red card", B = "Face card"
+
+    total_cards = 52
+    red_cards = 26  # Hearts + Diamonds
+    face_cards = 12  # J, Q, K in each suit
+    red_face_cards = 6  # Red Jacks, Queens, Kings
+
+    prob_A = red_cards / total_cards  # P(Red)
+    prob_B = face_cards / total_cards  # P(Face)
+    prob_A_and_B = red_face_cards / total_cards  # P(Red AND Face)
+    prob_A_or_B = prob_A + prob_B - prob_A_and_B  # P(Red OR Face)
+    prob_not_A = 1 - prob_A  # P(NOT Red) = P(Black)
+
+    # Visualization 1: Union (A OR B)
+    ax1 = axes[0, 0]
+    x = np.linspace(-2, 2, 100)
+    y = np.linspace(-2, 2, 100)
+    X, Y = np.meshgrid(x, y)
+
+    # Circle A (Red cards)
+    circle_A = (X + 0.5)**2 + Y**2 <= 1
+    # Circle B (Face cards)
+    circle_B = (X - 0.5)**2 + Y**2 <= 1
+    union = circle_A | circle_B
+
+    ax1.contourf(X, Y, union.astype(int), levels=[0.5, 1.5], colors=['lightblue'], alpha=0.7)
+    ax1.contour(X, Y, circle_A.astype(int), levels=[0.5], colors=['red'], linewidths=3)
+    ax1.contour(X, Y, circle_B.astype(int), levels=[0.5], colors=['blue'], linewidths=3)
+    ax1.set_xlim(-2, 2)
+    ax1.set_ylim(-2, 2)
+    ax1.set_aspect('equal')
+    ax1.set_title(f'Union: P(Red OR Face) = {prob_A_or_B:.3f}')
+    ax1.text(-0.8, 0, 'Red\nonly', ha='center', va='center', fontweight='bold')
+    ax1.text(0.8, 0, 'Face\nonly', ha='center', va='center', fontweight='bold')
+    ax1.text(0, 0, 'Both', ha='center', va='center', fontweight='bold', color='white')
+
+    # Visualization 2: Intersection (A AND B)
+    ax2 = axes[0, 1]
+    intersection = circle_A & circle_B
+
+    ax2.contourf(X, Y, intersection.astype(int), levels=[0.5, 1.5], colors=['purple'], alpha=0.7)
+    ax2.contour(X, Y, circle_A.astype(int), levels=[0.5], colors=['red'], linewidths=3)
+    ax2.contour(X, Y, circle_B.astype(int), levels=[0.5], colors=['blue'], linewidths=3)
+    ax2.set_xlim(-2, 2)
+    ax2.set_ylim(-2, 2)
+    ax2.set_aspect('equal')
+    ax2.set_title(f'Intersection: P(Red AND Face) = {prob_A_and_B:.3f}')
+    ax2.text(0, 0, 'Both', ha='center', va='center', fontweight='bold', color='white')
+
+    # Visualization 3: Complement (NOT A)
+    ax3 = axes[1, 0]
+    complement_A = ~circle_A
+
+    ax3.contourf(X, Y, complement_A.astype(int), levels=[0.5, 1.5], colors=['lightgreen'], alpha=0.7)
+    ax3.contour(X, Y, circle_A.astype(int), levels=[0.5], colors=['red'], linewidths=3)
+    ax3.set_xlim(-2, 2)
+    ax3.set_ylim(-2, 2)
+    ax3.set_aspect('equal')
+    ax3.set_title(f'Complement: P(NOT Red) = {prob_not_A:.3f}')
+    ax3.text(1.3, 1.3, 'NOT Red\n(Black)', ha='center', va='center', fontweight='bold')
+
+    # Visualization 4: Probability breakdown
+    ax4 = axes[1, 1]
+    categories = ['Red only', 'Face only', 'Both', 'Neither']
+
+    red_only = prob_A - prob_A_and_B
+    face_only = prob_B - prob_A_and_B
+    both = prob_A_and_B
+    neither = 1 - prob_A_or_B
+
+    probs = [red_only, face_only, both, neither]
+    colors = ['red', 'blue', 'purple', 'gray']
+
+    bars = ax4.bar(categories, probs, color=colors, alpha=0.7)
+    ax4.set_ylabel('Probability')
+    ax4.set_title('Card Drawing Probabilities')
+    ax4.tick_params(axis='x', rotation=45)
+
+    # Add probability labels
+    for bar, prob in zip(bars, probs):
+        height = bar.get_height()
+        ax4.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{prob:.3f}', ha='center', va='bottom', fontweight='bold')
+
+    plt.tight_layout()
+    plt.show()
+
+    # Verify the addition rule
+    print("🔍 Verification of Addition Rule:")
+    print(f"P(A) = P(Red) = {prob_A:.3f}")
+    print(f"P(B) = P(Face) = {prob_B:.3f}")
+    print(f"P(A ∩ B) = P(Red AND Face) = {prob_A_and_B:.3f}")
+    print(f"P(A ∪ B) = P(A) + P(B) - P(A ∩ B) = {prob_A:.3f} + {prob_B:.3f} - {prob_A_and_B:.3f} = {prob_A_or_B:.3f}")
+    print(f"Direct calculation: P(A ∪ B) = {prob_A_or_B:.3f} ✓")
+
+probability_operations_demo()
+```
+
+### 🏛️ Historical Perspective: The Birth of Probability
+
+**The Problem of Points (1654)**: Blaise Pascal and Pierre de Fermat needed to fairly divide the stakes in an interrupted gambling game.
+
+**Their insight**: Even unfinished games could be analyzed mathematically by considering all possible ways the game could end.
+
+**This revolutionary idea launched**:
+
+- **Mathematical probability theory**
+- **Decision theory under uncertainty**
+- **Statistical inference**
+- **Risk assessment and insurance**
+- **Modern machine learning and AI**
+
+### 🌟 Why This Matters
+
+**You've just learned the fundamental language for describing uncertainty.** These concepts form the foundation for:
+
+- **Statistics**: Analyzing data and drawing conclusions
+- **Machine Learning**: Building AI systems that handle uncertain, noisy data
+- **Physics**: Understanding quantum mechanics and statistical mechanics
+- **Economics**: Modeling markets and making financial decisions
+- **Medicine**: Diagnosing diseases and evaluating treatments
+- **Engineering**: Designing reliable systems despite component failures
+
+**Probability isn't just about gambling — it's about reasoning intelligently in an uncertain world!** 🎯✨
+
+---
+
+## Random Variables: From Abstract Probability to Concrete Numbers
+
+### 🎯 What Is a Random Variable Really?
+
+**Most textbooks say**: "A random variable is a function that assigns numbers to outcomes."
+
+**What this actually means**: A random variable is a **bridge** between the abstract world of probability (events, sample spaces) and the concrete world of **numbers we can calculate with**.
+
+**Think of it this way**:
+
+- **Experiment**: Flip 3 coins
+- **Sample space**: {HHH, HHT, HTH, HTT, THH, THT, TTH, TTT}
+- **Random variable X**: "Number of heads"
+- **X converts outcomes to numbers**: HHH → 3, HHT → 2, HTH → 2, etc.
+
+**Now we can do math**: What's the average number of heads? What's the probability of getting more than 1 head?
+
+### 🔢 Two Fundamental Types
+
+**Discrete Random Variables**: Can only take specific, countable values
+
+- **Examples**: Number of defects (0, 1, 2, 3...), dice rolls (1, 2, 3, 4, 5, 6), number of customers (0, 1, 2...)
+- **Why discrete**: You're **counting** something
+
+**Continuous Random Variables**: Can take any value in an interval
+
+- **Examples**: Height (68.2 inches), temperature (72.3°F), time (14.7 seconds)
+- **Why continuous**: You're **measuring** something
+
+### 🎨 Visualizing Random Variables in Action
+
+```python
+def random_variables_demo():
+    print("🎯 Random Variables: From Outcomes to Numbers")
+    print("=" * 50)
+
+    # Discrete Example: Rolling two dice, X = sum
+    print("Discrete Example: Sum of Two Dice")
+    print("-" * 40)
+
+    # Generate all possible outcomes
+    outcomes = []
+    sums = []
+
+    for die1 in range(1, 7):
+        for die2 in range(1, 7):
+            outcome = (die1, die2)
+            sum_value = die1 + die2
+            outcomes.append(outcome)
+            sums.append(sum_value)
+
+    # Count frequency of each sum
+    from collections import Counter
+    sum_counts = Counter(sums)
+
+    # Calculate probabilities
+    total_outcomes = len(outcomes)
+    sum_probs = {s: count/total_outcomes for s, count in sum_counts.items()}
+
+    # Create visualization
+    fig, axes = plt.subplots(2, 2, figsize=(15, 12))
+
+    # Plot 1: Sample space
+    ax1 = axes[0, 0]
+    die1_vals = [outcome[0] for outcome in outcomes]
+    die2_vals = [outcome[1] for outcome in outcomes]
+    scatter = ax1.scatter(die1_vals, die2_vals, c=sums, s=100, cmap='viridis', alpha=0.8)
+    ax1.set_xlabel('Die 1')
+    ax1.set_ylabel('Die 2')
+    ax1.set_title('Sample Space → Random Variable X\n(Color shows X = sum)')
+    ax1.set_xticks(range(1, 7))
+    ax1.set_yticks(range(1, 7))
+    ax1.grid(True, alpha=0.3)
+    plt.colorbar(scatter, ax=ax1, label='Sum (X)')
+
+    # Plot 2: Probability distribution
+    ax2 = axes[0, 1]
+    x_values = sorted(sum_probs.keys())
+    probabilities = [sum_probs[x] for x in x_values]
+
+    bars = ax2.bar(x_values, probabilities, alpha=0.7, color='skyblue', edgecolor='navy')
+    ax2.set_xlabel('X (Sum)')
+    ax2.set_ylabel('P(X = x)')
+    ax2.set_title('Probability Distribution of X')
+    ax2.grid(True, alpha=0.3)
+
+    # Add probability labels
+    for bar, prob in zip(bars, probabilities):
+        height = bar.get_height()
+        ax2.text(bar.get_x() + bar.get_width()/2., height + 0.005,
+                f'{prob:.3f}', ha='center', va='bottom', fontsize=9, fontweight='bold')
+
+    # Continuous Example: Heights
+    print("\nContinuous Example: Human Heights")
+    print("-" * 40)
+
+    # Simulate height data (normal distribution)
+    np.random.seed(42)
+    heights = np.random.normal(loc=68, scale=3, size=1000)  # Mean 68", SD 3"
+
+    # Plot 3: Histogram of heights
+    ax3 = axes[1, 0]
+    n, bins, patches = ax3.hist(heights, bins=30, density=True, alpha=0.7, color='lightgreen', edgecolor='darkgreen')
+    ax3.set_xlabel('Height (inches)')
+    ax3.set_ylabel('Density')
+    ax3.set_title('Continuous Random Variable\n(Human Heights)')
+    ax3.grid(True, alpha=0.3)
+
+    # Overlay theoretical normal curve
+    x_range = np.linspace(heights.min(), heights.max(), 100)
+    theoretical_curve = stats.norm.pdf(x_range, loc=68, scale=3)
+    ax3.plot(x_range, theoretical_curve, 'red', linewidth=3, label='Theoretical Normal')
+    ax3.legend()
+
+    # Plot 4: Cumulative distribution
+    ax4 = axes[1, 1]
+
+    # Discrete CDF
+    x_discrete = sorted(sum_probs.keys())
+    cdf_discrete = np.cumsum([sum_probs[x] for x in x_discrete])
+    ax4.step(x_discrete, cdf_discrete, where='post', linewidth=3, label='Discrete (Dice Sum)', alpha=0.8)
+
+    # Continuous CDF
+    heights_sorted = np.sort(heights)
+    cdf_continuous = np.arange(1, len(heights_sorted) + 1) / len(heights_sorted)
+    ax4.plot(heights_sorted, cdf_continuous, linewidth=2, label='Continuous (Heights)', alpha=0.8)
+
+    ax4.set_xlabel('Value')
+    ax4.set_ylabel('P(X ≤ x)')
+    ax4.set_title('Cumulative Distribution Functions')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Calculate and display key statistics
+    print("\n📊 Key Statistics:")
+    print("Discrete (Dice Sum):")
+    expected_sum = sum(x * prob for x, prob in sum_probs.items())
+    variance_sum = sum((x - expected_sum)**2 * prob for x, prob in sum_probs.items())
+    print(f"  Expected value E[X] = {expected_sum:.3f}")
+    print(f"  Variance Var(X) = {variance_sum:.3f}")
+    print(f"  Standard deviation σ = {np.sqrt(variance_sum):.3f}")
+
+    print(f"\nContinuous (Heights):")
+    print(f"  Sample mean = {np.mean(heights):.3f} inches")
+    print(f"  Sample variance = {np.var(heights):.3f}")
+    print(f"  Sample std dev = {np.std(heights):.3f} inches")
+
+random_variables_demo()
+```
+
+### 📊 The Shape of Uncertainty: Probability Distributions
+
+**A probability distribution** tells us:
+
+1. **What values** the random variable can take
+2. **How likely** each value is
+
+**For discrete variables**: **Probability Mass Function (PMF)**
+
+- $P(X = x)$ = probability that X equals exactly x
+- All probabilities must sum to 1: $\sum_x P(X = x) = 1$
+
+**For continuous variables**: **Probability Density Function (PDF)**
+
+- $f(x)$ = density at point x (NOT a probability!)
+- Probabilities come from areas: $P(a < X < b) = \int_a^b f(x)dx$
+- Total area must be 1: $\int_{-\infty}^{\infty} f(x)dx = 1$
+
+### 🎯 Key Summary Statistics
+
+**Expected Value (Mean)**: The "center" of the distribution
+
+- **Discrete**: $E[X] = \sum_x x \cdot P(X = x)$
+- **Continuous**: $E[X] = \int_{-\infty}^{\infty} x \cdot f(x)dx$
+- **Interpretation**: If you repeated the experiment many times, this is the average value you'd expect
+
+**Variance**: How "spread out" the distribution is
+
+- $\text{Var}(X) = E[(X - \mu)^2] = E[X^2] - (E[X])^2$
+- **Units**: Squared units of the original variable
+
+**Standard Deviation**: Square root of variance
+
+- $\sigma = \sqrt{\text{Var}(X)}$
+- **Units**: Same units as the original variable
+- **Interpretation**: Typical distance from the mean
+
+### 🌟 The Big Three Distributions You Must Know
+
+**1. Binomial Distribution**: "How many successes in n trials?"
+
+| Use When                                                                                                          | Parameters                                      | Formula                                 | Real Examples                                                                                                          |
+| ----------------------------------------------------------------------------------------------------------------- | ----------------------------------------------- | --------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| • Fixed number of trials<br>• Each trial has 2 outcomes<br>• Constant success probability<br>• Independent trials | n = number of trials<br>p = success probability | $P(X = k) = \binom{n}{k}p^k(1-p)^{n-k}$ | • A/B testing (conversions)<br>• Quality control (defects)<br>• Medical trials (recoveries)<br>• Marketing (responses) |
+
+**2. Poisson Distribution**: "How many events in a fixed time/space?"
+
+| Use When                                                                                                    | Parameters       | Formula                                        | Real Examples                                                                                           |
+| ----------------------------------------------------------------------------------------------------------- | ---------------- | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| • Events occur at constant rate<br>• Events are independent<br>• Multiple events can occur<br>• Rare events | λ = average rate | $P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$ | • Website crashes per day<br>• Earthquakes per year<br>• Customer arrivals per hour<br>• Typos per page |
+
+**3. Normal (Gaussian) Distribution**: "The universal pattern"
+
+| Use When                                                                                                                           | Parameters                         | Formula                                                              | Real Examples                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| • Many small, independent<br> factors contribute<br>• Measurement errors<br>• Natural phenomena<br>• Central Limit Theorem applies | μ = mean<br>σ = standard deviation | $f(x) = \frac{1}{\sigma\sqrt{2\pi}}e^{-\frac{(x-\mu)^2}{2\sigma^2}}$ | • Human heights/weights<br>• Test scores<br>• Measurement errors<br>• Stock price changes<br>• Many ML features |
+
+### 🔍 Why These Distributions Are So Important
+
+**Binomial** → **A/B Testing**: "Did our website change actually improve conversions?"
+
+**Poisson** → **Reliability Engineering**: "How often will our system fail?"
+
+**Normal** → **Machine Learning**: "What's the uncertainty in our predictions?"
+
+**The magic**: Most real-world randomness follows one of these three patterns! Once you recognize the pattern, you have powerful mathematical tools to analyze and predict.
+
+### 🎪 The Central Limit Theorem: Why Normal Is So Special
+
+**The most important theorem in probability**:
+
+**"No matter what distribution you start with, if you average many independent samples, the result approaches a normal distribution."**
+
+```python
+def central_limit_theorem_demo():
+    print("🎪 The Central Limit Theorem: Universal Convergence to Normal")
+    print("=" * 60)
+
+    # Start with three very different distributions
+    np.random.seed(42)
+    n_samples = 1000
+
+    # Distribution 1: Uniform (flat)
+    uniform_data = np.random.uniform(0, 1, n_samples)
+
+    # Distribution 2: Exponential (heavily skewed)
+    exponential_data = np.random.exponential(1, n_samples)
+
+    # Distribution 3: Bimodal (two peaks)
+    bimodal_data = np.concatenate([
+        np.random.normal(-2, 0.5, n_samples//2),
+        np.random.normal(2, 0.5, n_samples//2)
+    ])
+
+    distributions = [
+        ("Uniform", uniform_data),
+        ("Exponential", exponential_data),
+        ("Bimodal", bimodal_data)
+    ]
+
+    fig, axes = plt.subplots(3, 4, figsize=(16, 12))
+
+    for i, (name, data) in enumerate(distributions):
+        # Original distribution
+        ax_orig = axes[i, 0]
+        ax_orig.hist(data, bins=30, density=True, alpha=0.7, color=f'C{i}')
+        ax_orig.set_title(f'{name} Distribution\n(Original)')
+        ax_orig.set_ylabel('Density')
+
+        # Sample means for different sample sizes
+        sample_sizes = [5, 10, 50]
+
+        for j, n in enumerate(sample_sizes):
+            ax = axes[i, j+1]
+
+            # Take many samples of size n, compute their means
+            sample_means = []
+            for _ in range(1000):
+                sample = np.random.choice(data, n, replace=True)
+                sample_means.append(np.mean(sample))
+
+            ax.hist(sample_means, bins=30, density=True, alpha=0.7, color=f'C{i}')
+            ax.set_title(f'Sample Means\n(n = {n})')
+
+            # Overlay theoretical normal curve
+            theoretical_mean = np.mean(sample_means)
+            theoretical_std = np.std(sample_means)
+            x_range = np.linspace(min(sample_means), max(sample_means), 100)
+            theoretical_curve = stats.norm.pdf(x_range, theoretical_mean, theoretical_std)
+            ax.plot(x_range, theoretical_curve, 'red', linewidth=2, alpha=0.8)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎯 Key Insight: No matter what you start with, sample means become normal!")
+    print("This is why the normal distribution is everywhere in statistics and ML.")
+
+central_limit_theorem_demo()
+```
+
+**This is why**:
+
+- **Error analysis** assumes normal distributions
+- **Machine learning models** often assume normality
+- **Statistical tests** rely on the Central Limit Theorem
+- **Quality control** uses normal approximations
+
+**Random variables transform abstract probability into concrete, calculable mathematics — they're the foundation for all of statistics, machine learning, and data science!** 📊✨
+
+---
+
+## The Binomial Distribution: Success/Failure Experiments
+
+### 🎯 The Pattern: Counting Successes
+
+**The universal scenario**: You repeat the same experiment a fixed number of times, each time asking "Success or failure?"
+
+**Examples everywhere**:
+
+- **A/B Testing**: Of 1000 users, how many click the new button?
+- **Quality Control**: Of 100 manufactured parts, how many are defective?
+- **Medical Trials**: Of 50 patients, how many recover with the new treatment?
+- **Marketing**: Of 10,000 emails sent, how many get opened?
+- **Sports**: Of 20 free throws, how many does the player make?
+
+### 🧮 The Mathematical Framework
+
+**The Binomial Model Applies When**:
+
+1. **Fixed number of trials** (n): You decide in advance how many times to repeat
+2. **Binary outcomes**: Each trial has exactly 2 possible results (success/failure)
+3. **Constant probability**: Each trial has the same probability p of success
+4. **Independence**: The outcome of one trial doesn't affect the others
+
+**The Formula**:
+$$P(X = k) = \binom{n}{k}p^k(1-p)^{n-k}$$
+
+**Breaking it down**:
+
+- $\binom{n}{k}$ = Number of ways to choose k successes from n trials
+- $p^k$ = Probability of k specific successes
+- $(1-p)^{n-k}$ = Probability of (n-k) specific failures
+- **Multiply them**: All possible ways × probability of each way
+
+### 🎪 Interactive Binomial Exploration
+
+Let's see the binomial distribution in action across different scenarios:
+
+```python
+def comprehensive_binomial_demo():
+    print("🎯 Binomial Distribution: The Mathematics of Success/Failure")
+    print("=" * 60)
+
+    # Different scenarios to explore
+    scenarios = [
+        {"name": "Fair Coin Flips", "n": 20, "p": 0.5, "success": "Heads"},
+        {"name": "A/B Test Clicks", "n": 100, "p": 0.15, "success": "Clicks"},
+        {"name": "Free Throw Shots", "n": 10, "p": 0.8, "success": "Makes"},
+        {"name": "Quality Control", "n": 50, "p": 0.05, "success": "Defects"}
+    ]
+
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    axes = axes.flatten()
+
+    for i, scenario in enumerate(scenarios):
+        ax = axes[i]
+        n, p = scenario["n"], scenario["p"]
+
+        # Calculate theoretical probabilities
+        k_values = np.arange(0, n+1)
+        probabilities = [stats.binom.pmf(k, n, p) for k in k_values]
+
+        # Simulate the distribution
+        np.random.seed(42)
+        simulated_samples = np.random.binomial(n, p, size=10000)
+
+        # Plot theoretical vs simulated
+        ax.bar(k_values, probabilities, alpha=0.7, label='Theoretical', color='skyblue', edgecolor='navy')
+
+        # Overlay simulated histogram
+        counts, bins = np.histogram(simulated_samples, bins=np.arange(-0.5, n+1.5, 1), density=True)
+        bin_centers = (bins[:-1] + bins[1:]) / 2
+        ax.plot(bin_centers, counts, 'ro-', alpha=0.8, label='Simulated', markersize=4)
+
+        # Calculate and display statistics
+        theoretical_mean = n * p
+        theoretical_std = np.sqrt(n * p * (1 - p))
+        simulated_mean = np.mean(simulated_samples)
+        simulated_std = np.std(simulated_samples)
+
+        ax.axvline(theoretical_mean, color='red', linestyle='--', alpha=0.7, linewidth=2, label=f'Mean = {theoretical_mean:.1f}')
+        ax.axvline(theoretical_mean - theoretical_std, color='orange', linestyle=':', alpha=0.7, label=f'±1 SD')
+        ax.axvline(theoretical_mean + theoretical_std, color='orange', linestyle=':', alpha=0.7)
+
+        ax.set_xlabel(f'Number of {scenario["success"]}')
+        ax.set_ylabel('Probability')
+        ax.set_title(f'{scenario["name"]}\nn={n}, p={p:.2f}')
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+        # Add statistics text
+        stats_text = f'Theory: μ={theoretical_mean:.1f}, σ={theoretical_std:.1f}\n'
+        stats_text += f'Simulation: μ={simulated_mean:.1f}, σ={simulated_std:.1f}'
+        ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, verticalalignment='top',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8), fontsize=8)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Deep dive: How probability changes with parameters
+    print("\n🔍 Parameter Effects Analysis:")
+    print("=" * 40)
+
+    # Fixed n, varying p
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    n_fixed = 20
+    p_values = [0.1, 0.3, 0.5, 0.7, 0.9]
+    colors = ['red', 'blue', 'green', 'orange', 'purple']
+
+    for p, color in zip(p_values, colors):
+        k_values = np.arange(0, n_fixed+1)
+        probabilities = [stats.binom.pmf(k, n_fixed, p) for k in k_values]
+        ax1.plot(k_values, probabilities, 'o-', color=color, label=f'p = {p}', alpha=0.8)
+
+    ax1.set_xlabel('Number of Successes (k)')
+    ax1.set_ylabel('P(X = k)')
+    ax1.set_title(f'Effect of Success Probability p\n(Fixed n = {n_fixed})')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Fixed p, varying n
+    p_fixed = 0.3
+    n_values = [5, 10, 20, 50]
+
+    for n, color in zip(n_values, colors[:len(n_values)]):
+        k_values = np.arange(0, min(n+1, 25))  # Limit for visibility
+        probabilities = [stats.binom.pmf(k, n, p_fixed) for k in k_values]
+        ax2.plot(k_values, probabilities, 'o-', color=color, label=f'n = {n}', alpha=0.8)
+
+    ax2.set_xlabel('Number of Successes (k)')
+    ax2.set_ylabel('P(X = k)')
+    ax2.set_title(f'Effect of Number of Trials n\n(Fixed p = {p_fixed})')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+comprehensive_binomial_demo()
+```
+
+### 🚀 Real-World Application: A/B Testing
+
+**The problem**: You've redesigned your website button. Does it actually improve click rates?
+
+**The setup**:
+
+- **Control group**: 1000 users see old button, 120 click (12% rate)
+- **Test group**: 1000 users see new button, 140 click (14% rate)
+- **Question**: Is this difference real or just random variation?
+
+```python
+def ab_testing_with_binomial():
+    print("🚀 A/B Testing: Using Binomial Distribution for Business Decisions")
+    print("=" * 70)
+
+    # Scenario setup
+    n_control = n_test = 1000
+    clicks_control = 120  # 12% click rate
+    clicks_test = 140     # 14% click rate
+
+    p_control = clicks_control / n_control
+    p_test = clicks_test / n_test
+
+    print(f"Control group: {clicks_control}/{n_control} = {p_control:.1%} click rate")
+    print(f"Test group: {clicks_test}/{n_test} = {p_test:.1%} click rate")
+    print(f"Observed difference: {p_test - p_control:.1%}")
+
+    # Null hypothesis: both groups have same underlying click rate
+    p_combined = (clicks_control + clicks_test) / (n_control + n_test)
+    print(f"Combined click rate: {p_combined:.1%}")
+
+    # Simulate what would happen if null hypothesis is true
+    np.random.seed(42)
+    n_simulations = 10000
+
+    differences = []
+    for _ in range(n_simulations):
+        # Simulate both groups with same underlying rate
+        sim_control = np.random.binomial(n_control, p_combined)
+        sim_test = np.random.binomial(n_test, p_combined)
+
+        sim_diff = (sim_test / n_test) - (sim_control / n_control)
+        differences.append(sim_diff)
+
+    differences = np.array(differences)
+    observed_diff = p_test - p_control
+
+    # Calculate p-value: how often would we see this big a difference by chance?
+    p_value = np.mean(np.abs(differences) >= observed_diff)
+
+    # Visualization
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+
+    # Distribution of differences under null hypothesis
+    ax1.hist(differences, bins=50, density=True, alpha=0.7, color='lightblue', edgecolor='navy')
+    ax1.axvline(observed_diff, color='red', linewidth=3, label=f'Observed difference: {observed_diff:.1%}')
+    ax1.axvline(-observed_diff, color='red', linewidth=3, linestyle='--')
+    ax1.set_xlabel('Difference in Click Rates')
+    ax1.set_ylabel('Density')
+    ax1.set_title('Distribution of Differences\n(If no real effect)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Comparison of distributions
+    k_values = np.arange(0, 200)
+    control_probs = [stats.binom.pmf(k, n_control, p_control) for k in k_values]
+    test_probs = [stats.binom.pmf(k, n_test, p_test) for k in k_values]
+
+    ax2.plot(k_values, control_probs, 'b-', label=f'Control (p={p_control:.1%})', linewidth=2)
+    ax2.plot(k_values, test_probs, 'r-', label=f'Test (p={p_test:.1%})', linewidth=2)
+    ax2.axvline(clicks_control, color='blue', linestyle='--', alpha=0.7)
+    ax2.axvline(clicks_test, color='red', linestyle='--', alpha=0.7)
+    ax2.set_xlabel('Number of Clicks')
+    ax2.set_ylabel('Probability')
+    ax2.set_title('Binomial Distributions\nfor Each Group')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Statistical conclusion
+    print(f"\n📊 Statistical Analysis:")
+    print(f"P-value: {p_value:.4f}")
+    if p_value < 0.05:
+        print("✅ SIGNIFICANT: The difference is unlikely due to chance alone.")
+        print("   Recommendation: The new button appears to improve click rates.")
+    else:
+        print("❌ NOT SIGNIFICANT: The difference could easily be due to chance.")
+        print("   Recommendation: Need more data or the effect is too small to detect.")
+
+    print(f"\n💡 Business Impact:")
+    improvement = (p_test - p_control) * 100
+    print(f"Relative improvement: {improvement/p_control:.1%}")
+    print(f"If 100,000 users visit monthly:")
+    print(f"  Control: {p_control * 100000:.0f} clicks")
+    print(f"  Test: {p_test * 100000:.0f} clicks")
+    print(f"  Additional clicks: {improvement * 1000:.0f} per month")
+
+ab_testing_with_binomial()
+```
+
+### 🎯 Key Insights About the Binomial Distribution
+
+**1. Shape Changes**:
+
+- **Low p**: Right-skewed (most outcomes near 0)
+- **p ≈ 0.5**: Symmetric, bell-shaped
+- **High p**: Left-skewed (most outcomes near n)
+
+**2. The Normal Approximation**:
+When n is large and p is not too extreme: **Binomial ≈ Normal**
+
+- **Mean**: μ = np
+- **Standard deviation**: σ = √(np(1-p))
+- **Rule of thumb**: Use when np ≥ 5 and n(1-p) ≥ 5
+
+**3. Real-World Power**:
+
+- **Quality control**: Monitor defect rates
+- **A/B testing**: Measure conversion improvements
+- **Clinical trials**: Assess treatment effectiveness
+- **Market research**: Survey response analysis
+
+**The binomial distribution is the foundation for understanding success rates, conversion optimization, and statistical significance testing!** 🎯✨
+
+---
+
+## The Poisson Distribution: Modeling Rare but Important Events
+
+### ⚡ The Pattern: Events Over Time or Space
+
+**The universal scenario**: Events happen randomly over time or space at some average rate, but you want to know "How many will occur in a specific period?"
+
+**Classic examples**:
+
+- **System Reliability**: How many server crashes per day?
+- **Customer Service**: How many calls arrive per hour?
+- **Natural Disasters**: How many earthquakes per year?
+- **Quality Control**: How many defects per 1000 products?
+- **Biology**: How many mutations per DNA sequence?
+- **Finance**: How many market crashes per decade?
+
+### 🧮 The Mathematical Framework
+
+**The Poisson Model Applies When**:
+
+1. **Events occur independently**: One event doesn't influence another
+2. **Constant average rate**: The rate λ (lambda) stays the same over time
+3. **Events are rare**: Individual probability is small, but many opportunities exist
+4. **Non-overlapping intervals**: Events in different time periods are independent
+
+**The Formula**:
+$$P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}$$
+
+**Understanding the formula**:
+
+- **λ (lambda)**: Average number of events in the interval
+- **k**: The specific number of events we're calculating the probability for
+- **e ≈ 2.718**: Euler's number (base of natural logarithm)
+- **k!**: k factorial (k × (k-1) × ... × 1)
+
+### 🎪 Interactive Poisson Exploration
+
+Let's see how the Poisson distribution models different real-world scenarios:
+
+```python
+def comprehensive_poisson_demo():
+    print("⚡ Poisson Distribution: The Mathematics of Rare Events")
+    print("=" * 60)
+
+    # Different scenarios with varying lambda values
+    scenarios = [
+        {"name": "Website Crashes", "lambda": 0.5, "unit": "crashes/day", "period": "day"},
+        {"name": "Customer Calls", "lambda": 3.0, "unit": "calls/hour", "period": "hour"},
+        {"name": "Email Arrivals", "lambda": 12.0, "unit": "emails/hour", "period": "hour"},
+        {"name": "Defective Products", "lambda": 2.5, "unit": "defects/batch", "period": "batch"}
+    ]
+
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    axes = axes.flatten()
+
+    for i, scenario in enumerate(scenarios):
+        ax = axes[i]
+        lam = scenario["lambda"]
+
+        # Calculate theoretical probabilities
+        k_max = min(25, int(lam + 4*np.sqrt(lam)))  # Practical upper limit
+        k_values = np.arange(0, k_max + 1)
+        probabilities = [stats.poisson.pmf(k, lam) for k in k_values]
+
+        # Simulate the distribution
+        np.random.seed(42)
+        simulated_samples = np.random.poisson(lam, size=10000)
+
+        # Plot theoretical probabilities as bars
+        ax.bar(k_values, probabilities, alpha=0.7, label='Theoretical', color='lightcoral', edgecolor='darkred')
+
+        # Overlay simulated histogram
+        counts, bins = np.histogram(simulated_samples, bins=np.arange(-0.5, k_max+1.5, 1), density=True)
+        bin_centers = (bins[:-1] + bins[1:]) / 2
+        ax.plot(bin_centers, counts, 'bo-', alpha=0.8, label='Simulated', markersize=5)
+
+        # Calculate and display statistics
+        theoretical_mean = lam
+        theoretical_std = np.sqrt(lam)
+        simulated_mean = np.mean(simulated_samples)
+        simulated_std = np.std(simulated_samples)
+
+        ax.axvline(theoretical_mean, color='red', linestyle='--', alpha=0.7, linewidth=2,
+                  label=f'Mean = {theoretical_mean:.1f}')
+        ax.axvline(theoretical_mean - theoretical_std, color='orange', linestyle=':', alpha=0.7,
+                  label=f'±1 SD')
+        ax.axvline(theoretical_mean + theoretical_std, color='orange', linestyle=':', alpha=0.7)
+
+        ax.set_xlabel(f'Number of Events per {scenario["period"]}')
+        ax.set_ylabel('Probability')
+        ax.set_title(f'{scenario["name"]}\nλ = {lam} {scenario["unit"]}')
+        ax.legend(fontsize=8)
+        ax.grid(True, alpha=0.3)
+
+        # Add statistics text
+        stats_text = f'Theory: μ={theoretical_mean:.1f}, σ={theoretical_std:.1f}\n'
+        stats_text += f'Simulation: μ={simulated_mean:.1f}, σ={simulated_std:.1f}'
+        ax.text(0.98, 0.98, stats_text, transform=ax.transAxes, verticalalignment='top',
+                horizontalalignment='right', bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8),
+                fontsize=8)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Show how Poisson approximates Binomial for rare events
+    print("\n🔍 Poisson as Binomial Approximation:")
+    print("=" * 45)
+
+    fig, axes = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Parameters for comparison
+    lambda_val = 5
+    scenarios_binom = [
+        {"n": 50, "p": 0.1},    # np = 5
+        {"n": 100, "p": 0.05},  # np = 5
+        {"n": 1000, "p": 0.005} # np = 5
+    ]
+
+    for i, params in enumerate(scenarios_binom):
+        ax = axes[i]
+        n, p = params["n"], params["p"]
+
+        # Binomial probabilities
+        k_values = np.arange(0, 16)
+        binom_probs = [stats.binom.pmf(k, n, p) for k in k_values]
+        poisson_probs = [stats.poisson.pmf(k, lambda_val) for k in k_values]
+
+        ax.bar(k_values - 0.2, binom_probs, width=0.4, alpha=0.7,
+               label=f'Binomial(n={n}, p={p})', color='skyblue')
+        ax.bar(k_values + 0.2, poisson_probs, width=0.4, alpha=0.7,
+               label=f'Poisson(λ={lambda_val})', color='lightcoral')
+
+        ax.set_xlabel('Number of Events (k)')
+        ax.set_ylabel('Probability')
+        ax.set_title(f'n={n}, p={p}, np={n*p}')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+comprehensive_poisson_demo()
+```
+
+### 🚀 Real-World Application: System Reliability
+
+**The problem**: Your company's website crashes randomly. You want to plan for system reliability and set up appropriate monitoring.
+
+**Historical data**: On average, 2.3 crashes per week
+
+**Questions to answer**:
+
+- What's the probability of no crashes in a week?
+- What's the probability of more than 5 crashes?
+- How should you plan capacity and alerts?
+
+```python
+def system_reliability_analysis():
+    print("🚀 System Reliability: Using Poisson for IT Planning")
+    print("=" * 55)
+
+    # Historical data
+    lambda_crashes = 2.3  # average crashes per week
+
+    print(f"Historical average: {lambda_crashes} crashes per week")
+    print(f"Expected crashes per month: {lambda_crashes * 4:.1f}")
+    print(f"Expected crashes per year: {lambda_crashes * 52:.0f}")
+
+    # Calculate key probabilities
+    prob_zero_crashes = stats.poisson.pmf(0, lambda_crashes)
+    prob_one_or_fewer = stats.poisson.cdf(1, lambda_crashes)
+    prob_more_than_5 = 1 - stats.poisson.cdf(5, lambda_crashes)
+    prob_exactly_3 = stats.poisson.pmf(3, lambda_crashes)
+
+    print(f"\n📊 Weekly Crash Probabilities:")
+    print(f"Zero crashes: {prob_zero_crashes:.1%}")
+    print(f"1 or fewer crashes: {prob_one_or_fewer:.1%}")
+    print(f"Exactly 3 crashes: {prob_exactly_3:.1%}")
+    print(f"More than 5 crashes: {prob_more_than_5:.1%}")
+
+    # Visualization
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Weekly distribution
+    k_values = np.arange(0, 12)
+    weekly_probs = [stats.poisson.pmf(k, lambda_crashes) for k in k_values]
+
+    bars = ax1.bar(k_values, weekly_probs, alpha=0.7, color='lightcoral', edgecolor='darkred')
+    ax1.axvline(lambda_crashes, color='blue', linestyle='--', linewidth=2, label=f'Mean = {lambda_crashes}')
+    ax1.set_xlabel('Number of Crashes')
+    ax1.set_ylabel('Probability')
+    ax1.set_title('Weekly Crash Distribution')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Highlight critical regions
+    for i, (bar, prob) in enumerate(zip(bars, weekly_probs)):
+        if i <= 1:  # 0-1 crashes (good week)
+            bar.set_color('lightgreen')
+        elif i >= 6:  # 6+ crashes (crisis week)
+            bar.set_color('red')
+
+    # Cumulative distribution (for planning)
+    cumulative_probs = [stats.poisson.cdf(k, lambda_crashes) for k in k_values]
+    ax2.plot(k_values, cumulative_probs, 'bo-', linewidth=2, markersize=6)
+    ax2.axhline(0.95, color='red', linestyle='--', alpha=0.7, label='95% threshold')
+    ax2.set_xlabel('Number of Crashes')
+    ax2.set_ylabel('P(X ≤ k)')
+    ax2.set_title('Cumulative Probability\n(Planning threshold)')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    # Time between crashes (exponential distribution)
+    # If crashes follow Poisson, time between crashes follows exponential
+    rate = lambda_crashes / 7  # crashes per day
+    days = np.linspace(0, 14, 100)
+    time_between_pdf = rate * np.exp(-rate * days)
+
+    ax3.plot(days, time_between_pdf, 'g-', linewidth=3, label='Time between crashes')
+    ax3.axvline(1/rate, color='red', linestyle='--', alpha=0.7,
+               label=f'Mean = {1/rate:.1f} days')
+    ax3.set_xlabel('Days')
+    ax3.set_ylabel('Probability Density')
+    ax3.set_title('Time Between Crashes\n(Exponential Distribution)')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Planning recommendations
+    print(f"\n💡 IT Planning Recommendations:")
+
+    # Find threshold for 95% confidence
+    threshold_95 = stats.poisson.ppf(0.95, lambda_crashes)
+    threshold_99 = stats.poisson.ppf(0.99, lambda_crashes)
+
+    print(f"Plan for up to {int(threshold_95)} crashes/week (95% confidence)")
+    print(f"Emergency plan for {int(threshold_99)}+ crashes/week (99% confidence)")
+
+    # Cost analysis
+    cost_per_crash = 10000  # $10k per crash
+    expected_weekly_cost = lambda_crashes * cost_per_crash
+    print(f"\nExpected weekly cost: ${expected_weekly_cost:,.0f}")
+    print(f"Expected annual cost: ${expected_weekly_cost * 52:,.0f}")
+
+    # Investment in reliability
+    print(f"\nROI Analysis:")
+    print(f"If spending $50k reduces λ from 2.3 to 1.5:")
+    new_annual_cost = 1.5 * 52 * cost_per_crash
+    savings = (expected_weekly_cost * 52) - new_annual_cost
+    print(f"Annual savings: ${savings:,.0f}")
+    print(f"ROI: {(savings - 50000) / 50000 * 100:.0f}%")
+
+system_reliability_analysis()
+```
+
+### 🌍 Advanced Applications: Multiple Time Scales
+
+**Scaling property**: If events follow Poisson(λ) per unit time, then:
+
+- Events in time t follow Poisson(λt)
+- This makes the Poisson distribution incredibly flexible
+
+```python
+def poisson_time_scaling_demo():
+    print("🌍 Poisson Time Scaling: From Minutes to Years")
+    print("=" * 50)
+
+    # Base rate: 2 customer calls per hour
+    lambda_per_hour = 2.0
+
+    # Scale to different time periods
+    time_scales = [
+        {"period": "10 minutes", "factor": 1/6, "lambda": lambda_per_hour/6},
+        {"period": "1 hour", "factor": 1, "lambda": lambda_per_hour},
+        {"period": "1 day", "factor": 24, "lambda": lambda_per_hour * 24},
+        {"period": "1 week", "factor": 168, "lambda": lambda_per_hour * 168}
+    ]
+
+    fig, axes = plt.subplots(2, 2, figsize=(15, 10))
+    axes = axes.flatten()
+
+    for i, scale in enumerate(time_scales):
+        ax = axes[i]
+        lam = scale["lambda"]
+
+        # Calculate appropriate range
+        k_max = min(30, int(lam + 4*np.sqrt(lam)))
+        k_values = np.arange(0, k_max + 1)
+        probabilities = [stats.poisson.pmf(k, lam) for k in k_values]
+
+        ax.bar(k_values, probabilities, alpha=0.7, color='lightblue', edgecolor='navy')
+        ax.axvline(lam, color='red', linestyle='--', linewidth=2, label=f'Mean = {lam:.1f}')
+        ax.set_xlabel('Number of Calls')
+        ax.set_ylabel('Probability')
+        ax.set_title(f'Calls per {scale["period"]}\nλ = {lam:.2f}')
+        ax.legend()
+        ax.grid(True, alpha=0.3)
+
+        # Add key probabilities
+        prob_zero = stats.poisson.pmf(0, lam)
+        prob_more_than_mean = 1 - stats.poisson.cdf(int(lam), lam)
+
+        text = f'P(zero calls) = {prob_zero:.3f}\n'
+        text += f'P(>{int(lam)} calls) = {prob_more_than_mean:.3f}'
+        ax.text(0.98, 0.98, text, transform=ax.transAxes,
+                verticalalignment='top', horizontalalignment='right',
+                bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.8), fontsize=9)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎯 Key Insight: Poisson scales perfectly with time!")
+    print("This property makes it ideal for capacity planning across different time horizons.")
+
+poisson_time_scaling_demo()
+```
+
+### 🎯 Key Insights About the Poisson Distribution
+
+**1. Unique Properties**:
+
+- **Mean = Variance**: Both equal λ (this is a distinctive feature!)
+- **Memoryless**: Past events don't affect future probabilities
+- **Additive**: If X ~ Poisson(λ₁) and Y ~ Poisson(λ₂), then X+Y ~ Poisson(λ₁+λ₂)
+
+**2. When Poisson Applies**:
+
+- **System failures**: Equipment breakdowns, software crashes
+- **Natural phenomena**: Earthquakes, radioactive decay, meteor strikes
+- **Business events**: Customer arrivals, phone calls, email volumes
+- **Biology**: Mutations, cell divisions, species sightings
+
+**3. Connection to Other Distributions**:
+
+- **Approximates Binomial** when n is large, p is small, np = λ
+- **Related to Exponential** (time between Poisson events is exponential)
+- **Approaches Normal** when λ is large (λ > 20)
+
+**4. Practical Applications**:
+
+- **Reliability engineering**: Plan for system redundancy
+- **Queueing theory**: Staff customer service appropriately
+- **Insurance**: Model rare but expensive claims
+- **Quality control**: Monitor defect rates in manufacturing
+
+**The Poisson distribution is your go-to tool for modeling and planning around rare but important events that can significantly impact business operations!** ⚡✨
+
+---
+
+## The Normal Distribution: Nature's Universal Pattern
+
+### 🔔 The Most Important Distribution in the Universe
+
+**Why "normal"?** Not because other distributions are "abnormal," but because this pattern appears **everywhere** in nature and human activity!
+
+**The bell curve appears when**:
+
+- Many small, independent factors combine to create a result
+- Measurement errors accumulate
+- Natural biological processes vary around an average
+- Large samples from almost any distribution converge to normal (Central Limit Theorem)
+
+**Examples everywhere**:
+
+- **Human traits**: Heights, weights, IQ scores, blood pressure
+- **Measurement errors**: Scientific instruments, survey responses
+- **Financial markets**: Daily stock returns, portfolio values
+- **Manufacturing**: Product dimensions, quality measurements
+- **Machine Learning**: Feature distributions, model errors, neural network weights
+- **Physics**: Molecular speeds, quantum measurements
+
+### 🧮 The Mathematical Beauty
+
+**The Normal Distribution Formula**:
+$$f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}}$$
+
+**Understanding each piece**:
+
+- **μ (mu)**: Mean (center of the distribution)
+- **σ (sigma)**: Standard deviation (spread of the distribution)
+- **π ≈ 3.14159**: The circle constant (appears in many natural patterns)
+- **e ≈ 2.71828**: Euler's number (base of natural logarithm)
+- **The fraction**: Ensures the total area under the curve equals 1
+
+**Why this specific formula?** It emerges naturally from:
+
+- **Maximum entropy principle**: Given only mean and variance, this is the most "random" distribution
+- **Central Limit Theorem**: Sum of many independent variables approaches this shape
+- **Error minimization**: Least squares estimation assumes normal errors
+
+### 🎪 Interactive Normal Distribution Exploration
+
+Let's explore how the normal distribution behaves with different parameters:
+
+```python
+def comprehensive_normal_demo():
+    print("🔔 Normal Distribution: Nature's Universal Pattern")
+    print("=" * 55)
+
+    # Explore effect of different parameters
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+
+    # Effect of changing mean (μ)
+    ax1 = axes[0, 0]
+    x = np.linspace(-10, 15, 1000)
+    means = [0, 2, 5, 8]
+    sigma = 2
+
+    for mu in means:
+        y = stats.norm.pdf(x, mu, sigma)
+        ax1.plot(x, y, linewidth=2, label=f'μ = {mu}, σ = {sigma}')
+
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('Probability Density')
+    ax1.set_title('Effect of Changing Mean μ\n(same spread, different center)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Effect of changing standard deviation (σ)
+    ax2 = axes[0, 1]
+    x = np.linspace(-15, 15, 1000)
+    mu = 0
+    sigmas = [1, 2, 3, 5]
+
+    colors = ['red', 'blue', 'green', 'orange']
+    for sigma, color in zip(sigmas, colors):
+        y = stats.norm.pdf(x, mu, sigma)
+        ax2.plot(x, y, linewidth=2, label=f'μ = {mu}, σ = {sigma}', color=color)
+
+        # Show ±1 standard deviation
+        ax2.axvline(mu - sigma, color=color, linestyle='--', alpha=0.5)
+        ax2.axvline(mu + sigma, color=color, linestyle='--', alpha=0.5)
+
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('Probability Density')
+    ax2.set_title('Effect of Changing Standard Deviation σ\n(same center, different spread)')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    # The 68-95-99.7 Rule
+    ax3 = axes[1, 0]
+    x = np.linspace(-4, 4, 1000)
+    y = stats.norm.pdf(x, 0, 1)
+    ax3.plot(x, y, 'k-', linewidth=3, label='Standard Normal (μ=0, σ=1)')
+
+    # Fill areas for different ranges
+    x_fill = np.linspace(-1, 1, 100)
+    y_fill = stats.norm.pdf(x_fill, 0, 1)
+    ax3.fill_between(x_fill, y_fill, alpha=0.3, color='green', label='68% within ±1σ')
+
+    x_fill = np.linspace(-2, 2, 100)
+    y_fill = stats.norm.pdf(x_fill, 0, 1)
+    ax3.fill_between(x_fill, y_fill, alpha=0.2, color='blue', label='95% within ±2σ')
+
+    x_fill = np.linspace(-3, 3, 100)
+    y_fill = stats.norm.pdf(x_fill, 0, 1)
+    ax3.fill_between(x_fill, y_fill, alpha=0.1, color='red', label='99.7% within ±3σ')
+
+    ax3.set_xlabel('Standard Deviations from Mean')
+    ax3.set_ylabel('Probability Density')
+    ax3.set_title('The 68-95-99.7 Rule\n(Empirical Rule)')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+
+    # Real data vs Normal
+    ax4 = axes[1, 1]
+
+    # Generate sample data that follows different patterns
+    np.random.seed(42)
+    normal_data = np.random.normal(100, 15, 1000)
+    skewed_data = np.random.exponential(2, 1000) * 10 + 80
+
+    ax4.hist(normal_data, bins=30, density=True, alpha=0.7, color='lightblue',
+             label='Normal-like data\n(test scores)', edgecolor='navy')
+    ax4.hist(skewed_data, bins=30, density=True, alpha=0.7, color='lightcoral',
+             label='Skewed data\n(income distribution)', edgecolor='darkred')
+
+    # Overlay normal curves
+    x_range = np.linspace(60, 140, 100)
+    normal_fit = stats.norm.pdf(x_range, np.mean(normal_data), np.std(normal_data))
+    ax4.plot(x_range, normal_fit, 'blue', linewidth=2, label='Normal fit')
+
+    ax4.set_xlabel('Value')
+    ax4.set_ylabel('Density')
+    ax4.set_title('Real Data: Normal vs Skewed')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Calculate and display probabilities
+    print("\n📊 Key Normal Distribution Facts:")
+    print("Standard Normal (μ=0, σ=1):")
+    print(f"P(X ≤ 0) = {stats.norm.cdf(0, 0, 1):.3f} (exactly half)")
+    print(f"P(-1 ≤ X ≤ 1) = {stats.norm.cdf(1, 0, 1) - stats.norm.cdf(-1, 0, 1):.3f} (68% rule)")
+    print(f"P(-2 ≤ X ≤ 2) = {stats.norm.cdf(2, 0, 1) - stats.norm.cdf(-2, 0, 1):.3f} (95% rule)")
+    print(f"P(-3 ≤ X ≤ 3) = {stats.norm.cdf(3, 0, 1) - stats.norm.cdf(-3, 0, 1):.3f} (99.7% rule)")
+
+comprehensive_normal_demo()
+```
+
+### 🚀 Real-World Application: Quality Control
+
+**The problem**: A manufacturing process produces bolts with target diameter of 10mm. You need to set quality control limits and understand defect rates.
+
+**The data**: Measurements follow Normal(μ=10.0mm, σ=0.1mm)
+
+**Questions to answer**:
+
+- What percentage of bolts will be outside tolerance limits?
+- How should you set control limits?
+- What's the probability of extreme deviations?
+
+```python
+def quality_control_analysis():
+    print("🚀 Quality Control: Normal Distribution in Manufacturing")
+    print("=" * 60)
+
+    # Manufacturing specifications
+    target_diameter = 10.0  # mm
+    process_std = 0.1       # mm
+    tolerance_lower = 9.8   # mm
+    tolerance_upper = 10.2  # mm
+
+    print(f"Target diameter: {target_diameter} mm")
+    print(f"Process standard deviation: {process_std} mm")
+    print(f"Tolerance limits: {tolerance_lower} - {tolerance_upper} mm")
+
+    # Calculate defect rates
+    prob_too_small = stats.norm.cdf(tolerance_lower, target_diameter, process_std)
+    prob_too_large = 1 - stats.norm.cdf(tolerance_upper, target_diameter, process_std)
+    prob_defective = prob_too_small + prob_too_large
+    prob_acceptable = 1 - prob_defective
+
+    print(f"\n📊 Quality Analysis:")
+    print(f"Probability too small (< {tolerance_lower}mm): {prob_too_small:.4f} = {prob_too_small*100:.2f}%")
+    print(f"Probability too large (> {tolerance_upper}mm): {prob_too_large:.4f} = {prob_too_large*100:.2f}%")
+    print(f"Total defect rate: {prob_defective:.4f} = {prob_defective*100:.2f}%")
+    print(f"Acceptable rate: {prob_acceptable:.4f} = {prob_acceptable*100:.2f}%")
+
+    # Visualization
+    fig, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(18, 6))
+
+    # Distribution with tolerance limits
+    x = np.linspace(9.6, 10.4, 1000)
+    y = stats.norm.pdf(x, target_diameter, process_std)
+
+    ax1.plot(x, y, 'k-', linewidth=3, label='Process distribution')
+
+    # Color regions
+    x_defect_low = x[x <= tolerance_lower]
+    y_defect_low = stats.norm.pdf(x_defect_low, target_diameter, process_std)
+    ax1.fill_between(x_defect_low, y_defect_low, alpha=0.7, color='red', label='Too small (defect)')
+
+    x_defect_high = x[x >= tolerance_upper]
+    y_defect_high = stats.norm.pdf(x_defect_high, target_diameter, process_std)
+    ax1.fill_between(x_defect_high, y_defect_high, alpha=0.7, color='red', label='Too large (defect)')
+
+    x_acceptable = x[(x > tolerance_lower) & (x < tolerance_upper)]
+    y_acceptable = stats.norm.pdf(x_acceptable, target_diameter, process_std)
+    ax1.fill_between(x_acceptable, y_acceptable, alpha=0.5, color='green', label='Acceptable')
+
+    ax1.axvline(tolerance_lower, color='red', linestyle='--', linewidth=2)
+    ax1.axvline(tolerance_upper, color='red', linestyle='--', linewidth=2)
+    ax1.axvline(target_diameter, color='blue', linestyle='-', linewidth=2, label='Target')
+
+    ax1.set_xlabel('Diameter (mm)')
+    ax1.set_ylabel('Probability Density')
+    ax1.set_title('Process Distribution with Tolerance Limits')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Process capability analysis
+    # Cp = (Upper Limit - Lower Limit) / (6 * sigma)
+    cp = (tolerance_upper - tolerance_lower) / (6 * process_std)
+
+    # Cpk = min(distance to nearest spec limit) / (3 * sigma)
+    cpk_upper = (tolerance_upper - target_diameter) / (3 * process_std)
+    cpk_lower = (target_diameter - tolerance_lower) / (3 * process_std)
+    cpk = min(cpk_upper, cpk_lower)
+
+    ax2.bar(['Cp', 'Cpk'], [cp, cpk], color=['skyblue', 'lightcoral'], alpha=0.7)
+    ax2.axhline(1.0, color='orange', linestyle='--', linewidth=2, label='Minimum acceptable')
+    ax2.axhline(1.33, color='green', linestyle='--', linewidth=2, label='Good process')
+    ax2.set_ylabel('Capability Index')
+    ax2.set_title('Process Capability Indices')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    # Control chart simulation
+    np.random.seed(42)
+    n_samples = 50
+    sample_means = np.random.normal(target_diameter, process_std/np.sqrt(5), n_samples)
+
+    # Control limits (±3 sigma for sample means)
+    ucl = target_diameter + 3 * (process_std / np.sqrt(5))
+    lcl = target_diameter - 3 * (process_std / np.sqrt(5))
+
+    ax3.plot(range(1, n_samples+1), sample_means, 'bo-', alpha=0.7, markersize=4)
+    ax3.axhline(target_diameter, color='green', linewidth=2, label='Target')
+    ax3.axhline(ucl, color='red', linestyle='--', linewidth=2, label='Upper Control Limit')
+    ax3.axhline(lcl, color='red', linestyle='--', linewidth=2, label='Lower Control Limit')
+
+    # Highlight out-of-control points
+    out_of_control = (sample_means > ucl) | (sample_means < lcl)
+    if np.any(out_of_control):
+        ax3.scatter(np.where(out_of_control)[0] + 1, sample_means[out_of_control],
+                   color='red', s=100, marker='x', linewidth=3, label='Out of control')
+
+    ax3.set_xlabel('Sample Number')
+    ax3.set_ylabel('Sample Mean Diameter (mm)')
+    ax3.set_title('Control Chart (Sample Means)')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"\n🔧 Process Capability Analysis:")
+    print(f"Cp = {cp:.2f} (Process capability)")
+    print(f"Cpk = {cpk:.2f} (Process capability with centering)")
+
+    if cp >= 1.33 and cpk >= 1.33:
+        print("✅ EXCELLENT: Process is highly capable")
+    elif cp >= 1.0 and cpk >= 1.0:
+        print("⚠️  ACCEPTABLE: Process meets minimum requirements")
+    else:
+        print("❌ POOR: Process needs improvement")
+
+    # Business impact
+    daily_production = 10000
+    daily_defects = daily_production * prob_defective
+    cost_per_defect = 5  # $5 per defective part
+    daily_cost = daily_defects * cost_per_defect
+
+    print(f"\n💰 Business Impact:")
+    print(f"Daily production: {daily_production:,} parts")
+    print(f"Expected daily defects: {daily_defects:.0f}")
+    print(f"Daily defect cost: ${daily_cost:.0f}")
+    print(f"Annual defect cost: ${daily_cost * 365:,.0f}")
+
+quality_control_analysis()
+```
+
+### 🧠 Machine Learning Applications
+
+**The Normal distribution is everywhere in ML**:
+
+```python
+def ml_normal_applications():
+    print("🧠 Normal Distribution in Machine Learning")
+    print("=" * 50)
+
+    # 1. Feature distributions and preprocessing
+    print("1. Feature Standardization (Z-score normalization)")
+    print("-" * 45)
+
+    # Generate sample feature data
+    np.random.seed(42)
+    raw_features = np.random.normal(50, 15, 1000)  # Original feature
+    standardized_features = (raw_features - np.mean(raw_features)) / np.std(raw_features)
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 10))
+
+    # Original vs standardized features
+    axes[0, 0].hist(raw_features, bins=30, density=True, alpha=0.7, color='lightblue')
+    axes[0, 0].set_title(f'Original Feature\nμ = {np.mean(raw_features):.1f}, σ = {np.std(raw_features):.1f}')
+    axes[0, 0].set_xlabel('Feature Value')
+    axes[0, 0].set_ylabel('Density')
+
+    axes[0, 1].hist(standardized_features, bins=30, density=True, alpha=0.7, color='lightgreen')
+    axes[0, 1].set_title(f'Standardized Feature\nμ = {np.mean(standardized_features):.1f}, σ = {np.std(standardized_features):.1f}')
+    axes[0, 1].set_xlabel('Standardized Value')
+    axes[0, 1].set_ylabel('Density')
+
+    # 2. Model predictions with uncertainty
+    print("\n2. Bayesian Neural Network Predictions")
+    print("-" * 40)
+
+    # Simulate prediction uncertainty
+    x_test = np.linspace(0, 10, 100)
+    mean_prediction = 2 * x_test + 1 + 0.5 * np.sin(2 * x_test)
+    prediction_std = 0.5 + 0.3 * np.sin(x_test)  # Heteroscedastic uncertainty
+
+    # Generate confidence intervals
+    upper_95 = mean_prediction + 1.96 * prediction_std
+    lower_95 = mean_prediction - 1.96 * prediction_std
+    upper_68 = mean_prediction + prediction_std
+    lower_68 = mean_prediction - prediction_std
+
+    axes[0, 2].plot(x_test, mean_prediction, 'b-', linewidth=2, label='Mean prediction')
+    axes[0, 2].fill_between(x_test, lower_95, upper_95, alpha=0.2, color='blue', label='95% confidence')
+    axes[0, 2].fill_between(x_test, lower_68, upper_68, alpha=0.4, color='blue', label='68% confidence')
+
+    # Add some "true" data points
+    np.random.seed(42)
+    x_data = np.random.uniform(0, 10, 20)
+    y_true = 2 * x_data + 1 + 0.5 * np.sin(2 * x_data)
+    noise = np.random.normal(0, 0.5, 20)
+    y_data = y_true + noise
+
+    axes[0, 2].scatter(x_data, y_data, color='red', alpha=0.7, s=50, label='Observed data')
+    axes[0, 2].set_title('Uncertainty Quantification')
+    axes[0, 2].set_xlabel('Input')
+    axes[0, 2].set_ylabel('Output')
+    axes[0, 2].legend()
+    axes[0, 2].grid(True, alpha=0.3)
+
+    # 3. Weight initialization
+    print("\n3. Neural Network Weight Initialization")
+    print("-" * 42)
+
+    # Compare different initialization strategies
+    layer_size = 1000
+
+    # Xavier/Glorot initialization
+    xavier_weights = np.random.normal(0, np.sqrt(1/layer_size), layer_size)
+
+    # He initialization (for ReLU)
+    he_weights = np.random.normal(0, np.sqrt(2/layer_size), layer_size)
+
+    # Poor initialization (too large)
+    poor_weights = np.random.normal(0, 1, layer_size)
+
+    weights_data = [xavier_weights, he_weights, poor_weights]
+    titles = ['Xavier Init\n(tanh/sigmoid)', 'He Init\n(ReLU)', 'Poor Init\n(too large)']
+    colors = ['lightblue', 'lightgreen', 'lightcoral']
+
+    for i, (weights, title, color) in enumerate(zip(weights_data, titles, colors)):
+        ax = axes[1, i]
+        ax.hist(weights, bins=50, density=True, alpha=0.7, color=color)
+
+        # Overlay normal curve
+        x_range = np.linspace(weights.min(), weights.max(), 100)
+        normal_curve = stats.norm.pdf(x_range, np.mean(weights), np.std(weights))
+        ax.plot(x_range, normal_curve, 'red', linewidth=2)
+
+        ax.set_title(f'{title}\nσ = {np.std(weights):.3f}')
+        ax.set_xlabel('Weight Value')
+        ax.set_ylabel('Density')
+        ax.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎯 Key ML Applications of Normal Distribution:")
+    print("• Feature standardization/normalization")
+    print("• Weight initialization in neural networks")
+    print("• Uncertainty quantification in predictions")
+    print("• Gaussian processes for regression")
+    print("• Bayesian neural networks")
+    print("• Error distribution assumptions in many models")
+    print("• Gaussian mixture models for clustering")
+    print("• Principal component analysis")
+
+ml_normal_applications()
+```
+
+### 🌟 The Central Limit Theorem Revisited
+
+**The most important theorem connecting normal distribution to everything else**:
+
+```python
+def clt_comprehensive_demo():
+    print("🌟 Central Limit Theorem: Why Normal Rules Everything")
+    print("=" * 60)
+
+    # Start with very non-normal distributions
+    np.random.seed(42)
+
+    distributions = {
+        'Uniform': lambda n: np.random.uniform(0, 1, n),
+        'Exponential': lambda n: np.random.exponential(1, n),
+        'Binomial': lambda n: np.random.binomial(10, 0.3, n),
+        'Bimodal': lambda n: np.concatenate([
+            np.random.normal(-2, 0.5, n//2),
+            np.random.normal(2, 0.5, n//2)
+        ])
+    }
+
+    sample_sizes = [1, 5, 30, 100]
+
+    fig, axes = plt.subplots(4, 5, figsize=(20, 16))
+
+    for i, (dist_name, dist_func) in enumerate(distributions.items()):
+        # Original distribution
+        original_data = dist_func(10000)
+        axes[i, 0].hist(original_data, bins=50, density=True, alpha=0.7, color='lightcoral')
+        axes[i, 0].set_title(f'{dist_name}\n(Original)')
+        axes[i, 0].set_ylabel('Density')
+
+        # Sample means for different sample sizes
+        for j, n in enumerate(sample_sizes):
+            sample_means = []
+            for _ in range(1000):
+                sample = dist_func(n)
+                sample_means.append(np.mean(sample))
+
+            sample_means = np.array(sample_means)
+
+            ax = axes[i, j+1]
+            ax.hist(sample_means, bins=30, density=True, alpha=0.7, color='lightblue')
+
+            # Overlay theoretical normal curve
+            theoretical_mean = np.mean(sample_means)
+            theoretical_std = np.std(sample_means)
+            x_range = np.linspace(sample_means.min(), sample_means.max(), 100)
+            normal_curve = stats.norm.pdf(x_range, theoretical_mean, theoretical_std)
+            ax.plot(x_range, normal_curve, 'red', linewidth=2, alpha=0.8)
+
+            ax.set_title(f'Sample Size n={n}\nMeans → Normal')
+            if i == 3:  # Bottom row
+                ax.set_xlabel('Sample Mean')
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎯 CLT Key Insights:")
+    print("• No matter what you start with, sample means become normal")
+    print("• Larger sample size → better normal approximation")
+    print("• Standard error decreases as σ/√n")
+    print("• This is why normal distribution is everywhere in statistics!")
+
+clt_comprehensive_demo()
+```
+
+### 🎯 Key Insights About the Normal Distribution
+
+**1. Mathematical Properties**:
+
+- **Symmetric**: Mean = Median = Mode
+- **Fully determined by μ and σ**: These two parameters tell you everything
+- **68-95-99.7 Rule**: Fundamental for understanding spread
+- **Linear combinations**: If X ~ Normal and Y ~ Normal, then aX + bY ~ Normal
+
+**2. Practical Applications**:
+
+- **Hypothesis testing**: Most statistical tests assume normality
+- **Confidence intervals**: Based on normal distribution properties
+- **Machine learning**: Feature preprocessing, weight initialization, uncertainty
+- **Quality control**: Process monitoring and capability analysis
+- **Risk assessment**: Financial modeling, insurance, safety analysis
+
+**3. When to Use Normal**:
+
+- **Many small factors combine** (Central Limit Theorem)
+- **Measurement errors** and natural variations
+- **Large sample approximations** to other distributions
+- **Machine learning features** after standardization
+
+**4. When NOT to Use Normal**:
+
+- **Highly skewed data** (income, web traffic, earthquake magnitudes)
+- **Bounded data** that can't be negative (times, counts, proportions)
+- **Heavy tails** (extreme events more common than normal predicts)
+- **Discrete outcomes** (unless using normal approximation)
+
+**The normal distribution isn't just a mathematical curiosity — it's the foundation for most of modern statistics, machine learning, and data science!** 🔔✨
+
+---
+
+## Conditional Probability & Bayes' Theorem: Learning from Evidence
+
+### 🧠 The Foundation of All Learning
+
+**The profound insight**: Most real-world decisions depend on **new information**. Conditional probability gives us the mathematical framework for **updating our understanding** when we learn something new.
+
+**Examples everywhere**:
+
+- **Medical diagnosis**: "What's the probability of disease X given these symptoms?"
+- **Spam filtering**: "What's the probability this email is spam given it contains 'lottery'?"
+- **Machine learning**: "What's the probability this image is a cat given these pixel patterns?"
+- **Legal reasoning**: "What's the probability of guilt given this evidence?"
+- **Weather forecasting**: "What's the probability of rain given current atmospheric conditions?"
+
+### 🎯 Conditional Probability: When Information Changes Everything
+
+**Conditional Probability Formula**:
+$$P(A|B) = \frac{P(A \cap B)}{P(B)}$$
+
+**What this means**:
+
+- **P(A|B)**: Probability of A **given that** B has occurred
+- **P(A ∩ B)**: Probability that **both** A and B occur
+- **P(B)**: Probability that B occurs (and B must be possible, so P(B) > 0)
+
+**The intuition**: We're **restricting our sample space** to only the cases where B occurred, then asking how often A happens in that restricted world.
+
+### 🎪 Interactive Conditional Probability Exploration
+
+```python
+def conditional_probability_demo():
+    print("🧠 Conditional Probability: How Information Changes Everything")
+    print("=" * 60)
+
+    # Medical diagnosis scenario
+    # Disease D affects 1% of population
+    # Test T is 95% accurate (both sensitivity and specificity)
+
+    p_disease = 0.01
+    p_no_disease = 1 - p_disease
+    p_positive_given_disease = 0.95  # Sensitivity
+    p_negative_given_no_disease = 0.95  # Specificity
+    p_positive_given_no_disease = 1 - p_negative_given_no_disease  # False positive rate
+
+    # Calculate total probability of positive test
+    p_positive = (p_positive_given_disease * p_disease +
+                  p_positive_given_no_disease * p_no_disease)
+
+    # Bayes' theorem: P(Disease|Positive)
+    p_disease_given_positive = (p_positive_given_disease * p_disease) / p_positive
+
+    # Visualization
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+
+    # Population breakdown
+    ax1 = axes[0, 0]
+    population = 100000
+
+    # Create population visualization
+    diseased = int(population * p_disease)
+    healthy = population - diseased
+
+    diseased_test_pos = int(diseased * p_positive_given_disease)
+    diseased_test_neg = diseased - diseased_test_pos
+    healthy_test_pos = int(healthy * p_positive_given_no_disease)
+    healthy_test_neg = healthy - healthy_test_pos
+
+    categories = ['Diseased\n& Test+', 'Diseased\n& Test-', 'Healthy\n& Test+', 'Healthy\n& Test-']
+    counts = [diseased_test_pos, diseased_test_neg, healthy_test_pos, healthy_test_neg]
+    colors = ['darkred', 'lightcoral', 'orange', 'lightgreen']
+
+    bars = ax1.bar(categories, counts, color=colors, alpha=0.8)
+    ax1.set_ylabel('Number of People')
+    ax1.set_title(f'Population Breakdown (N = {population:,})')
+    ax1.tick_params(axis='x', rotation=45)
+
+    # Add count labels on bars
+    for bar, count in zip(bars, counts):
+        height = bar.get_height()
+        ax1.text(bar.get_x() + bar.get_width()/2., height + 100,
+                f'{count:,}', ha='center', va='bottom', fontweight='bold')
+
+    # Conditional probability visualization
+    ax2 = axes[0, 1]
+
+    # Among all positive tests, what fraction are true positives?
+    total_positive = diseased_test_pos + healthy_test_pos
+    true_positive_rate = diseased_test_pos / total_positive
+    false_positive_rate = healthy_test_pos / total_positive
+
+    ax2.pie([true_positive_rate, false_positive_rate],
+           labels=[f'Actually Diseased\n{true_positive_rate:.1%}',
+                  f'Actually Healthy\n{false_positive_rate:.1%}'],
+           colors=['darkred', 'orange'], autopct='%1.1f%%', startangle=90)
+    ax2.set_title('Among All Positive Tests:\nP(Disease|Positive Test)')
+
+    # Prior vs Posterior comparison
+    ax3 = axes[1, 0]
+
+    probs = [p_disease, p_disease_given_positive]
+    labels = ['Before Test\n(Prior)', 'After Positive Test\n(Posterior)']
+    colors = ['lightblue', 'darkred']
+
+    bars = ax3.bar(labels, probs, color=colors, alpha=0.8)
+    ax3.set_ylabel('Probability of Disease')
+    ax3.set_title('How Test Result Updates Our Belief')
+    ax3.set_ylim(0, max(probs) * 1.2)
+
+    # Add probability labels
+    for bar, prob in zip(bars, probs):
+        height = bar.get_height()
+        ax3.text(bar.get_x() + bar.get_width()/2., height + 0.01,
+                f'{prob:.1%}', ha='center', va='bottom', fontweight='bold', fontsize=12)
+
+    # Different test accuracies
+    ax4 = axes[1, 1]
+
+    accuracies = [0.8, 0.9, 0.95, 0.99]
+    posteriors = []
+
+    for acc in accuracies:
+        p_pos = acc * p_disease + (1 - acc) * p_no_disease
+        posterior = (acc * p_disease) / p_pos
+        posteriors.append(posterior)
+
+    ax4.plot(accuracies, posteriors, 'bo-', linewidth=2, markersize=8)
+    ax4.set_xlabel('Test Accuracy')
+    ax4.set_ylabel('P(Disease|Positive)')
+    ax4.set_title('Effect of Test Accuracy\non Posterior Probability')
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"\n📊 Medical Test Analysis:")
+    print(f"Disease prevalence: {p_disease:.1%}")
+    print(f"Test accuracy: {p_positive_given_disease:.1%}")
+    print(f"P(Disease|Positive Test) = {p_disease_given_positive:.1%}")
+    print(f"\n💡 Key Insight: Even with 95% accurate test,")
+    print(f"   a positive result only means {p_disease_given_positive:.1%} chance of disease!")
+    print(f"   This is because the disease is rare (base rate fallacy)")
+
+    # Show the calculation step by step
+    print(f"\n🔍 Step-by-step calculation:")
+    print(f"P(Disease) = {p_disease}")
+    print(f"P(Test+|Disease) = {p_positive_given_disease}")
+    print(f"P(Test+|No Disease) = {p_positive_given_no_disease}")
+    print(f"P(Test+) = P(Test+|Disease)×P(Disease) + P(Test+|No Disease)×P(No Disease)")
+    print(f"         = {p_positive_given_disease}×{p_disease} + {p_positive_given_no_disease}×{p_no_disease}")
+    print(f"         = {p_positive:.4f}")
+    print(f"P(Disease|Test+) = P(Test+|Disease)×P(Disease) / P(Test+)")
+    print(f"                 = {p_positive_given_disease}×{p_disease} / {p_positive:.4f}")
+    print(f"                 = {p_disease_given_positive:.4f} = {p_disease_given_positive:.1%}")
+
+conditional_probability_demo()
+```
+
+### 🎯 Bayes' Theorem: The Engine of Learning
+
+**Bayes' Theorem Formula**:
+$$P(A|B) = \frac{P(B|A) \cdot P(A)}{P(B)}$$
+
+**In words**:
+$$\text{Posterior} = \frac{\text{Likelihood} \times \text{Prior}}{\text{Evidence}}$$
+
+**What each piece means**:
+
+- **P(A|B)**: **Posterior** - what we believe after seeing the evidence
+- **P(B|A)**: **Likelihood** - how likely the evidence is if our hypothesis is true
+- **P(A)**: **Prior** - what we believed before seeing the evidence
+- **P(B)**: **Evidence** - how likely the evidence is overall (normalizing factor)
+
+### 🚀 Real-World Application: Intelligent Spam Detection
+
+**The problem**: Build an email spam filter that learns and adapts
+
+```python
+def intelligent_spam_filter_demo():
+    print("🚀 Intelligent Spam Detection with Naive Bayes")
+    print("=" * 55)
+
+    # Training data: word frequencies in spam vs ham emails
+    spam_word_counts = {
+        'lottery': 150, 'win': 200, 'money': 180, 'free': 220,
+        'meeting': 5, 'project': 8, 'report': 10, 'team': 12
+    }
+
+    ham_word_counts = {
+        'lottery': 2, 'win': 15, 'money': 25, 'free': 30,
+        'meeting': 180, 'project': 200, 'report': 150, 'team': 190
+    }
+
+    # Total emails in training
+    total_spam = 1000
+    total_ham = 2000
+    total_emails = total_spam + total_ham
+
+    # Prior probabilities
+    p_spam = total_spam / total_emails
+    p_ham = total_ham / total_emails
+
+    print(f"Training data: {total_spam} spam emails, {total_ham} ham emails")
+    print(f"Prior P(Spam) = {p_spam:.3f}")
+    print(f"Prior P(Ham) = {p_ham:.3f}")
+
+    def calculate_word_probabilities(word_counts, total_emails):
+        """Calculate P(word|class) with smoothing"""
+        vocab_size = len(set(spam_word_counts.keys()) | set(ham_word_counts.keys()))
+        total_words = sum(word_counts.values())
+
+        probabilities = {}
+        for word in word_counts:
+            # Add-one smoothing to handle unseen words
+            probabilities[word] = (word_counts[word] + 1) / (total_words + vocab_size)
+        return probabilities
+
+    spam_word_probs = calculate_word_probabilities(spam_word_counts, total_spam)
+    ham_word_probs = calculate_word_probabilities(ham_word_counts, total_ham)
+
+    def classify_email(words):
+        """Classify email using Naive Bayes"""
+        # Calculate log probabilities to avoid underflow
+        log_prob_spam = np.log(p_spam)
+        log_prob_ham = np.log(p_ham)
+
+        for word in words:
+            if word in spam_word_probs:
+                log_prob_spam += np.log(spam_word_probs[word])
+                log_prob_ham += np.log(ham_word_probs[word])
+
+        # Convert back to probabilities and normalize
+        prob_spam = np.exp(log_prob_spam)
+        prob_ham = np.exp(log_prob_ham)
+        total_prob = prob_spam + prob_ham
+
+        final_prob_spam = prob_spam / total_prob
+        final_prob_ham = prob_ham / total_prob
+
+        return final_prob_spam, final_prob_ham
+
+    # Test emails
+    test_emails = [
+        ['win', 'lottery', 'money', 'free'],           # Likely spam
+        ['meeting', 'project', 'report', 'team'],      # Likely ham
+        ['win', 'project', 'meeting'],                 # Mixed
+        ['lottery', 'free', 'money'],                  # Likely spam
+        ['team', 'report']                             # Likely ham
+    ]
+
+    email_descriptions = [
+        "Promotional email",
+        "Work email",
+        "Sports team email",
+        "Contest notification",
+        "Brief work message"
+    ]
+
+    # Visualize results
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(16, 6))
+
+    # Classification results
+    spam_probs = []
+    ham_probs = []
+
+    print(f"\n📧 Email Classification Results:")
+    print("=" * 50)
+
+    for i, (email, description) in enumerate(zip(test_emails, email_descriptions)):
+        prob_spam, prob_ham = classify_email(email)
+        spam_probs.append(prob_spam)
+        ham_probs.append(prob_ham)
+
+        classification = "SPAM" if prob_spam > 0.5 else "HAM"
+        confidence = max(prob_spam, prob_ham)
+
+        print(f"Email {i+1}: {email}")
+        print(f"  Description: {description}")
+        print(f"  P(Spam) = {prob_spam:.3f}, P(Ham) = {prob_ham:.3f}")
+        print(f"  Classification: {classification} (confidence: {confidence:.1%})")
+        print()
+
+    # Plot classification results
+    x = range(1, len(test_emails) + 1)
+    width = 0.35
+
+    bars1 = ax1.bar([i - width/2 for i in x], spam_probs, width,
+                   label='P(Spam)', color='red', alpha=0.7)
+    bars2 = ax1.bar([i + width/2 for i in x], ham_probs, width,
+                   label='P(Ham)', color='green', alpha=0.7)
+
+    ax1.set_xlabel('Email')
+    ax1.set_ylabel('Probability')
+    ax1.set_title('Spam Classification Results')
+    ax1.set_xticks(x)
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Feature importance (word probabilities)
+    words = list(spam_word_probs.keys())
+    spam_word_prob_values = [spam_word_probs[word] for word in words]
+    ham_word_prob_values = [ham_word_probs[word] for word in words]
+
+    x_words = range(len(words))
+    bars1 = ax2.bar([i - width/2 for i in x_words], spam_word_prob_values, width,
+                   label='P(word|Spam)', color='red', alpha=0.7)
+    bars2 = ax2.bar([i + width/2 for i in x_words], ham_word_prob_values, width,
+                   label='P(word|Ham)', color='green', alpha=0.7)
+
+    ax2.set_xlabel('Words')
+    ax2.set_ylabel('P(word|class)')
+    ax2.set_title('Word Probabilities by Class')
+    ax2.set_xticks(x_words)
+    ax2.set_xticklabels(words, rotation=45)
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print("🎯 Key Insights:")
+    print("• Bayes' theorem combines prior knowledge with new evidence")
+    print("• 'Naive' assumption: words are independent (often false but works well)")
+    print("• Prior probabilities matter: rare events need strong evidence")
+    print("• Smoothing prevents zero probabilities for unseen words")
+
+intelligent_spam_filter_demo()
+```
+
+### 🌟 Why Bayes' Theorem Is Revolutionary
+
+**1. Formal Framework for Learning**:
+
+- **Quantifies belief updating** with mathematical precision
+- **Handles uncertainty** explicitly rather than ignoring it
+- **Accumulates evidence** over time naturally
+
+**2. Foundation of Modern AI**:
+
+- **Machine learning**: Bayesian neural networks, Gaussian processes
+- **Natural language processing**: Language models, translation
+- **Computer vision**: Object detection, image classification
+- **Robotics**: Sensor fusion, localization, mapping
+
+**3. Scientific Method Formalized**:
+
+- **Hypothesis testing**: Comparing competing theories
+- **Evidence accumulation**: Stronger evidence → stronger conclusions
+- **Model selection**: Choosing between different explanations
+
+---
+
+## Probability in Physics: From Molecules to Quantum Mechanics
+
+### ⚛️ Where Certainty Meets Uncertainty
+
+**Physics reveal a profound truth**: At the most fundamental level, **nature is probabilistic**. Yet from this randomness emerges the predictable world we see.
+
+**Two revolutionary insights**:
+
+1. **Statistical Mechanics**: Macroscopic properties (temperature, pressure) emerge from probabilistic behavior of countless particles
+2. **Quantum Mechanics**: Fundamental uncertainty isn't due to measurement limitations — it's built into reality itself
+
+### 🌡️ Statistical Mechanics: Order from Chaos
+
+**The Maxwell-Boltzmann distribution** describes how particle speeds are distributed in a gas:
+
+$$f(v) = 4\pi \left(\frac{m}{2\pi k_B T}\right)^{3/2} v^2 e^{-\frac{mv^2}{2k_B T}}$$
+
+**Where**: m = particle mass, k_B = Boltzmann constant, T = temperature, v = speed
+
+```python
+def statistical_mechanics_demo():
+    print("🌡️ Statistical Mechanics: How Probability Creates Temperature")
+    print("=" * 65)
+
+    # Physical constants
+    k_B = 1.38e-23  # Boltzmann constant (J/K)
+    m_air = 4.8e-26  # Average air molecule mass (kg)
+
+    # Different temperatures
+    temperatures = [200, 300, 400, 600]  # Kelvin
+    colors = ['blue', 'green', 'orange', 'red']
+
+    # Speed range (m/s)
+    v = np.linspace(0, 2000, 1000)
+
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+
+    # Plot Maxwell-Boltzmann distributions
+    ax1 = axes[0, 0]
+
+    for T, color in zip(temperatures, colors):
+        # Maxwell-Boltzmann distribution
+        coefficient = 4 * np.pi * (m_air / (2 * np.pi * k_B * T))**(3/2)
+        distribution = coefficient * v**2 * np.exp(-m_air * v**2 / (2 * k_B * T))
+
+        ax1.plot(v, distribution, color=color, linewidth=2, label=f'T = {T} K')
+
+        # Mark most probable speed
+        v_mp = np.sqrt(2 * k_B * T / m_air)
+        ax1.axvline(v_mp, color=color, linestyle='--', alpha=0.7)
+
+    ax1.set_xlabel('Speed (m/s)')
+    ax1.set_ylabel('Probability Density')
+    ax1.set_title('Maxwell-Boltzmann Speed Distribution\n(Air molecules at different temperatures)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Temperature vs characteristic speeds
+    ax2 = axes[0, 1]
+
+    T_range = np.linspace(200, 600, 100)
+    v_mp_range = np.sqrt(2 * k_B * T_range / m_air)  # Most probable speed
+    v_avg_range = np.sqrt(8 * k_B * T_range / (np.pi * m_air))  # Average speed
+    v_rms_range = np.sqrt(3 * k_B * T_range / m_air)  # RMS speed
+
+    ax2.plot(T_range, v_mp_range, 'b-', linewidth=2, label='Most probable speed')
+    ax2.plot(T_range, v_avg_range, 'g-', linewidth=2, label='Average speed')
+    ax2.plot(T_range, v_rms_range, 'r-', linewidth=2, label='RMS speed')
+
+    ax2.set_xlabel('Temperature (K)')
+    ax2.set_ylabel('Speed (m/s)')
+    ax2.set_title('Characteristic Speeds vs Temperature')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    # Pressure from kinetic theory
+    ax3 = axes[1, 0]
+
+    # Ideal gas law: PV = nRT, or P = (n/V)RT = ρRT/M
+    # From kinetic theory: P = (1/3)ρ<v²> = (1/3)ρ(3kT/m) = ρkT/m
+
+    densities = [1.0, 1.2, 1.5, 2.0]  # kg/m³
+    T_pressure = np.linspace(200, 600, 100)
+
+    for density, color in zip(densities, colors):
+        pressure = density * k_B * T_pressure / m_air / 1000  # Convert to kPa
+        ax3.plot(T_pressure, pressure, color=color, linewidth=2,
+                label=f'ρ = {density} kg/m³')
+
+    ax3.set_xlabel('Temperature (K)')
+    ax3.set_ylabel('Pressure (kPa)')
+    ax3.set_title('Pressure vs Temperature\n(From kinetic theory)')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+
+    # Random walk simulation (diffusion)
+    ax4 = axes[1, 1]
+
+    # Simulate particle diffusion
+    np.random.seed(42)
+    n_particles = 1000
+    n_steps = 100
+
+    # 2D random walk
+    x_positions = np.zeros(n_particles)
+    y_positions = np.zeros(n_particles)
+
+    step_size = 1.0
+    for step in range(n_steps):
+        # Random steps in x and y
+        x_steps = np.random.choice([-step_size, step_size], n_particles)
+        y_steps = np.random.choice([-step_size, step_size], n_particles)
+
+        x_positions += x_steps
+        y_positions += y_steps
+
+    # Calculate distances from origin
+    distances = np.sqrt(x_positions**2 + y_positions**2)
+
+    ax4.scatter(x_positions, y_positions, alpha=0.6, s=1)
+
+    # Theoretical prediction: <r²> = 2Dt, where D is diffusion coefficient
+    # For 2D random walk: <r²> = 2n (n = number of steps)
+    theoretical_rms = np.sqrt(2 * n_steps) * step_size
+    circle = plt.Circle((0, 0), theoretical_rms, fill=False, color='red',
+                       linewidth=2, label=f'Theoretical RMS = {theoretical_rms:.1f}')
+    ax4.add_patch(circle)
+
+    ax4.set_xlabel('X Position')
+    ax4.set_ylabel('Y Position')
+    ax4.set_title(f'2D Random Walk: {n_particles} Particles, {n_steps} Steps')
+    ax4.set_aspect('equal')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"🎯 Key Statistical Mechanics Insights:")
+    print(f"• Temperature is average kinetic energy: <E> = (3/2)kT")
+    print(f"• Pressure comes from molecular collisions")
+    print(f"• Diffusion follows √t law: typical distance ∝ √time")
+    print(f"• Macroscopic properties emerge from microscopic randomness")
+
+    # Show specific calculations
+    T_room = 300  # K
+    v_mp_room = np.sqrt(2 * k_B * T_room / m_air)
+    v_avg_room = np.sqrt(8 * k_B * T_room / (np.pi * m_air))
+
+    print(f"\n📊 At room temperature (300 K):")
+    print(f"Most probable speed: {v_mp_room:.0f} m/s")
+    print(f"Average speed: {v_avg_room:.0f} m/s")
+    print(f"This is why air molecules move at ~500 m/s!")
+
+statistical_mechanics_demo()
+```
+
+### ⚙️ Quantum Mechanics: Probability as Reality
+
+**In quantum mechanics**, probabilities aren't just due to our ignorance — they're **fundamental to how nature works**.
+
+**Key principle**: The **wavefunction** ψ(x,t) contains all possible information about a quantum system. The probability of finding a particle at position x is **|ψ(x,t)|²**.
+
+```python
+def quantum_probability_demo():
+    print("⚙️ Quantum Mechanics: Probability as Fundamental Reality")
+    print("=" * 60)
+
+    # Particle in a box: standing wave solutions
+    # ψ(x) = √(2/L) sin(nπx/L) for n = 1, 2, 3, ...
+
+    L = 1.0  # Box length
+    x = np.linspace(0, L, 1000)
+
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+
+    # Wavefunctions for different quantum numbers
+    ax1 = axes[0, 0]
+
+    quantum_numbers = [1, 2, 3, 4]
+    colors = ['blue', 'red', 'green', 'orange']
+
+    for n, color in zip(quantum_numbers, colors):
+        # Wavefunction
+        psi = np.sqrt(2/L) * np.sin(n * np.pi * x / L)
+        ax1.plot(x, psi, color=color, linewidth=2, label=f'n = {n}')
+
+    ax1.set_xlabel('Position (x/L)')
+    ax1.set_ylabel('Wavefunction ψ(x)')
+    ax1.set_title('Quantum Wavefunctions (Particle in a Box)')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+    ax1.axhline(y=0, color='black', linewidth=0.5)
+
+    # Probability densities |ψ|²
+    ax2 = axes[0, 1]
+
+    for n, color in zip(quantum_numbers, colors):
+        psi = np.sqrt(2/L) * np.sin(n * np.pi * x / L)
+        probability_density = np.abs(psi)**2
+        ax2.plot(x, probability_density, color=color, linewidth=2, label=f'n = {n}')
+
+    ax2.set_xlabel('Position (x/L)')
+    ax2.set_ylabel('Probability Density |ψ(x)|²')
+    ax2.set_title('Quantum Probability Distributions')
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    # Uncertainty principle demonstration
+    ax3 = axes[1, 0]
+
+    # Wave packet: superposition of plane waves
+    k0 = 20  # Central wave number
+    sigma_k = 2  # Wave number spread
+
+    # Create wave packet
+    k_values = np.linspace(k0 - 4*sigma_k, k0 + 4*sigma_k, 100)
+    x_packet = np.linspace(-1, 1, 1000)
+
+    # Gaussian envelope in k-space creates Gaussian wave packet in x-space
+    sigma_x = 1 / (2 * sigma_k)  # Uncertainty relation: Δx Δk ≥ 1/2
+
+    # Wave packet wavefunction
+    envelope = np.exp(-(x_packet**2) / (4 * sigma_x**2))
+    oscillation = np.cos(k0 * x_packet)
+    wave_packet = envelope * oscillation
+
+    ax3.plot(x_packet, wave_packet, 'b-', linewidth=2, label='Wave packet ψ(x)')
+    ax3.plot(x_packet, envelope, 'r--', linewidth=2, label='Envelope |ψ(x)|')
+    ax3.plot(x_packet, -envelope, 'r--', linewidth=2)
+
+    ax3.set_xlabel('Position')
+    ax3.set_ylabel('Amplitude')
+    ax3.set_title(f'Wave Packet: Δx ≈ {sigma_x:.2f}, Δk ≈ {sigma_k:.2f}\nΔx·Δk = {sigma_x * sigma_k:.2f} ≥ 0.5')
+    ax3.legend()
+    ax3.grid(True, alpha=0.3)
+
+    # Measurement probability simulation
+    ax4 = axes[1, 1]
+
+    # Simulate quantum measurements
+    np.random.seed(42)
+    n_measurements = 10000
+
+    # For n=1 state, probability density is sin²(πx/L)
+    n = 1
+
+    # Generate random positions according to quantum probability
+    # Use rejection sampling
+    measurements = []
+    while len(measurements) < n_measurements:
+        x_trial = np.random.uniform(0, L)
+        prob_density = (2/L) * np.sin(n * np.pi * x_trial / L)**2
+
+        if np.random.uniform(0, 2/L) < prob_density:
+            measurements.append(x_trial)
+
+    measurements = np.array(measurements)
+
+    # Plot histogram of measurements
+    counts, bins, patches = ax4.hist(measurements, bins=50, density=True, alpha=0.7,
+                                    color='lightblue', label='Measurement results')
+
+    # Overlay theoretical probability density
+    x_theory = np.linspace(0, L, 1000)
+    prob_theory = (2/L) * np.sin(n * np.pi * x_theory / L)**2
+    ax4.plot(x_theory, prob_theory, 'r-', linewidth=3, label='Theoretical |ψ|²')
+
+    ax4.set_xlabel('Measured Position')
+    ax4.set_ylabel('Probability Density')
+    ax4.set_title(f'Quantum Measurement Results\n(n=1 state, {n_measurements:,} measurements)')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"🎯 Quantum Mechanics Key Points:")
+    print(f"• Wavefunction ψ(x) contains all information about quantum system")
+    print(f"• Probability density = |ψ(x)|² (Born rule)")
+    print(f"• Uncertainty principle: Δx·Δp ≥ ℏ/2 (fundamental limit)")
+    print(f"• Measurement 'collapses' wavefunction to definite state")
+    print(f"• Superposition: quantum systems can be in multiple states simultaneously")
+
+    # Calculate expectation values
+    print(f"\n📊 Expectation Values for n=1 state:")
+    # <x> = ∫ x |ψ(x)|² dx = L/2 (center of box)
+    expectation_x = L/2
+    # <x²> = ∫ x² |ψ(x)|² dx = L²(1/3 - 1/(2π²))
+    expectation_x2 = L**2 * (1/3 - 1/(2*np.pi**2))
+    variance_x = expectation_x2 - expectation_x**2
+    uncertainty_x = np.sqrt(variance_x)
+
+    print(f"Expected position <x> = {expectation_x:.3f}L")
+    print(f"Position uncertainty Δx = {uncertainty_x:.3f}L")
+    print(f"Measured average: {np.mean(measurements):.3f}L")
+    print(f"Measured std dev: {np.std(measurements):.3f}L")
+
+quantum_probability_demo()
+```
+
+### 🌌 From Classical to Quantum: The Probabilistic Universe
+
+**Classical Physics**: Probability due to **incomplete information**
+
+- If we knew exact positions and velocities, we could predict everything
+- Probability is a **practical tool** for complex systems
+
+**Quantum Physics**: Probability is **fundamental reality**
+
+- Even with complete information, outcomes are probabilistic
+- Uncertainty is built into the fabric of reality
+- **Information itself** has physical consequences
+
+**The profound implication**: Nature uses **probability as a creative force**, not just a limitation!
+
+---
+
+## Probability in Machine Learning: Intelligence from Uncertainty
+
+### 🤖 AI That Knows What It Doesn't Know
+
+**Modern AI isn't just about making predictions** — it's about **quantifying uncertainty** in those predictions. This enables:
+
+- **Confidence-aware decisions**: Acting differently when uncertain
+- **Active learning**: Asking for labels on most uncertain examples
+- **Robust systems**: Handling unexpected inputs gracefully
+- **Scientific discovery**: Understanding which hypotheses are most likely
+
+**Three fundamental applications**:
+
+1. **Probabilistic Models**: Representing knowledge with uncertainty
+2. **Bayesian Learning**: Updating beliefs as we see more data
+3. **Uncertainty Quantification**: Knowing how confident our predictions are
+
+### 📊 Probabilistic Classification: Beyond Simple Predictions
+
+```python
+def probabilistic_ml_demo():
+    print("🤖 Probabilistic Machine Learning: AI That Knows Its Limits")
+    print("=" * 65)
+
+    # Generate synthetic dataset with some ambiguous regions
+    np.random.seed(42)
+    n_samples = 1000
+
+    # Create two overlapping clusters
+    cluster1_x = np.random.normal(2, 1, n_samples//2)
+    cluster1_y = np.random.normal(2, 1, n_samples//2)
+    cluster1_labels = np.zeros(n_samples//2)
+
+    cluster2_x = np.random.normal(4, 1, n_samples//2)
+    cluster2_y = np.random.normal(4, 1, n_samples//2)
+    cluster2_labels = np.ones(n_samples//2)
+
+    # Combine data
+    X = np.column_stack([
+        np.concatenate([cluster1_x, cluster2_x]),
+        np.concatenate([cluster1_y, cluster2_y])
+    ])
+    y = np.concatenate([cluster1_labels, cluster2_labels])
+
+    # Train multiple models
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.neural_network import MLPClassifier
+    from sklearn.model_selection import train_test_split
+    from sklearn.calibration import CalibratedClassifierCV
+
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    # Different models with probability estimates
+    models = {
+        'Logistic Regression': LogisticRegression(random_state=42),
+        'Random Forest': RandomForestClassifier(n_estimators=100, random_state=42),
+        'Neural Network': MLPClassifier(hidden_layer_sizes=(50, 30), max_iter=1000, random_state=42)
+    }
+
+    # Train models and get probability predictions
+    trained_models = {}
+    for name, model in models.items():
+        # Use calibration for better probability estimates
+        calibrated_model = CalibratedClassifierCV(model, method='isotonic', cv=3)
+        calibrated_model.fit(X_train, y_train)
+        trained_models[name] = calibrated_model
+
+    # Create prediction grid for visualization
+    h = 0.1
+    x_min, x_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    y_min, y_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx, yy = np.meshgrid(np.arange(x_min, x_max, h),
+                         np.arange(y_min, y_max, h))
+
+    fig, axes = plt.subplots(2, 3, figsize=(18, 12))
+
+    for idx, (name, model) in enumerate(trained_models.items()):
+        # Get probability predictions for entire grid
+        grid_points = np.column_stack([xx.ravel(), yy.ravel()])
+        prob_predictions = model.predict_proba(grid_points)[:, 1]  # Probability of class 1
+        prob_predictions = prob_predictions.reshape(xx.shape)
+
+        # Plot decision boundary with uncertainty
+        ax = axes[0, idx]
+
+        # Contour plot showing probability levels
+        contour = ax.contourf(xx, yy, prob_predictions, levels=20, alpha=0.8, cmap='RdYlBu')
+
+        # Add decision boundary (50% probability)
+        ax.contour(xx, yy, prob_predictions, levels=[0.5], colors='black', linewidths=2)
+
+        # Plot training data
+        scatter = ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train,
+                           cmap='RdYlBu', edgecolors='black', alpha=0.7)
+
+        ax.set_title(f'{name}\nProbability Predictions')
+        ax.set_xlabel('Feature 1')
+        ax.set_ylabel('Feature 2')
+
+        # Add colorbar
+        plt.colorbar(contour, ax=ax, label='P(Class 1)')
+
+    # Model uncertainty comparison
+    ax = axes[1, 0]
+
+    # Calculate prediction entropy (uncertainty) for each model
+    for idx, (name, model) in enumerate(trained_models.items()):
+        probs = model.predict_proba(grid_points)
+        # Entropy: -Σ p_i log(p_i)
+        entropy = -np.sum(probs * np.log(probs + 1e-8), axis=1)
+        entropy = entropy.reshape(xx.shape)
+
+        if idx == 0:  # Use first model for visualization
+            uncertainty_contour = ax.contourf(xx, yy, entropy, levels=20, alpha=0.8, cmap='Reds')
+            ax.contour(xx, yy, entropy, levels=10, colors='darkred', linewidths=1, alpha=0.6)
+
+    ax.scatter(X_train[:, 0], X_train[:, 1], c=y_train,
+              cmap='RdYlBu', edgecolors='black', alpha=0.7)
+    ax.set_title('Prediction Uncertainty\n(Entropy of probabilities)')
+    ax.set_xlabel('Feature 1')
+    ax.set_ylabel('Feature 2')
+    plt.colorbar(uncertainty_contour, ax=ax, label='Uncertainty (bits)')
+
+    # Calibration curve
+    ax = axes[1, 1]
+
+    from sklearn.calibration import calibration_curve
+
+    for name, model in trained_models.items():
+        prob_pos = model.predict_proba(X_test)[:, 1]
+        fraction_of_positives, mean_predicted_value = calibration_curve(
+            y_test, prob_pos, n_bins=10)
+
+        ax.plot(mean_predicted_value, fraction_of_positives,
+               marker='o', linewidth=2, label=name)
+
+    # Perfect calibration line
+    ax.plot([0, 1], [0, 1], 'k--', label='Perfect calibration')
+    ax.set_xlabel('Mean predicted probability')
+    ax.set_ylabel('Fraction of positives')
+    ax.set_title('Calibration Curves\n(How well do probabilities match reality?)')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+
+    # Confidence-based accuracy
+    ax = axes[1, 2]
+
+    # For each model, show accuracy vs confidence threshold
+    confidence_thresholds = np.linspace(0.5, 0.95, 20)
+
+    for name, model in trained_models.items():
+        prob_predictions = model.predict_proba(X_test)
+        max_probs = np.max(prob_predictions, axis=1)  # Confidence = max probability
+        predictions = model.predict(X_test)
+
+        accuracies = []
+        sample_sizes = []
+
+        for threshold in confidence_thresholds:
+            # Only consider predictions above confidence threshold
+            confident_mask = max_probs >= threshold
+            if np.sum(confident_mask) > 0:
+                confident_predictions = predictions[confident_mask]
+                confident_true = y_test[confident_mask]
+                accuracy = np.mean(confident_predictions == confident_true)
+                accuracies.append(accuracy)
+                sample_sizes.append(np.sum(confident_mask))
+            else:
+                accuracies.append(np.nan)
+                sample_sizes.append(0)
+
+        ax.plot(confidence_thresholds, accuracies, marker='o', linewidth=2, label=name)
+
+    ax.set_xlabel('Confidence Threshold')
+    ax.set_ylabel('Accuracy')
+    ax.set_title('Accuracy vs Confidence\n(Higher confidence → Higher accuracy)')
+    ax.legend()
+    ax.grid(True, alpha=0.3)
+    ax.set_ylim(0.5, 1.05)
+
+    plt.tight_layout()
+    plt.show()
+
+    # Print performance metrics
+    print(f"\n📊 Model Performance Analysis:")
+    print("=" * 50)
+
+    for name, model in trained_models.items():
+        predictions = model.predict(X_test)
+        probabilities = model.predict_proba(X_test)[:, 1]
+
+        accuracy = np.mean(predictions == y_test)
+
+        # Log-likelihood (measure of probability quality)
+        log_likelihood = np.mean(y_test * np.log(probabilities + 1e-8) +
+                               (1 - y_test) * np.log(1 - probabilities + 1e-8))
+
+        # Brier score (mean squared error of probabilities)
+        brier_score = np.mean((probabilities - y_test)**2)
+
+        print(f"{name}:")
+        print(f"  Accuracy: {accuracy:.3f}")
+        print(f"  Log-likelihood: {log_likelihood:.3f}")
+        print(f"  Brier score: {brier_score:.3f} (lower is better)")
+        print()
+
+    print("🎯 Key Insights:")
+    print("• Probabilistic models provide uncertainty estimates, not just predictions")
+    print("• Calibration ensures probabilities match real frequencies")
+    print("• High uncertainty often indicates borderline cases or out-of-distribution data")
+    print("• Confidence-based filtering can improve accuracy on retained predictions")
+
+probabilistic_ml_demo()
+```
+
+### 🧠 Bayesian Neural Networks: Deep Learning with Uncertainty
+
+**Traditional neural networks**: Output a single prediction
+**Bayesian neural networks**: Output a **distribution** over predictions
+
+```python
+def bayesian_neural_network_demo():
+    print("🧠 Bayesian Neural Networks: Deep Learning with Uncertainty")
+    print("=" * 65)
+
+    # Generate regression dataset with heteroscedastic noise
+    np.random.seed(42)
+    n_train = 100
+    n_test = 50
+
+    def true_function(x):
+        return 0.5 * x + 0.3 * np.sin(3 * x) + 0.1 * x**2
+
+    def noise_function(x):
+        return 0.1 + 0.2 * np.abs(x)  # Noise increases with |x|
+
+    # Training data
+    X_train = np.random.uniform(-2, 2, n_train).reshape(-1, 1)
+    y_train_true = true_function(X_train.flatten())
+    noise_std = noise_function(X_train.flatten())
+    y_train = y_train_true + np.random.normal(0, noise_std)
+
+    # Test data (more spread out)
+    X_test = np.linspace(-3, 3, n_test).reshape(-1, 1)
+    y_test_true = true_function(X_test.flatten())
+
+    # Simulate Bayesian Neural Network with Monte Carlo Dropout
+    from sklearn.neural_network import MLPRegressor
+    from sklearn.preprocessing import StandardScaler
+
+    # Scale features
+    scaler_X = StandardScaler()
+    scaler_y = StandardScaler()
+
+    X_train_scaled = scaler_X.fit_transform(X_train)
+    y_train_scaled = scaler_y.fit_transform(y_train.reshape(-1, 1)).flatten()
+    X_test_scaled = scaler_X.transform(X_test)
+
+    # Train ensemble of neural networks (approximate Bayesian inference)
+    n_models = 50
+    models = []
+
+    for i in range(n_models):
+        model = MLPRegressor(hidden_layer_sizes=(50, 30),
+                           alpha=0.01,  # L2 regularization
+                           max_iter=1000,
+                           random_state=i)
+
+        # Bootstrap sampling for variability
+        bootstrap_indices = np.random.choice(len(X_train_scaled),
+                                           size=len(X_train_scaled),
+                                           replace=True)
+        X_boot = X_train_scaled[bootstrap_indices]
+        y_boot = y_train_scaled[bootstrap_indices]
+
+        model.fit(X_boot, y_boot)
+        models.append(model)
+
+    # Make predictions with uncertainty
+    predictions = []
+    for model in models:
+        pred_scaled = model.predict(X_test_scaled)
+        pred = scaler_y.inverse_transform(pred_scaled.reshape(-1, 1)).flatten()
+        predictions.append(pred)
+
+    predictions = np.array(predictions)
+
+    # Calculate statistics
+    mean_prediction = np.mean(predictions, axis=0)
+    std_prediction = np.std(predictions, axis=0)
+
+    # Confidence intervals
+    lower_bound = np.percentile(predictions, 16, axis=0)  # ~-1 std
+    upper_bound = np.percentile(predictions, 84, axis=0)  # ~+1 std
+    lower_bound_95 = np.percentile(predictions, 2.5, axis=0)  # ~-2 std
+    upper_bound_95 = np.percentile(predictions, 97.5, axis=0)  # ~+2 std
+
+    # Visualization
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+
+    # Prediction with uncertainty
+    ax1 = axes[0, 0]
+
+    # Plot individual model predictions (sample)
+    for i in range(min(10, n_models)):
+        ax1.plot(X_test.flatten(), predictions[i], 'b-', alpha=0.1, linewidth=0.5)
+
+    # Plot mean prediction and confidence bands
+    ax1.plot(X_test.flatten(), mean_prediction, 'r-', linewidth=3, label='Mean prediction')
+    ax1.fill_between(X_test.flatten(), lower_bound_95, upper_bound_95,
+                    alpha=0.2, color='red', label='95% confidence')
+    ax1.fill_between(X_test.flatten(), lower_bound, upper_bound,
+                    alpha=0.3, color='red', label='68% confidence')
+
+    # Plot true function and training data
+    ax1.plot(X_test.flatten(), y_test_true, 'g--', linewidth=2, label='True function')
+    ax1.scatter(X_train.flatten(), y_train, alpha=0.6, color='black', s=20, label='Training data')
+
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('y')
+    ax1.set_title('Bayesian Neural Network Predictions')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Uncertainty vs distance from training data
+    ax2 = axes[0, 1]
+
+    # Calculate distance to nearest training point
+    distances = []
+    for x_test in X_test.flatten():
+        min_distance = np.min(np.abs(X_train.flatten() - x_test))
+        distances.append(min_distance)
+
+    ax2.scatter(distances, std_prediction, alpha=0.7, color='blue')
+    ax2.set_xlabel('Distance to Nearest Training Point')
+    ax2.set_ylabel('Prediction Uncertainty (std)')
+    ax2.set_title('Uncertainty vs Training Data Distance')
+    ax2.grid(True, alpha=0.3)
+
+    # Add trend line
+    from scipy import stats
+    slope, intercept, r_value, p_value, std_err = stats.linregress(distances, std_prediction)
+    line = slope * np.array(distances) + intercept
+    ax2.plot(distances, line, 'r-', alpha=0.8,
+            label=f'Trend (R² = {r_value**2:.3f})')
+    ax2.legend()
+
+    # Prediction error vs uncertainty
+    ax3 = axes[1, 0]
+
+    prediction_errors = np.abs(mean_prediction - y_test_true)
+    ax3.scatter(std_prediction, prediction_errors, alpha=0.7, color='green')
+    ax3.set_xlabel('Prediction Uncertainty (std)')
+    ax3.set_ylabel('Prediction Error |y_pred - y_true|')
+    ax3.set_title('Error vs Uncertainty\n(Good uncertainty should correlate with error)')
+    ax3.grid(True, alpha=0.3)
+
+    # Add trend line
+    slope2, intercept2, r_value2, p_value2, std_err2 = stats.linregress(std_prediction, prediction_errors)
+    line2 = slope2 * std_prediction + intercept2
+    ax3.plot(std_prediction, line2, 'r-', alpha=0.8,
+            label=f'Trend (R² = {r_value2**2:.3f})')
+    ax3.legend()
+
+    # Uncertainty decomposition
+    ax4 = axes[1, 1]
+
+    # Epistemic uncertainty (reducible with more data) vs Aleatoric uncertainty (irreducible noise)
+    # Simple approximation: high uncertainty far from data = epistemic
+    # high uncertainty near data = aleatoric
+
+    epistemic_proxy = np.array(distances) / np.max(distances)  # Normalized distance
+    aleatoric_proxy = 1 - epistemic_proxy  # Complement
+
+    width = 0.35
+    x_pos = range(len(X_test))
+
+    ax4.bar([x - width/2 for x in x_pos], epistemic_proxy * std_prediction,
+           width, label='Epistemic (model uncertainty)', alpha=0.7, color='blue')
+    ax4.bar([x + width/2 for x in x_pos], aleatoric_proxy * std_prediction,
+           width, label='Aleatoric (data noise)', alpha=0.7, color='orange')
+
+    ax4.set_xlabel('Test Point Index')
+    ax4.set_ylabel('Uncertainty Component')
+    ax4.set_title('Uncertainty Decomposition\n(Simplified approximation)')
+    ax4.legend()
+    ax4.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"🎯 Bayesian Neural Network Analysis:")
+    print("=" * 50)
+
+    # Calculate metrics
+    rmse = np.sqrt(np.mean((mean_prediction - y_test_true)**2))
+    coverage_68 = np.mean((y_test_true >= lower_bound) & (y_test_true <= upper_bound))
+    coverage_95 = np.mean((y_test_true >= lower_bound_95) & (y_test_true <= upper_bound_95))
+
+    print(f"RMSE: {rmse:.3f}")
+    print(f"68% confidence interval coverage: {coverage_68:.1%} (should be ~68%)")
+    print(f"95% confidence interval coverage: {coverage_95:.1%} (should be ~95%)")
+
+    # Uncertainty quality metrics
+    uncertainty_correlation = np.corrcoef(std_prediction, prediction_errors)[0, 1]
+    distance_correlation = np.corrcoef(distances, std_prediction)[0, 1]
+
+    print(f"\nUncertainty Quality:")
+    print(f"Correlation between uncertainty and error: {uncertainty_correlation:.3f}")
+    print(f"Correlation between distance and uncertainty: {distance_correlation:.3f}")
+
+    print(f"\n💡 Key Insights:")
+    print("• Bayesian neural networks provide uncertainty estimates with predictions")
+    print("• Uncertainty typically increases far from training data (epistemic)")
+    print("• Good uncertainty should correlate with prediction errors")
+    print("• Can distinguish between reducible and irreducible uncertainty")
+    print("• Enables confident decision-making and active learning")
+
+bayesian_neural_network_demo()
+```
+
+### 🎯 Active Learning: Learning Efficiently with Uncertainty
+
+**The idea**: Instead of labeling data randomly, **ask for labels on the most uncertain examples** to improve the model fastest.
+
+```python
+def active_learning_demo():
+    print("🎯 Active Learning: Asking the Right Questions")
+    print("=" * 50)
+
+    # Generate dataset
+    np.random.seed(42)
+    from sklearn.datasets import make_classification
+
+    X, y = make_classification(n_samples=1000, n_features=2, n_redundant=0,
+                              n_informative=2, n_clusters_per_class=1, random_state=42)
+
+    # Start with small labeled set
+    n_initial = 20
+    n_queries = 10
+    query_size = 5
+
+    # Initial random split
+    from sklearn.model_selection import train_test_split
+    X_pool, X_test, y_pool, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+    # Start with random labeled examples
+    initial_indices = np.random.choice(len(X_pool), n_initial, replace=False)
+
+    X_labeled = X_pool[initial_indices]
+    y_labeled = y_pool[initial_indices]
+
+    # Remove from pool
+    X_pool = np.delete(X_pool, initial_indices, axis=0)
+    y_pool = np.delete(y_pool, initial_indices, axis=0)
+
+    # Track performance
+    random_accuracies = []
+    uncertainty_accuracies = []
+
+    for query_round in range(n_queries):
+        print(f"\nQuery round {query_round + 1}/{n_queries}")
+        print(f"Labeled examples: {len(X_labeled)}")
+
+        # Train model on current labeled data
+        model = LogisticRegression(random_state=42)
+        model.fit(X_labeled, y_labeled)
+
+        # Evaluate current performance
+        current_accuracy = model.score(X_test, y_test)
+        print(f"Current accuracy: {current_accuracy:.3f}")
+
+        if len(X_pool) < query_size:
+            break
+
+        # UNCERTAINTY SAMPLING: Query most uncertain examples
+        pool_probs = model.predict_proba(X_pool)
+        # Uncertainty = 1 - max(probabilities) (least confident)
+        uncertainty_scores = 1 - np.max(pool_probs, axis=1)
+
+        # Select most uncertain examples
+        uncertain_indices = np.argsort(uncertainty_scores)[-query_size:]
+
+        # RANDOM SAMPLING: Query random examples (for comparison)
+        random_indices = np.random.choice(len(X_pool), query_size, replace=False)
+
+        # Add to labeled set (uncertainty sampling)
+        X_new_uncertain = X_pool[uncertain_indices]
+        y_new_uncertain = y_pool[uncertain_indices]
+
+        X_labeled_uncertain = np.vstack([X_labeled, X_new_uncertain])
+        y_labeled_uncertain = np.concatenate([y_labeled, y_new_uncertain])
+
+        # Train and evaluate uncertainty-based model
+        model_uncertain = LogisticRegression(random_state=42)
+        model_uncertain.fit(X_labeled_uncertain, y_labeled_uncertain)
+        uncertainty_accuracy = model_uncertain.score(X_test, y_test)
+        uncertainty_accuracies.append(uncertainty_accuracy)
+
+        # Add to labeled set (random sampling)
+        X_new_random = X_pool[random_indices]
+        y_new_random = y_pool[random_indices]
+
+        X_labeled_random = np.vstack([X_labeled, X_new_random])
+        y_labeled_random = np.concatenate([y_labeled, y_new_random])
+
+        # Train and evaluate random sampling model
+        model_random = LogisticRegression(random_state=42)
+        model_random.fit(X_labeled_random, y_labeled_random)
+        random_accuracy = model_random.score(X_test, y_test)
+        random_accuracies.append(random_accuracy)
+
+        # Update labeled set with uncertainty sampling (for next round)
+        X_labeled = X_labeled_uncertain
+        y_labeled = y_labeled_uncertain
+
+        # Remove queried examples from pool
+        all_queried = np.unique(np.concatenate([uncertain_indices, random_indices]))
+        X_pool = np.delete(X_pool, all_queried, axis=0)
+        y_pool = np.delete(y_pool, all_queried, axis=0)
+
+    # Visualization
+    fig, axes = plt.subplots(1, 2, figsize=(16, 6))
+
+    # Learning curves
+    ax1 = axes[0]
+
+    sample_sizes = [n_initial + i * query_size for i in range(1, len(uncertainty_accuracies) + 1)]
+
+    ax1.plot(sample_sizes, uncertainty_accuracies, 'ro-', linewidth=2,
+            label='Uncertainty Sampling', markersize=8)
+    ax1.plot(sample_sizes, random_accuracies, 'bo-', linewidth=2,
+            label='Random Sampling', markersize=8)
+
+    ax1.set_xlabel('Number of Labeled Examples')
+    ax1.set_ylabel('Test Accuracy')
+    ax1.set_title('Active Learning vs Random Sampling')
+    ax1.legend()
+    ax1.grid(True, alpha=0.3)
+
+    # Improvement over random sampling
+    ax2 = axes[1]
+
+    improvement = np.array(uncertainty_accuracies) - np.array(random_accuracies)
+    ax2.bar(range(len(improvement)), improvement, alpha=0.7, color='green')
+    ax2.axhline(y=0, color='black', linestyle='-', linewidth=1)
+    ax2.set_xlabel('Query Round')
+    ax2.set_ylabel('Accuracy Improvement')
+    ax2.set_title('Uncertainty Sampling Advantage')
+    ax2.grid(True, alpha=0.3)
+
+    plt.tight_layout()
+    plt.show()
+
+    print(f"\n📊 Active Learning Results:")
+    print("=" * 40)
+
+    final_uncertainty_acc = uncertainty_accuracies[-1]
+    final_random_acc = random_accuracies[-1]
+    total_improvement = final_uncertainty_acc - final_random_acc
+
+    print(f"Final accuracy (uncertainty sampling): {final_uncertainty_acc:.3f}")
+    print(f"Final accuracy (random sampling): {final_random_acc:.3f}")
+    print(f"Total improvement: {total_improvement:.3f}")
+
+    # Calculate data efficiency
+    target_accuracy = 0.85
+    if final_uncertainty_acc >= target_accuracy and final_random_acc >= target_accuracy:
+        uncertain_samples_needed = next((i for i, acc in enumerate(uncertainty_accuracies)
+                                       if acc >= target_accuracy), len(uncertainty_accuracies))
+        random_samples_needed = next((i for i, acc in enumerate(random_accuracies)
+                                    if acc >= target_accuracy), len(random_accuracies))
+
+        if uncertain_samples_needed < random_samples_needed:
+            efficiency = (random_samples_needed - uncertain_samples_needed) / random_samples_needed
+            print(f"\nData efficiency at {target_accuracy:.1%} accuracy:")
+            print(f"Uncertainty sampling: {uncertain_samples_needed * query_size} fewer examples needed")
+            print(f"Efficiency gain: {efficiency:.1%}")
+
+    print(f"\n💡 Active Learning Benefits:")
+    print("• Focuses on informative examples near decision boundary")
+    print("• Reduces labeling costs by 20-50% typically")
+    print("• Especially powerful for expensive-to-label domains")
+    print("• Can be combined with other query strategies")
+
+active_learning_demo()
+```
+
+### 🎯 Key Insights About Probability in Machine Learning
+
+**1. Beyond Point Predictions**:
+
+- **Traditional ML**: "The prediction is 7.3"
+- **Probabilistic ML**: "The prediction is 7.3 ± 1.2 with 90% confidence"
+
+**2. Uncertainty Types**:
+
+- **Aleatoric (irreducible)**: Due to noisy data, inherent randomness
+- **Epistemic (reducible)**: Due to model uncertainty, lack of training data
+
+**3. Practical Applications**:
+
+- **Medical diagnosis**: "90% confidence this is benign" vs "60% confidence"
+- **Autonomous vehicles**: Slow down when uncertain about obstacles
+- **Financial trading**: Larger bets when more confident in predictions
+- **Scientific discovery**: Focus experiments on most uncertain hypotheses
+
+**4. Bayesian Perspective**:
+
+- **Models have beliefs** that update with new evidence
+- **Overfitting is naturally penalized** through regularization
+- **Uncertainty decreases** as we collect more relevant data
+- **Model selection** becomes principled through evidence comparison
+
+**Machine learning with probability transforms AI from rigid automation to intelligent systems that can reason about their own uncertainty — a crucial step toward truly reliable artificial intelligence!** 🤖✨
+
+---
+
+# Chapter 7 Summary
+
+### 🎯 The Mathematical Mastery of Uncertainty You've Gained
+
+You've just completed a **transformative journey** from the world of deterministic mathematics into the realm of **uncertainty and randomness**! This isn't just about gambling and dice — you've mastered the mathematical framework that powers everything from **Google's search algorithms** to **Netflix recommendations** to **quantum mechanics**!
+
+### 🔑 Key Concepts Mastered
+
+**1. Probability Foundations - The Language of Uncertainty**
+
+- **Three interpretations**: Classical, frequentist, and Bayesian perspectives
+- **Sample spaces and events**: The building blocks of probabilistic thinking
+- **Fundamental rules**: Non-negativity, normalization, and additivity
+- **Law of Large Numbers**: Why randomness becomes predictable in large quantities
+- **Probability operations**: Unions, intersections, complements, and conditional probability
+
+**2. Random Variables - Bridging Abstract and Concrete**
+
+- **The conceptual breakthrough**: Converting outcomes to numbers we can calculate with
+- **Discrete vs continuous**: Counting vs measuring, PMFs vs PDFs
+- **Key statistics**: Expected value (center), variance (spread), standard deviation
+- **Distributions as shapes**: Understanding how uncertainty is structured
+- **Cumulative distribution functions**: The probability of being "at most" a certain value
+
+**3. The Big Three Distributions - Patterns That Rule the World**
+
+**Binomial Distribution**: The mathematics of success/failure
+
+- **When to use**: Fixed trials, binary outcomes, constant probability, independence
+- **Real power**: A/B testing, quality control, clinical trials, conversion analysis
+- **Key insight**: From individual uncertainty to aggregate predictability
+
+**Poisson Distribution**: Modeling rare but important events
+
+- **When to use**: Events over time/space, constant rate, independence, rarity
+- **Real power**: System reliability, customer arrivals, natural disasters, defect monitoring
+- **Key insight**: Rare events follow predictable patterns over time
+
+**Normal Distribution**: Nature's universal pattern
+
+- **When to use**: Many small factors combine, measurement errors, Central Limit Theorem applies
+- **Real power**: Quality control, machine learning features, statistical inference, risk assessment
+- **Key insight**: The "bell curve" emerges naturally from complexity
+
+**4. Central Limit Theorem - The Most Important Theorem in Probability**
+
+- **The profound truth**: No matter what you start with, sample means become normal
+- **Why this matters**: Foundation for all statistical inference and machine learning
+- **Practical impact**: Makes the impossible possible — predicting from samples
+
+### 🌟 Real-World Superpowers Unlocked
+
+**🎯 A/B Testing & Conversion Optimization**
+
+- **Problem**: Did the website change actually improve performance?
+- **Solution**: Binomial distribution + statistical significance testing
+- **Impact**: Billions in revenue optimization across the tech industry
+
+**⚡ System Reliability & Risk Management**
+
+- **Problem**: How often will our systems fail? How should we plan?
+- **Solution**: Poisson distribution for failure modeling and capacity planning
+- **Impact**: Preventing catastrophic failures, optimizing maintenance schedules
+
+**🔧 Quality Control & Manufacturing**
+
+- **Problem**: Are our products meeting specifications?
+- **Solution**: Normal distribution + process capability analysis
+- **Impact**: Six Sigma methodology, defect reduction, cost savings
+
+**🤖 Machine Learning & AI Foundations**
+
+- **Problem**: How do we handle uncertainty in predictions?
+- **Solution**: Normal distributions for feature preprocessing, weight initialization, uncertainty quantification
+- **Impact**: Modern AI systems that can reason about confidence and reliability
+
+**📊 Data Science & Statistical Inference**
+
+- **Problem**: What can we conclude from limited data?
+- **Solution**: Probability distributions + Central Limit Theorem
+- **Impact**: Evidence-based decision making across all industries
+
+### 🔗 Connections Across Mathematics
+
+**Building on Previous Chapters**:
+
+- **Chapter 1**: Functions become probability functions (PMFs, PDFs)
+- **Chapter 2**: Derivatives appear in maximum likelihood estimation
+- **Chapter 3**: Integration becomes the foundation for continuous probability
+- **Chapter 4**: Gradients drive probabilistic optimization and machine learning
+- **Chapter 5**: Linear algebra powers multivariate distributions and dimension reduction
+- **Chapter 6**: Eigenanalysis reveals principal components in data distributions
+
+**Preparing for Advanced Topics**:
+
+- **Bayesian inference**: Updating beliefs with evidence
+- **Markov chains**: Sequential random processes
+- **Statistical testing**: Hypothesis testing and p-values
+- **Regression analysis**: Modeling relationships with uncertainty
+- **Machine learning**: Probabilistic models and neural networks
+
+### 🧮 Essential Formulas & Insights
+
+$$
+\begin{aligned}
+\text{Binomial: } &P(X = k) = \binom{n}{k}p^k(1-p)^{n-k} \\
+\text{Poisson: } &P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!} \\
+\text{Normal: } &f(x) = \frac{1}{\sigma\sqrt{2\pi}} e^{-\frac{(x-\mu)^2}{2\sigma^2}} \\
+\text{Expected Value: } &E[X] = \sum_x x \cdot P(X = x) \text{ (discrete)} \\
+\text{Variance: } &\text{Var}(X) = E[X^2] - (E[X])^2 \\
+\text{Central Limit Theorem: } &\bar{X} \sim N\left(\mu, \frac{\sigma}{\sqrt{n}}\right)
+\end{aligned}
+$$
+
+### 🎯 Practical Problem-Solving Arsenal
+
+**When to Use Binomial**:
+
+- A/B testing and conversion analysis
+- Quality control with pass/fail outcomes
+- Clinical trials and medical studies
+- Survey response analysis
+- Any fixed-trial success/failure scenario
+
+**When to Use Poisson**:
+
+- System failure and reliability analysis
+- Customer arrival and queueing theory
+- Natural disaster and risk modeling
+- Manufacturing defect monitoring
+- Any rare events over time/space
+
+**When to Use Normal**:
+
+- Measurement error and quality control
+- Machine learning feature preprocessing
+- Financial risk and portfolio analysis
+- Natural phenomena and biological traits
+- Large sample statistical inference
+
+**How to Recognize Patterns**:
+
+1. **Fixed trials + success/failure** → Binomial
+2. **Rare events over time/space** → Poisson
+3. **Many small factors combining** → Normal
+4. **Large samples from any distribution** → Normal (via CLT)
+
+### 🚀 The Bigger Picture
+
+**You now possess the mathematical framework for reasoning intelligently under uncertainty** — a superpower that enables:
+
+1. **Data-driven decision making** with confidence intervals and significance testing
+2. **Predictive modeling** that quantifies uncertainty in predictions
+3. **Risk assessment** across finance, engineering, and business operations
+4. **Quality optimization** in manufacturing and service processes
+5. **Understanding AI systems** that handle real-world uncertainty
+
+**From Casino Games to Quantum Mechanics**: The probability concepts you've mastered are the **mathematical foundation** underlying:
+
+- Search engines and recommendation systems
+- Financial modeling and risk management
+- Medical diagnosis and treatment effectiveness
+- Quality control and Six Sigma methodology
+- Machine learning and artificial intelligence
+- Physics from statistical mechanics to quantum theory
+- A/B testing and experimental design
+
+### 🌌 The Probabilistic Universe
+
+**Probability reveals a profound truth about reality**:
+
+**The world appears random at small scales but becomes predictable at large scales.** Whether it's individual coin flips becoming predictable averages, quantum uncertainties creating stable matter, or customer behaviors enabling business forecasting — the mathematics is the same.
+
+**You've learned to see uncertainty not as a problem to be avoided, but as a pattern to be understood and harnessed.**
+
+**This is more than just mathematics — it's a new way of thinking about the world through the lens of uncertainty, evidence, and probabilistic reasoning.** 🎲✨
+
+### 🔥 Ready for Advanced Applications?
+
+With probability and statistics mastered, you're now equipped to:
+
+- **Design and interpret** A/B tests and scientific experiments
+- **Build machine learning models** that handle uncertainty gracefully
+- **Perform statistical analysis** with confidence and rigor
+- **Understand research papers** in data science, AI, and quantitative fields
+- **Make data-driven decisions** in business, engineering, and research
+
+**You've gained the mathematical literacy to understand how data scientists, machine learning engineers, and researchers actually work!** 📊🚀
+
+**The next frontiers await** — armed with these probabilistic tools, you can tackle advanced topics like Bayesian inference, time series analysis, experimental design, and the statistical foundations of machine learning with confidence and deep understanding!
+
+---

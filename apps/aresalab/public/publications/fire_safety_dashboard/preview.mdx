@@ -1,0 +1,51 @@
+## Abstract
+
+This applied analytics study examines emergency fire response patterns in Allegheny County, Pennsylvania, using comprehensive dispatch data spanning 2015-2024. We analyzed 930,808 emergency dispatch records to identify geographic hotspots, temporal patterns, and resource allocation challenges facing fire departments in the region.
+
+Our analysis revealed a critical false alarm crisis: 37.3% of all fire dispatches (347,191 incidents) were fire alarms, many of which proved to be false alarms. This represents a substantial drain on emergency resources, with estimated costs exceeding $347 million over the study period at approximately $1,000 per false alarm response. Geographic analysis identified significant disparities in incident distribution, with certain municipalities experiencing disproportionately high call volumes relative to population.
+
+Temporal analysis uncovered distinct seasonal patterns varying by incident type. Structure fires peaked during winter heating months (December-February), while outdoor fires concentrated in summer months (June-August). False fire alarms showed surprisingly consistent year-round distribution, suggesting systemic issues with alarm system quality rather than seasonal factors. Hour-of-day analysis revealed bimodal patterns for most incident types, with peaks during morning (8-11 AM) and evening (5-8 PM) periods.
+
+We developed an interactive analytics dashboard using Python's Gradio framework to enable stakeholders to explore these patterns dynamically. The dashboard provides geographic visualizations, temporal trend analysis, and emergency priority breakdowns to support evidence-based policy decisions. Based on our findings, we recommend three priority interventions: (1) smart alarm technology deployment to reduce false alarms by 30-50%, (2) targeted community fire prevention programs in high-incident neighborhoods, and (3) seasonal resource reallocation to match demand patterns. This research demonstrates how large-scale public safety data can inform strategic resource allocation and policy development.
+
+---
+
+## Introduction
+
+## Background and Motivation
+
+Fire departments face increasing pressure to optimize resource allocation while maintaining rapid response capabilities. In Allegheny County, which encompasses Pittsburgh and 129 surrounding municipalities, fire services respond to hundreds of thousands of emergency incidents annually. Understanding the spatial and temporal distribution of these incidents is critical for strategic planning, resource deployment, and community risk reduction programs.
+
+Public safety agencies increasingly recognize the value of data-driven decision making [@nfpa2023]. However, many departments lack the analytical capabilities to extract actionable insights from their operational data. This research addresses that gap by analyzing a decade of emergency dispatch records to identify patterns that can inform policy and resource allocation decisions.
+
+The Western Pennsylvania Regional Data Center (WPRDC) maintains comprehensive records of emergency dispatches, providing a unique opportunity for longitudinal analysis. This dataset captures the full spectrum of fire department responses, from structure fires to medical assists, enabling systematic examination of incident patterns and resource demands.
+
+## Research Objectives
+
+This study pursues three primary objectives:
+
+1. **Geographic Analysis**: Identify municipalities and neighborhoods with disproportionately high incident rates, enabling targeted prevention and resource allocation.
+
+2. **Temporal Pattern Detection**: Characterize seasonal, monthly, and hourly patterns in different incident types to support dynamic resource deployment strategies.
+
+3. **False Alarm Assessment**: Quantify the false alarm burden on emergency resources and estimate the cost impact on public safety systems.
+
+## Public Safety Context
+
+Fire departments provide multiple critical services beyond fire suppression, including emergency medical response, hazardous materials incidents, and rescue operations. However, a growing challenge facing departments nationwide is the proliferation of false alarms from automated detection systems. These false alarms divert resources from genuine emergencies, increase operational costs, and contribute to responder fatigue [@hall2020].
+
+Allegheny County's diverse geography—ranging from dense urban neighborhoods in Pittsburgh to rural townships—creates varied risk profiles and resource requirements. Understanding how incident patterns differ across this landscape is essential for equitable and efficient service delivery.
+
+## Analytical Approach
+
+We employed descriptive analytics and geospatial analysis techniques to characterize incident patterns:
+
+**Data Processing**: Cleaning and standardizing 930,808 dispatch records spanning 10 years, including geocoding, temporal feature extraction, and incident type classification.
+
+**Geographic Analysis**: Mapping incident distributions across municipalities and neighborhoods, calculating per-capita rates, and identifying spatial clusters.
+
+**Temporal Analysis**: Decomposing incident patterns by year, month, day of week, and hour of day to reveal cyclical patterns and trends.
+
+**Dashboard Development**: Creating an interactive analytics platform using Gradio to make findings accessible to non-technical stakeholders including fire chiefs, municipal officials, and community leaders.
+
+This multi-faceted approach enables both high-level strategic insights and granular operational intelligence to support evidence-based fire service management.

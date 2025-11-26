@@ -5,11 +5,11 @@ import { serialize } from "next-mdx-remote/serialize";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 
-const PUBLICATIONS_DIR = path.join(process.cwd(), "content/publications");
-const BOOKS_DIR = path.join(process.cwd(), "content/books");
+const PUBLICATIONS_DIR = path.join(process.cwd(), "public/publications");
 
 export async function getPublicationContent(slug: string) {
-  const filePath = path.join(PUBLICATIONS_DIR, `${slug}.mdx`);
+  // Look for preview.mdx in the publication's folder
+  const filePath = path.join(PUBLICATIONS_DIR, slug, "preview.mdx");
 
   if (!fs.existsSync(filePath)) {
     return null;
@@ -33,31 +33,10 @@ export async function getPublicationContent(slug: string) {
 }
 
 export async function getBookContent(slug: string) {
-  // Books are plain markdown files
-  const filePath = path.join(BOOKS_DIR, `${slug}.md`);
+  // Look for preview.mdx in the book's folder
+  const filePath = path.join(PUBLICATIONS_DIR, slug, "preview.mdx");
 
   if (!fs.existsSync(filePath)) {
-    // Try alternate naming
-    const files = fs.readdirSync(BOOKS_DIR);
-    const matchingFile = files.find(f => f.toLowerCase().includes(slug.replace(/-/g, "_")));
-    if (matchingFile) {
-      const fullPath = path.join(BOOKS_DIR, matchingFile);
-      const fileContent = fs.readFileSync(fullPath, "utf-8");
-      const { content, data } = matter(fileContent);
-
-      const mdxSource = await serialize(content, {
-        mdxOptions: {
-          remarkPlugins: [remarkMath],
-          rehypePlugins: [rehypeKatex as any],
-        },
-      });
-
-      return {
-        source: mdxSource,
-        frontmatter: data,
-        filename: matchingFile,
-      };
-    }
     return null;
   }
 
