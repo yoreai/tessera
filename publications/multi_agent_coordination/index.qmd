@@ -1,0 +1,22 @@
+# Abstract {.unnumbered}
+
+Environmental risk assessment at scale requires synthesizing diverse expertise---wildfire behavior, flood hydrology, seismic hazards, infrastructure vulnerability---that no single model can encompass. This paper presents a **Multi-Agent Geospatial Coordination Protocol (MACP)** that distributes risk assessment across 128 specialized agents organized into domain-specific pools, achieving both high accuracy and robust fault tolerance.
+
+Our theoretical contributions establish:
+
+1. **Consensus Optimality**: We prove that our weighted consensus mechanism produces the Best Linear Unbiased Estimator (BLUE) of true risk when agent confidences reflect inverse variance (Theorem 1). This result, derived from the Gauss-Markov theorem, guarantees statistical optimality.
+
+2. **Convergence Bounds**: We establish probabilistic bounds on consensus accuracy using Chebyshev's inequality, proving that with $n$ agents, the consensus error is bounded by $O(1/\sqrt{n})$ with high probability (Corollary 1).
+
+3. **Byzantine Fault Tolerance**: We prove that MACP tolerates up to $\lfloor (n-1)/3 \rfloor$ Byzantine (arbitrarily faulty) agents while maintaining bounded consensus error (Theorem 3).
+
+4. **Communication Complexity**: We analyze message and bandwidth complexity, showing that MACP achieves $O(n)$ messages and $O(n \cdot m)$ bandwidth per assessment round.
+
+Experimental evaluation on California fire hazard data demonstrates that the 128-agent MACP achieves **89.7% classification accuracy**---6.3 percentage points better than single-model baselines---with **93% scaling efficiency** up to 256 agents. Real-world deployment processes 546,000+ addresses in under 35 seconds.
+
+---
+
+**Keywords:** Multi-Agent Systems, Consensus Protocols, Byzantine Fault Tolerance, Environmental Risk Assessment, Distributed Computing
+
+**Mathematics Subject Classification:** 68T42 (Agent Technology), 68W15 (Distributed Algorithms), 62F10 (Point Estimation)
+

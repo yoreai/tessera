@@ -1,0 +1,193 @@
+# Coordinate Embedding Framework
+
+The Coordinate Embedding Framework (CEF) transforms geographic coordinates into semantically rich vectors that enable downstream neural processing. This section details the architecture, training procedure, and implementation specifics.
+
+## Architecture Overview
+
+```{python}
+#| label: fig-cef-architecture
+#| fig-cap: "Four-stage Coordinate Embedding Framework architecture. Each stage extracts 128-dimensional features that are concatenated and projected to the final 512-dimensional embedding."
+
+import sys
+sys.path.insert(0, '..')
+from _diagram_style import render_boxes_diagram
+
+stages = [
+    {
+        'name': 'Spatial Features',
+        'items': ['Zone Distance', 'Elevation', 'Slope/Aspect', 'Positional Enc.'],
+        'color': '#64b5f6'  # blue
+    },
+    {
+        'name': 'Environmental',
+        'items': ['NDVI Index', 'Soil Moisture', 'Precipitation', 'Temperature'],
+        'color': '#4db6ac'  # teal
+    },
+    {
+        'name': 'Topographic',
+        'items': ['TRI Ruggedness', 'Watershed ID', 'Ridge Distance', 'Valley Depth'],
+        'color': '#ffb74d'  # orange
+    },
+    {
+        'name': 'Infrastructure',
+        'items': ['Road Density', 'Building Count', 'Utility Lines', 'Access Routes'],
+        'color': '#ba68c8'  # purple
+    },
+]
+
+render_boxes_diagram(stages, "Coordinate Embedding Framework (CEF) Pipeline", "cef_architecture.svg")
+```
+
+![CEF Architecture](cef_architecture.svg){#fig-cef-arch width=100%}
+
+The CEF processes coordinates through four sequential stages, each extracting domain-specific features before a final projection layer produces the 512-dimensional embedding.
+
+## Stage 1: Spatial Feature Extraction
+
+The spatial stage establishes the fundamental geographic representation. For coordinate $p = (\phi, \lambda)$:
+
+**Distance Features (32 dimensions):**
+We compute distances to the $k=8$ nearest fire hazard zone boundaries:
+
+$$
+d_i(p) = \min_{q \in \partial Z_i} d_{\text{geo}}(p, q) \quad \text{for } i = 1, \ldots, k
+$$
+
+where $\partial Z_i$ denotes the boundary of fire hazard zone $i$. These distances are normalized and encoded with both linear and logarithmic scales to capture sensitivity at multiple ranges.
+
+**Elevation and Terrain (32 dimensions):**
+Elevation $h(p)$, slope $\nabla h(p)$, and aspect $\theta(p)$ are extracted from USGS Digital Elevation Model data at 10-meter resolution:
+
+$$
+\text{slope}(p) = \arctan(|\nabla h(p)|), \quad \text{aspect}(p) = \arctan2\left(\frac{\partial h}{\partial \lambda}, \frac{\partial h}{\partial \phi}\right)
+$$
+
+**Positional Encoding (64 dimensions):**
+Following the transformer literature [@vaswani2017attention], we apply sinusoidal encoding at multiple frequencies:
+
+$$
+\text{PE}_{2i}(\phi) = \sin\left(\frac{\phi}{10000^{2i/64}}\right), \quad \text{PE}_{2i+1}(\phi) = \cos\left(\frac{\phi}{10000^{2i/64}}\right)
+$$
+
+This encoding allows the model to distinguish coordinates at sub-meter resolution while maintaining smooth interpolation between nearby points.
+
+## Stage 2: Environmental Context
+
+The environmental stage captures vegetation, climate, and ecological factors that influence fire risk:
+
+**Vegetation Index (48 dimensions):**
+Normalized Difference Vegetation Index (NDVI) from Sentinel-2 satellite imagery at 10-meter resolution, averaged over seasonal time windows:
+
+$$
+\text{NDVI}(p) = \frac{\rho_{\text{NIR}}(p) - \rho_{\text{Red}}(p)}{\rho_{\text{NIR}}(p) + \rho_{\text{Red}}(p)}
+$$
+
+We compute NDVI for each season (4 values) and derive temporal statistics (mean, variance, trend) yielding 48 features.
+
+**Moisture and Climate (80 dimensions):**
+Soil moisture estimates from SMAP satellite data, 30-year precipitation normals from PRISM, and temperature anomalies are encoded at multiple spatial scales (local, 1km, 5km, 10km neighborhoods).
+
+## Stage 3: Topographic Structure
+
+Topographic features capture the landscape context that channels fire spread:
+
+**Terrain Ruggedness Index (32 dimensions):**
+The TRI quantifies local elevation variability:
+
+$$
+\text{TRI}(p) = \sqrt{\frac{1}{|N(p)|} \sum_{q \in N(p)} (h(q) - h(p))^2}
+$$
+
+where $N(p)$ is the 8-cell neighborhood around $p$.
+
+**Watershed Position (32 dimensions):**
+Each coordinate is assigned to a HUC-12 watershed unit. Relative position within the watershed (headwater, mid-reach, outlet) is encoded along with watershed area and mean slope.
+
+**Ridge and Valley Structure (64 dimensions):**
+We compute distance to nearest ridgeline and valley bottom using hydrological flow accumulation:
+
+$$
+\text{ridge\_dist}(p) = \min_{q : \text{FA}(q) < \tau_{\text{low}}} d_{\text{geo}}(p, q)
+$$
+
+$$
+\text{valley\_dist}(p) = \min_{q : \text{FA}(q) > \tau_{\text{high}}} d_{\text{geo}}(p, q)
+$$
+
+where FA is flow accumulation and $\tau$ are thresholds.
+
+## Stage 4: Infrastructure Analysis
+
+Infrastructure features encode human-built environment and accessibility:
+
+**Road Network (48 dimensions):**
+Distance to nearest road by classification (interstate, state highway, county road, local street), road density within 500m and 2km buffers, and intersection density.
+
+**Building Footprints (48 dimensions):**
+Building count and total footprint area within 100m, 500m, and 1km buffers. Building density gradient indicates urban-wildland interface zones critical for fire risk.
+
+**Utility Corridors (32 dimensions):**
+Distance to power lines (major transmission, distribution), gas pipelines, and water infrastructure. These features inform both ignition risk (power lines) and suppression capability (water access).
+
+## Projection and Normalization
+
+The four 128-dimensional stage outputs are concatenated into a 512-dimensional raw feature vector:
+
+$$
+\mathbf{f}(p) = f_S(p) \oplus f_E(p) \oplus f_T(p) \oplus f_I(p)
+$$
+
+A learned linear projection followed by layer normalization produces the final embedding:
+
+$$
+\text{CEF}(p) = \text{LayerNorm}(W \mathbf{f}(p) + b)
+$$
+
+where $W \in \mathbb{R}^{512 \times 512}$ and $b \in \mathbb{R}^{512}$ are trained parameters.
+
+## Training Procedure
+
+The CEF is trained with a multi-objective loss combining:
+
+1. **Contrastive Loss** (distance preservation):
+$$
+\mathcal{L}_{\text{cont}} = \sum_{i,j} \left(\|\text{CEF}(p_i) - \text{CEF}(p_j)\|_2 - \gamma \cdot d_{\text{geo}}(p_i, p_j)\right)^2
+$$
+
+2. **Reconstruction Loss** (feature fidelity):
+$$
+\mathcal{L}_{\text{recon}} = \sum_{f \in \{S,E,T,I\}} \|D_f(\text{CEF}(p)) - f(p)\|_2^2
+$$
+
+3. **Orthogonality Regularizer** (stage independence):
+$$
+\mathcal{L}_{\text{orth}} = \sum_{i < j} \cos^2(\theta_{ij}) \quad \text{where } \theta_{ij} = \angle(e_i, e_j)
+$$
+
+4. **Risk Prediction Loss** (downstream utility):
+$$
+\mathcal{L}_{\text{risk}} = \text{BCE}(\sigma(\mathbf{w}^T \text{CEF}(p)), y_{\text{risk}}(p))
+$$
+
+The combined loss is:
+
+$$
+\mathcal{L} = \lambda_1 \mathcal{L}_{\text{cont}} + \lambda_2 \mathcal{L}_{\text{recon}} + \lambda_3 \mathcal{L}_{\text{orth}} + \lambda_4 \mathcal{L}_{\text{risk}}
+$$
+
+with $\lambda_1 = 1.0$, $\lambda_2 = 0.5$, $\lambda_3 = 0.1$, $\lambda_4 = 2.0$ determined by validation performance.
+
+## Computational Complexity
+
+| Operation | Complexity | Wall Time (batch=1024) |
+|-----------|------------|------------------------|
+| Feature Extraction (per stage) | $O(k \cdot n)$ | 12 ms |
+| Concatenation | $O(512)$ | <1 ms |
+| Linear Projection | $O(512^2)$ | 2 ms |
+| Layer Normalization | $O(512)$ | <1 ms |
+| **Total CEF** | $O(k \cdot n + 512^2)$ | **~50 ms** |
+
+: CEF computational complexity for $n$ coordinates and $k=8$ nearest zone queries. {#tbl-cef-complexity}
+
+The CEF achieves approximately **20,000 embeddings per second** on a single A100 GPU, enabling real-time processing of large address datasets.
+

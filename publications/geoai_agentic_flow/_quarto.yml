@@ -1,0 +1,101 @@
+project:
+  type: book
+  output-dir: ../pdf
+
+book:
+  title: "GeoAI Agentic Flow"
+  subtitle: "A Novel Architecture for Spatial Intelligence in Environmental Risk Assessment"
+  chapters:
+    - index.qmd
+    - 1_introduction.qmd
+    - 2_mathematical_foundations.qmd
+    - 3_coordinate_embedding.qmd
+    - 4_spatial_neural_network.qmd
+    - 5_multi_agent_system.qmd
+    - 6_experiments.qmd
+    - 7_results.qmd
+    - 8_conclusion.qmd
+    - 9_appendix.qmd
+    - 10_use_case.qmd
+
+# Global bibliography configuration
+bibliography: references.bib
+link-citations: true
+citeproc: true
+
+format:
+  pdf:
+    toc: true
+    toc-depth: 2
+    number-sections: true
+    top-level-division: section
+    colorlinks: true
+    geometry:
+      - top=1in
+      - bottom=1in
+      - left=1in
+      - right=1in
+    fontsize: 12pt
+    documentclass: article
+    fig-pos: "H"
+    code-block-bg: true
+    code-block-border-left: "#ef5350"
+    linestretch: 1.2
+    include-before-body:
+      text: |
+        \RecustomVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+        \usepackage{fancyhdr}
+        \usepackage{lastpage}
+        \pagestyle{fancy}
+        \fancyhead[L]{\footnotesize GeoAI Agentic Flow}
+        \fancyhead[R]{\footnotesize \thepage\ of \pageref{LastPage}}
+        \fancyfoot[C]{}
+        \usepackage{authblk}
+        \usepackage{microtype}
+        \usepackage{booktabs}
+        \usepackage{tabularx}
+        \usepackage[table]{xcolor}
+        \definecolor{lightgray}{gray}{0.9}
+        \usepackage{graphicx}
+        \usepackage{caption}
+        \usepackage{float}
+        \usepackage{amsmath}
+        \usepackage{amssymb}
+        \usepackage{amsthm}
+        \newtheorem{theorem}{Theorem}
+        \newtheorem{lemma}[theorem]{Lemma}
+        \newtheorem{corollary}[theorem]{Corollary}
+        \newtheorem{definition}{Definition}
+        \raggedbottom
+        \renewcommand\Authfont{\fontsize{12}{14.4}\selectfont}
+        \renewcommand\Affilfont{\fontsize{10}{12}\selectfont\itshape}
+        \setlength{\affilsep}{1em}
+        \author{Yevheniy Chuba}
+        \affil{University of Pittsburgh, School of Computing and Information}
+        \affil{BlazeBuilder Spatial Intelligence Research Laboratory}
+        \date{November 2025 -- Version 2.0}
+        \renewcommand{\maketitle}{%
+          \begin{center}
+            {\LARGE\bfseries GeoAI Agentic Flow}\\[0.4em]
+            {\large A Novel Architecture for Spatial Intelligence in Environmental Risk Assessment}\\[1.5em]
+            {\Authfont Yevheniy Chuba}\\[0.5em]
+            {\Affilfont University of Pittsburgh, School of Computing and Information}\\
+            {\Affilfont BlazeBuilder Spatial Intelligence Research Laboratory}\\[1.5em]
+            {\normalsize \textit{Version 2.0 -- November 2025}}\\[0.5em]
+            {\footnotesize \textit{Contact: yec64@pitt.edu}}\\[0.2em]
+          \end{center}
+        }
+
+execute:
+  echo: false
+  warning: false
+  message: false
+  cache: false
+  dpi: 300
+
+jupyter: python3
+

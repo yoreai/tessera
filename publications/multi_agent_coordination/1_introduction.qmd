@@ -1,0 +1,63 @@
+# Introduction
+
+## The Challenge of Multi-Domain Risk Assessment
+
+On October 9, 2017, multiple wildfires ignited simultaneously across Northern California wine country. Within hours, the Tubbs Fire alone had destroyed 5,636 structures in Santa Rosa. Post-incident analysis revealed that the fires exploited a convergence of factors: dry vegetation from prolonged drought, extreme Diablo winds channeled through Sonoma Valley's terrain, aging power infrastructure prone to ignition, and a road network that created fuel breaks in some areas while funneling evacuees through bottlenecks in others.
+
+No single expert---not a fire behavior specialist, not a meteorologist, not an infrastructure engineer---possessed the comprehensive knowledge needed to predict which addresses faced the highest risk. The challenge was fundamentally one of coordination: how to synthesize diverse domain expertise into unified risk assessments at the speed required for effective emergency response.
+
+This coordination challenge motivates our work on multi-agent systems for geospatial risk assessment. Rather than building a monolithic model that attempts to capture all relevant factors, we propose distributing expertise across specialized agents that collaborate through a principled consensus protocol.
+
+## Multi-Agent Systems for Geospatial Intelligence
+
+Multi-agent systems (MAS) have been studied extensively in distributed computing [@lynch1996distributed], robotics [@jadbabaie2003coordination], and game theory [@marden2009game]. The fundamental insight is that complex problems can often be decomposed into subproblems handled by specialized agents, with coordination mechanisms combining their outputs.
+
+For geospatial risk assessment, this decomposition is natural:
+
+- **Wildfire agents** specialize in fire behavior, fuel conditions, weather patterns, and suppression logistics
+- **Flood agents** understand hydrology, precipitation dynamics, drainage infrastructure, and coastal hazards
+- **Seismic agents** assess fault proximity, ground motion, liquefaction potential, and structural vulnerability
+- **Analytics agents** integrate multi-hazard assessments and quantify compound risks
+
+Each agent type can be trained on domain-specific data, consult domain-specific data sources, and apply domain-specific reasoning. The coordination protocol then synthesizes their assessments into unified risk scores.
+
+## Challenges in Multi-Agent Coordination
+
+Effective multi-agent coordination must address several challenges:
+
+**Heterogeneous Expertise.** Agents have different competencies and should have different influence on the final assessment. A wildfire specialist's opinion on fire risk should carry more weight than a flood specialist's.
+
+**Varying Confidence.** Even within their domain, agents may be more or less confident depending on the specific situation. An agent should be able to express uncertainty.
+
+**Potential Failures.** In production systems, agents may fail (software bugs, data unavailability) or even produce adversarial outputs (security compromises). The system must remain reliable despite individual agent failures.
+
+**Scalability.** Processing hundreds of thousands of addresses requires efficient communication patterns that don't bottleneck on coordination overhead.
+
+**Correctness.** The consensus mechanism should have provable properties: it should converge, produce statistically optimal estimates, and degrade gracefully under failures.
+
+## Our Contributions
+
+This paper presents the Multi-Agent Geospatial Coordination Protocol (MACP), a theoretically grounded approach to distributed risk assessment. Our contributions are:
+
+**1. Agent Architecture.** We define a 128-agent system organized into four domain-specific pools (Wildfire, Flood, Seismic, Analytics), each containing 32 specialized agents with distinct sub-competencies.
+
+**2. Weighted Consensus Protocol.** We develop a confidence-weighted consensus mechanism and prove:
+
+- *Optimality* (Theorem 1): Weighted consensus is the BLUE estimator
+- *Convergence* (Corollary 1): Consensus error bounded by $O(1/\sqrt{n})$
+- *Fault Tolerance* (Theorem 3): Byzantine tolerance up to $n/3$ failures
+
+**3. Communication Efficiency.** We analyze message complexity and design efficient communication patterns achieving $O(n)$ messages per assessment.
+
+**4. Empirical Validation.** We demonstrate on California fire hazard data:
+
+- 89.7% accuracy with 6.3 pp improvement over single-model baselines
+- 93% scaling efficiency up to 256 agents
+- Full dataset processing (546K addresses) in under 35 seconds
+
+**5. Real-World Deployment.** We describe operational deployment for BlazeBuilder, including lessons learned from production use.
+
+## Paper Organization
+
+Section 2 develops the theoretical framework for multi-agent coordination, formalizing agent pools, consensus mechanisms, and communication protocols. Section 3 proves the main theoretical results on consensus optimality and fault tolerance. Section 4 describes the agent specialization architecture. Section 5 presents experimental results. Section 6 concludes with discussion and future directions.
+

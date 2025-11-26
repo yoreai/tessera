@@ -1,0 +1,171 @@
+# Embedding Theory
+
+This section establishes the mathematical framework for coordinate embedding, defining the source and target metric spaces and formalizing the requirements for distance preservation.
+
+## Metric Spaces
+
+### The Geographic Space
+
+::: {.callout-note}
+## Definition 1 (Geographic Coordinate Space)
+
+The **geographic coordinate space** $(\mathcal{G}, d_{\text{geo}})$ is the metric space where:
+
+- $\mathcal{G} = \{(\phi, \lambda) : \phi \in [-90, 90], \lambda \in [-180, 180]\}$ is the set of valid latitude-longitude pairs
+- $d_{\text{geo}}: \mathcal{G} \times \mathcal{G} \to \mathbb{R}_{\geq 0}$ is the geodesic distance function
+:::
+
+The geodesic distance between points $p_1 = (\phi_1, \lambda_1)$ and $p_2 = (\phi_2, \lambda_2)$ is given by the Haversine formula:
+
+$$
+d_{\text{geo}}(p_1, p_2) = 2R \cdot \arcsin\left(\sqrt{\sin^2\left(\frac{\phi_2 - \phi_1}{2}\right) + \cos(\phi_1)\cos(\phi_2)\sin^2\left(\frac{\lambda_2 - \lambda_1}{2}\right)}\right)
+$$
+
+where $R = 6371.009$ km is Earth's mean radius.
+
+::: {.callout-tip}
+## Proposition 1 (Geodesic Metric Properties)
+
+The geodesic distance $d_{\text{geo}}$ satisfies the metric axioms:
+
+1. **Non-negativity**: $d_{\text{geo}}(p_1, p_2) \geq 0$ with equality iff $p_1 = p_2$
+2. **Symmetry**: $d_{\text{geo}}(p_1, p_2) = d_{\text{geo}}(p_2, p_1)$
+3. **Triangle Inequality**: $d_{\text{geo}}(p_1, p_3) \leq d_{\text{geo}}(p_1, p_2) + d_{\text{geo}}(p_2, p_3)$
+:::
+
+The triangle inequality follows from the fact that geodesics on a sphere are arcs of great circles, and the shortest path between two points lies along the connecting great circle.
+
+### The Embedding Space
+
+::: {.callout-note}
+## Definition 2 (Embedding Space)
+
+The **embedding space** $(\mathcal{E}, d_{\text{emb}})$ is the $d$-dimensional Euclidean space where:
+
+- $\mathcal{E} = \mathbb{R}^d$ (with $d = 512$ in our implementation)
+- $d_{\text{emb}}(e_1, e_2) = \|e_1 - e_2\|_2$ is the Euclidean distance
+:::
+
+The choice of Euclidean space as the target is deliberate: it enables efficient similarity search via established algorithms [@johnson2019billion], compatibility with neural network operations, and theoretical analysis using linear algebra.
+
+## Lipschitz Continuity
+
+The central requirement for a useful coordinate embedding is that it preserves distances---nearby coordinates should produce nearby embeddings, and distant coordinates should produce distant embeddings. We formalize this through Lipschitz conditions.
+
+::: {.callout-note}
+## Definition 3 (Lipschitz Mapping)
+
+A mapping $f: (\mathcal{X}, d_{\mathcal{X}}) \to (\mathcal{Y}, d_{\mathcal{Y}})$ between metric spaces is **Lipschitz continuous** with constant $L \geq 0$ if:
+
+$$
+d_{\mathcal{Y}}(f(x_1), f(x_2)) \leq L \cdot d_{\mathcal{X}}(x_1, x_2) \quad \forall x_1, x_2 \in \mathcal{X}
+$$
+
+The smallest such $L$ is the **Lipschitz constant** of $f$, denoted $\text{Lip}(f)$.
+:::
+
+Lipschitz continuity provides an upper bound on how much the mapping can expand distances, but says nothing about contraction. A mapping that collapses all points to a single value is trivially Lipschitz with $L = 0$, yet useless for preserving spatial structure.
+
+::: {.callout-note}
+## Definition 4 (Bi-Lipschitz Mapping)
+
+A mapping $f: (\mathcal{X}, d_{\mathcal{X}}) \to (\mathcal{Y}, d_{\mathcal{Y}})$ is **bi-Lipschitz** with constants $\alpha, \beta > 0$ if:
+
+$$
+\alpha \cdot d_{\mathcal{X}}(x_1, x_2) \leq d_{\mathcal{Y}}(f(x_1), f(x_2)) \leq \beta \cdot d_{\mathcal{X}}(x_1, x_2) \quad \forall x_1, x_2 \in \mathcal{X}
+$$
+
+The ratio $\beta/\alpha$ is the **distortion** of $f$.
+:::
+
+A bi-Lipschitz mapping is a quasi-isometry: it preserves distances up to bounded multiplicative factors. The lower bound $\alpha$ prevents collapse (distinct points remain distinct), while the upper bound $\beta$ prevents explosion (nearby points remain nearby).
+
+::: {.callout-tip}
+## Proposition 2 (Bi-Lipschitz Injectivity)
+
+Every bi-Lipschitz mapping with $\alpha > 0$ is injective.
+:::
+
+**Proof.** Suppose $f(x_1) = f(x_2)$. Then $d_{\mathcal{Y}}(f(x_1), f(x_2)) = 0$. By the lower bound:
+
+$$
+\alpha \cdot d_{\mathcal{X}}(x_1, x_2) \leq 0
+$$
+
+Since $\alpha > 0$ and $d_{\mathcal{X}} \geq 0$, we must have $d_{\mathcal{X}}(x_1, x_2) = 0$, which implies $x_1 = x_2$ by the metric axioms. $\square$
+
+## The Coordinate Embedding Problem
+
+::: {.callout-note}
+## Definition 5 (Coordinate Embedding)
+
+A **coordinate embedding** is a mapping $\text{CEF}: (\mathcal{G}, d_{\text{geo}}) \to (\mathcal{E}, d_{\text{emb}})$ that satisfies:
+
+1. **Bi-Lipschitz**: There exist $\alpha, \beta > 0$ with $\alpha \cdot d_{\text{geo}} \leq d_{\text{emb}} \circ \text{CEF} \leq \beta \cdot d_{\text{geo}}$
+2. **Feature Preservation**: Geographic features are recoverable from embeddings
+3. **Computational Efficiency**: Embedding computation is tractable
+:::
+
+The bi-Lipschitz requirement is the mathematically rigorous version of "distance preservation." The challenge is achieving low distortion ($\beta/\alpha$ close to 1) while also encoding rich semantic features.
+
+## Impossibility Results
+
+Before presenting our solution, we note fundamental limitations on what coordinate embeddings can achieve.
+
+::: {.callout-tip}
+## Theorem 1 (No Isometric Embedding of Spherical Geometry)
+
+There is no isometric (distance-preserving) embedding of the sphere $S^2$ into Euclidean space $\mathbb{R}^d$ for any finite $d$.
+:::
+
+**Proof Sketch.** The sphere has positive Gaussian curvature everywhere. By the Theorema Egregium, Gaussian curvature is an intrinsic invariant preserved by isometries. Euclidean space has zero curvature. Since curvature is preserved by isometries, no isometry exists. $\square$
+
+This theorem implies that *some* distance distortion is unavoidable when embedding geographic coordinates into Euclidean space. Our goal is to minimize this distortion while maintaining computational tractability.
+
+::: {.callout-tip}
+## Corollary 1 (Distortion Lower Bound)
+
+For any embedding $\text{CEF}: \mathcal{G} \to \mathbb{R}^d$ with bounded domain (e.g., California), the distortion $\beta/\alpha \geq 1 + \Omega(\text{diameter}(\mathcal{G})^2/R^2)$.
+:::
+
+For California (diameter $\approx 1300$ km), this gives a theoretical minimum distortion of approximately 1.02. Our achieved distortion of 1.33 is thus within a factor of 1.3 of optimal.
+
+## Feature Layers
+
+The CEF enriches raw coordinates with contextual information through feature layers.
+
+::: {.callout-note}
+## Definition 6 (Feature Layer)
+
+A **feature layer** is a function $f: \mathcal{G} \to \mathbb{R}^{d_f}$ that extracts $d_f$ features from geographic coordinates. A feature layer is **locally Lipschitz** if for each $p \in \mathcal{G}$, there exists $\delta_p > 0$ and $L_p > 0$ such that:
+
+$$
+\|f(p_1) - f(p_2)\|_2 \leq L_p \cdot d_{\text{geo}}(p_1, p_2) \quad \text{whenever } d_{\text{geo}}(p, p_1), d_{\text{geo}}(p, p_2) < \delta_p
+$$
+:::
+
+Our four feature layers are:
+
+| Layer | Symbol | Dimension | Content |
+|-------|--------|-----------|---------|
+| Spatial | $f_S$ | 128 | Zone distances, elevation, slope, positional encoding |
+| Environmental | $f_E$ | 128 | NDVI, soil moisture, precipitation, temperature |
+| Topographic | $f_T$ | 128 | TRI, watershed position, ridge/valley distances |
+| Infrastructure | $f_I$ | 128 | Road density, building footprints, utility proximity |
+
+: Feature layer specification. {#tbl-feature-layers}
+
+::: {.callout-tip}
+## Lemma 1 (Feature Layer Lipschitz Constants)
+
+Under standard smoothness assumptions on geographic data layers, the feature functions satisfy:
+
+$$
+L_S \leq 0.15, \quad L_E \leq 0.08, \quad L_T \leq 0.12, \quad L_I \leq 0.10
+$$
+
+(in normalized units where $d_{\text{geo}}$ is in kilometers and features are in $[0,1]$).
+:::
+
+These Lipschitz constants are determined by the inherent spatial smoothness of geographic phenomena. Elevation varies smoothly except at cliffs; vegetation indices are spatially autocorrelated; infrastructure density changes gradually except at urban boundaries.
+

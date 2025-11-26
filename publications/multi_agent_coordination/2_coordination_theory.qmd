@@ -1,0 +1,220 @@
+# Coordination Theory
+
+This section establishes the mathematical framework for multi-agent coordination, defining agents, pools, consensus mechanisms, and communication protocols.
+
+## Agent Model
+
+::: {.callout-note}
+## Definition 1 (Risk Assessment Agent)
+
+A **risk assessment agent** is a function $a: \mathcal{E} \to [0,1] \times [0,1]$ that maps an embedding $e \in \mathcal{E} = \mathbb{R}^{512}$ to a pair $(s, c)$ where:
+
+- $s \in [0,1]$ is the **risk score** (probability of high risk)
+- $c \in [0,1]$ is the **confidence** (self-assessed reliability)
+:::
+
+The risk score represents the agent's assessment of the probability that the location faces high environmental risk. The confidence represents the agent's uncertainty: high confidence indicates the agent believes its assessment is reliable, while low confidence indicates uncertainty.
+
+::: {.callout-tip}
+## Assumption 1 (Agent Unbiasedness)
+
+We assume agents are **unbiased**: $\mathbb{E}[s] = s_{\text{true}}$ where $s_{\text{true}}$ is the true risk level.
+:::
+
+This assumption is satisfied when agents are trained on representative data without systematic bias. In practice, we achieve approximate unbiasedness through careful training data curation and cross-validation.
+
+::: {.callout-tip}
+## Assumption 2 (Confidence-Variance Relationship)
+
+Agent confidence is inversely related to variance: $c \propto 1/\text{Var}(s)$.
+:::
+
+This assumption is calibrated during training by penalizing agents whose confidence does not match their empirical accuracy.
+
+## Agent Pools
+
+::: {.callout-note}
+## Definition 2 (Agent Pool)
+
+An **agent pool** $\mathcal{A} = \{a_1, \ldots, a_n\}$ is a collection of $n$ agents with shared domain expertise. We define four pools:
+
+1. **Wildfire Pool** $\mathcal{A}_W$: Fire behavior, fuel, weather, suppression
+2. **Flood Pool** $\mathcal{A}_F$: Hydrology, precipitation, drainage, coastal
+3. **Seismic Pool** $\mathcal{A}_S$: Faults, ground motion, liquefaction, structures
+4. **Analytics Pool** $\mathcal{A}_A$: Multi-hazard integration, uncertainty quantification
+:::
+
+Each pool contains $n_k = 32$ agents, for a total of $N = 128$ agents.
+
+```{python}
+#| label: fig-agent-architecture
+#| fig-cap: "Four-pool multi-agent architecture with 32 agents per pool."
+
+import sys
+sys.path.insert(0, '..')
+from _diagram_style import render_agent_cluster_diagram
+
+clusters = [
+    {
+        'name': 'Wildfire (32)',
+        'agents': ['Fuel', 'Weather', 'Terrain', 'Ignition', 'Spread', 'Suppression', 'History', 'Monitor'],
+        'color': '#ef5350',
+        'x': 1, 'y': 2
+    },
+    {
+        'name': 'Flood (32)',
+        'agents': ['Hydrology', 'Precip.', 'Drainage', 'Coastal', 'Dam', 'Storm', 'History', 'Forecast'],
+        'color': '#64b5f6',
+        'x': 4, 'y': 2
+    },
+    {
+        'name': 'Seismic (32)',
+        'agents': ['Fault', 'Motion', 'Liquefac.', 'Structure', 'Tsunami', 'Landslide', 'History', 'Sensor'],
+        'color': '#ffb74d',
+        'x': 7, 'y': 2
+    },
+    {
+        'name': 'Analytics (32)',
+        'agents': ['Multi-haz.', 'Uncertainty', 'Priority', 'Resource', 'Comms', 'Validate', 'Ensemble', 'Synth.'],
+        'color': '#66bb6a',
+        'x': 10, 'y': 2
+    },
+]
+
+render_agent_cluster_diagram(clusters, "128-Agent Pool Architecture", "agent_architecture.svg", height=320)
+```
+
+![Agent Architecture](agent_architecture.svg){#fig-agent-arch width=100%}
+
+## Intra-Pool Consensus
+
+Within each pool, agents produce risk scores that must be aggregated into a pool-level consensus.
+
+::: {.callout-note}
+## Definition 3 (Weighted Pool Consensus)
+
+For agent pool $\mathcal{A}_k = \{a_1, \ldots, a_n\}$ evaluating embedding $e$, let $(s_i, c_i) = a_i(e)$ be the score-confidence pairs. The **weighted pool consensus** is:
+
+$$
+S_k = \frac{\sum_{i=1}^{n} c_i \cdot s_i}{\sum_{i=1}^{n} c_i}
+$$
+:::
+
+This is a confidence-weighted average: agents with higher confidence have more influence on the consensus.
+
+::: {.callout-note}
+## Definition 4 (Pool Agreement)
+
+The **pool agreement** measures intra-pool consistency:
+
+$$
+A_k = 1 - \frac{2}{n(n-1)} \sum_{i < j} |s_i - s_j|
+$$
+
+A pool with perfect agreement ($s_i = s_j$ for all $i, j$) has $A_k = 1$, while maximum disagreement gives $A_k = 0$.
+:::
+
+::: {.callout-note}
+## Definition 5 (Pool Confidence)
+
+The **pool confidence** combines individual confidences with agreement:
+
+$$
+C_k = A_k \cdot \frac{1}{n} \sum_{i=1}^{n} c_i
+$$
+
+A pool is confident only if both (a) individual agents are confident and (b) agents agree with each other.
+:::
+
+## Inter-Pool Aggregation
+
+The four pool consensuses must be combined into a final risk assessment.
+
+::: {.callout-note}
+## Definition 6 (Inter-Pool Consensus)
+
+The **final risk score** is a weighted combination of pool consensuses:
+
+$$
+S^* = \sum_{k \in \{W, F, S, A\}} w_k \cdot S_k
+$$
+
+where pool weights $w_k \geq 0$ satisfy $\sum_k w_k = 1$.
+:::
+
+Pool weights depend on geographic context:
+
+| Context | $w_W$ | $w_F$ | $w_S$ | $w_A$ |
+|---------|-------|-------|-------|-------|
+| High Fire Hazard Zone | 0.50 | 0.15 | 0.10 | 0.25 |
+| Flood Plain | 0.15 | 0.50 | 0.10 | 0.25 |
+| Near Active Fault | 0.15 | 0.15 | 0.45 | 0.25 |
+| General | 0.25 | 0.25 | 0.25 | 0.25 |
+
+: Context-dependent pool weights. {#tbl-pool-weights}
+
+The Analytics pool always receives at least 25% weight because it specializes in integrating multi-hazard information.
+
+## Communication Protocol
+
+Agents communicate through a coordinator that broadcasts inputs and collects outputs.
+
+::: {.callout-note}
+## Definition 7 (Communication Round)
+
+A **communication round** consists of:
+
+1. **Broadcast**: Coordinator sends embedding $e$ to all agents
+2. **Compute**: Each agent $a_i$ computes $(s_i, c_i) = a_i(e)$
+3. **Report**: Each agent sends $(s_i, c_i)$ to coordinator
+4. **Aggregate**: Coordinator computes pool and final consensus
+:::
+
+**Message Format:**
+
+Each agent report is a fixed-size message:
+
+| Field | Size | Description |
+|-------|------|-------------|
+| `agent_id` | 16 bytes | Unique agent identifier |
+| `embed_hash` | 32 bytes | Hash of input embedding |
+| `score` | 4 bytes | Risk score (float32) |
+| `confidence` | 4 bytes | Confidence (float32) |
+| `timestamp` | 8 bytes | Unix timestamp |
+| `signature` | 64 bytes | Cryptographic signature |
+| **Total** | 128 bytes | |
+
+: Message format. {#tbl-message-format}
+
+::: {.callout-tip}
+## Proposition 1 (Message Complexity)
+
+A single assessment round requires:
+
+- **Messages**: $N + 1$ (1 broadcast + $N$ reports)
+- **Bandwidth**: $512 \cdot 4 + N \cdot 128$ bytes = $2048 + 16384 = 18,432$ bytes for $N = 128$
+:::
+
+## Failure Model
+
+We consider two types of agent failures:
+
+::: {.callout-note}
+## Definition 8 (Crash Failure)
+
+An agent experiences a **crash failure** if it fails to respond within the timeout period. Crashed agents are excluded from consensus.
+:::
+
+::: {.callout-note}
+## Definition 9 (Byzantine Failure)
+
+An agent experiences a **Byzantine failure** if it produces arbitrary (potentially adversarial) outputs [@lamport1982byzantine]. A Byzantine agent may:
+
+- Report incorrect scores
+- Report misleading confidence
+- Collude with other Byzantine agents
+- Behave arbitrarily
+:::
+
+Byzantine failures are strictly more severe than crash failures. Our fault tolerance analysis addresses the Byzantine case.
+

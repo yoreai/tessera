@@ -1,0 +1,288 @@
+# Implementation
+
+This section describes the practical implementation of the Coordinate Embedding Framework, including the feature extraction pipeline, model architecture, and training procedure.
+
+## Architecture Overview
+
+```{python}
+#| label: fig-cef-pipeline
+#| fig-cap: "Complete CEF pipeline from raw coordinates to 512-dimensional embedding."
+
+import sys
+sys.path.insert(0, '..')
+from _diagram_style import render_boxes_diagram
+
+stages = [
+    {
+        'name': 'Input',
+        'items': ['Latitude φ', 'Longitude λ', 'Raw (2D)'],
+        'color': '#78909c'  # gray
+    },
+    {
+        'name': 'Stage 1: Spatial',
+        'items': ['Zone Distance', 'Elevation/Slope', 'Positional Enc.'],
+        'color': '#64b5f6'  # blue
+    },
+    {
+        'name': 'Stage 2: Environ.',
+        'items': ['NDVI Seasonal', 'Soil Moisture', 'Climate Normals'],
+        'color': '#4db6ac'  # teal
+    },
+    {
+        'name': 'Stage 3: Topo.',
+        'items': ['TRI Index', 'Watershed', 'Ridge/Valley'],
+        'color': '#ffb74d'  # orange
+    },
+    {
+        'name': 'Stage 4: Infra.',
+        'items': ['Road Network', 'Buildings', 'Utilities'],
+        'color': '#ba68c8'  # purple
+    },
+]
+
+render_boxes_diagram(stages, "Coordinate Embedding Framework Pipeline", "cef_pipeline.svg", scale=0.9)
+```
+
+![CEF Pipeline](cef_pipeline.svg){#fig-cef-pipeline-diagram width=100%}
+
+## Feature Extraction Details
+
+### Stage 1: Spatial Features (128 dimensions)
+
+**Zone Distance Features (32 dimensions):**
+
+For each coordinate $p = (\phi, \lambda)$, we compute distances to the $k = 8$ nearest fire hazard zone boundaries using a spatial index (R-tree):
+
+```python
+def zone_distances(lat: float, lon: float, k: int = 8) -> np.ndarray:
+    """Compute distances to k nearest fire hazard zones."""
+    point = Point(lon, lat)
+
+    # Query R-tree for k nearest zone boundaries
+    nearest_indices = zone_rtree.nearest(
+        (lon, lat, lon, lat), k, objects=False
+    )
+
+    distances = []
+    for idx in nearest_indices:
+        zone_geom = fire_zones[idx].geometry
+        dist_km = point.distance(zone_geom) * DEG_TO_KM
+        distances.append(dist_km)
+
+    # Encode with linear and log scales
+    linear = np.array(distances) / MAX_DISTANCE
+    log = np.log1p(distances) / np.log1p(MAX_DISTANCE)
+
+    return np.concatenate([linear, log])  # 16 dims
+```
+
+**Terrain Features (32 dimensions):**
+
+Elevation, slope, and aspect from 10m DEM:
+
+$$
+\text{slope}(p) = \arctan(|\nabla h(p)|), \quad \text{aspect}(p) = \text{atan2}\left(\frac{\partial h}{\partial y}, \frac{\partial h}{\partial x}\right)
+$$
+
+**Positional Encoding (64 dimensions):**
+
+Multi-scale sinusoidal encoding following @vaswani2017attention:
+
+$$
+\text{PE}(\phi, \lambda) = \left[\sin\left(\frac{\phi}{f_i}\right), \cos\left(\frac{\phi}{f_i}\right), \sin\left(\frac{\lambda}{f_i}\right), \cos\left(\frac{\lambda}{f_i}\right)\right]_{i=1}^{16}
+$$
+
+where frequencies $f_i = 10000^{2i/64}$ span scales from centimeters to thousands of kilometers.
+
+### Stage 2: Environmental Features (128 dimensions)
+
+**Vegetation Index (48 dimensions):**
+
+NDVI from Sentinel-2 imagery at 10m resolution, computed seasonally:
+
+| Season | Months | NDVI Stats |
+|--------|--------|------------|
+| Winter | Dec-Feb | mean, std, min, max |
+| Spring | Mar-May | mean, std, min, max |
+| Summer | Jun-Aug | mean, std, min, max |
+| Fall | Sep-Nov | mean, std, min, max |
+
+Each season contributes 12 features (spatial aggregations at point, 500m, 2km scales).
+
+**Moisture and Climate (80 dimensions):**
+
+- Soil moisture: SMAP 9km resampled to point, 4 temporal aggregations
+- Precipitation: PRISM 4km 30-year normals, monthly values
+- Temperature: PRISM 4km 30-year normals, monthly min/max
+- Evapotranspiration: MODIS-derived ET estimates
+
+### Stage 3: Topographic Features (128 dimensions)
+
+**Terrain Ruggedness Index (32 dimensions):**
+
+$$
+\text{TRI}(p) = \sqrt{\frac{1}{8}\sum_{q \in N_8(p)} (h(q) - h(p))^2}
+$$
+
+Computed at multiple scales (local, 100m, 500m, 1km) with summary statistics.
+
+**Watershed Position (32 dimensions):**
+
+- HUC-12 watershed identifier (one-hot encoded, top 50 watersheds)
+- Relative position in watershed (headwater=0 to outlet=1)
+- Watershed area, mean slope, stream density
+
+**Ridge and Valley Structure (64 dimensions):**
+
+Using hydrological flow accumulation:
+
+- Distance to nearest ridgeline (low flow accumulation)
+- Distance to nearest valley (high flow accumulation)
+- Local relief (elevation range in 1km neighborhood)
+- Topographic position index (elevation relative to neighborhood mean)
+
+### Stage 4: Infrastructure Features (128 dimensions)
+
+**Road Network (48 dimensions):**
+
+- Distance to nearest road by class (interstate, highway, arterial, local)
+- Road density within 500m, 1km, 2km buffers
+- Intersection density (measure of network complexity)
+- Distance to nearest fire station
+
+**Building Footprints (48 dimensions):**
+
+- Building count within 100m, 500m, 1km
+- Total footprint area within each buffer
+- Building density gradient (urban-rural transition indicator)
+- Distance to dense urban area (>10 buildings/hectare)
+
+**Utilities (32 dimensions):**
+
+- Distance to nearest power transmission line
+- Distance to nearest distribution line
+- Distance to gas pipeline
+- Distance to water main
+
+## Model Architecture
+
+```python
+class CoordinateEmbeddingFramework(nn.Module):
+    def __init__(self, d_model: int = 512):
+        super().__init__()
+        self.d_model = d_model
+
+        # Feature extractors (pretrained and frozen)
+        self.spatial_extractor = SpatialFeatureExtractor()
+        self.environmental_extractor = EnvironmentalExtractor()
+        self.topographic_extractor = TopographicExtractor()
+        self.infrastructure_extractor = InfrastructureExtractor()
+
+        # Learnable projection
+        self.projection = nn.Linear(512, d_model)
+        self.layer_norm = nn.LayerNorm(d_model)
+
+        # Initialize projection orthogonally
+        nn.init.orthogonal_(self.projection.weight)
+
+    def forward(self, coords: torch.Tensor) -> torch.Tensor:
+        """
+        Args:
+            coords: (batch, 2) tensor of (lat, lon)
+        Returns:
+            embeddings: (batch, d_model) normalized embeddings
+        """
+        # Extract features from each stage
+        f_s = self.spatial_extractor(coords)       # (batch, 128)
+        f_e = self.environmental_extractor(coords) # (batch, 128)
+        f_t = self.topographic_extractor(coords)   # (batch, 128)
+        f_i = self.infrastructure_extractor(coords) # (batch, 128)
+
+        # Concatenate
+        features = torch.cat([f_s, f_e, f_t, f_i], dim=-1)  # (batch, 512)
+
+        # Project and normalize
+        projected = self.projection(features)
+        embeddings = self.layer_norm(projected)
+
+        return embeddings
+```
+
+## Training Procedure
+
+### Loss Function
+
+The total loss combines four objectives:
+
+$$
+\mathcal{L} = \lambda_1 \mathcal{L}_{\text{cont}} + \lambda_2 \mathcal{L}_{\text{recon}} + \lambda_3 \mathcal{L}_{\text{orth}} + \lambda_4 \mathcal{L}_{\text{task}}
+$$
+
+with $\lambda_1 = 1.0$, $\lambda_2 = 0.5$, $\lambda_3 = 0.1$, $\lambda_4 = 2.0$.
+
+**Contrastive Loss** (distance preservation):
+
+$$
+\mathcal{L}_{\text{cont}} = \frac{1}{|P|} \sum_{(i,j) \in P} \left(\frac{\|e_i - e_j\|_2}{\gamma \cdot d_{\text{geo}}(p_i, p_j)} - 1\right)^2
+$$
+
+where $P$ is the set of coordinate pairs and $\gamma$ is a scaling factor.
+
+**Reconstruction Loss** (feature fidelity):
+
+$$
+\mathcal{L}_{\text{recon}} = \sum_{X} \|D_X(e) - f_X(p)\|_2^2
+$$
+
+where $D_X$ are linear decoders for each feature stage.
+
+**Orthogonality Loss** (stage independence):
+
+$$
+\mathcal{L}_{\text{orth}} = \sum_{X < Y} \text{cos}^2(e_X, e_Y)
+$$
+
+**Task Loss** (downstream utility):
+
+$$
+\mathcal{L}_{\text{task}} = \text{BCE}(\sigma(w^T e), y)
+$$
+
+for fire risk classification.
+
+### Training Configuration
+
+| Hyperparameter | Value |
+|---------------|-------|
+| Batch size | 8,192 |
+| Learning rate | $10^{-4}$ |
+| Weight decay | $10^{-5}$ |
+| Optimizer | AdamW |
+| Scheduler | Cosine annealing |
+| Epochs | 100 |
+| Early stopping | 10 epochs patience |
+
+: Training hyperparameters. {#tbl-training}
+
+### Data Augmentation
+
+To improve generalization, we apply coordinate augmentation:
+
+- **Jittering**: Add Gaussian noise ($\sigma = 10$ meters) to coordinates
+- **Neighborhood Sampling**: Sample nearby points within 100m radius
+- **Temporal Variation**: Use different seasonal environmental snapshots
+
+## Inference Optimization
+
+For production deployment, we optimize inference through:
+
+**Batching**: Process coordinates in batches of 8,192 for GPU efficiency.
+
+**Caching**: Precompute and cache zone distances for frequently queried regions using a hierarchical grid.
+
+**Quantization**: Reduce embedding precision to FP16 without measurable accuracy loss.
+
+**Spatial Indexing**: Use R-trees for all nearest-neighbor queries, reducing complexity from $O(Z)$ to $O(\log Z)$ for $Z$ zones.
+
+These optimizations achieve **20,000 embeddings/second** on a single A100 GPU.
+

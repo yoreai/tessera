@@ -1,0 +1,49 @@
+# Introduction
+
+## The Problem of Geographic Representation
+
+Geographic coordinates---latitude and longitude pairs---are the fundamental atoms of geospatial data. Yet these two-dimensional numbers are remarkably impoverished representations. The coordinates (38.4404, -122.7141) denote a specific location in Sonoma County, California, but reveal nothing about what makes that location meaningful: its elevation above sea level, proximity to fire hazard zones, vegetation density, road accessibility, or historical patterns of natural disasters.
+
+This representational poverty creates a fundamental challenge for machine learning on geospatial data. Standard neural network architectures process vectors through continuous transformations, learning to extract patterns from high-dimensional representations. When geographic data enters these systems as raw coordinate pairs, the networks must learn from scratch that (38.4404, -122.7141) and (38.4405, -122.7140)---separated by approximately 15 meters---share virtually identical environmental contexts, while (38.4404, -122.7141) and (38.4404, -122.9141)---separated by 18 kilometers---may have dramatically different risk profiles.
+
+The success of embedding methods in natural language processing [@mikolov2013word2vec; @pennington2014glove] and graph learning [@grover2016node2vec] suggests a solution: transform coordinates into dense vector representations that encode semantic relationships. A well-designed embedding would place geographically proximate locations close together in vector space while also capturing relevant contextual features like terrain, infrastructure, and environmental conditions.
+
+## Limitations of Existing Approaches
+
+Prior work on geographic embedding has proceeded largely empirically, without rigorous theoretical foundations:
+
+**Positional Encoding Methods** [@vaswani2017attention] apply sinusoidal transformations to coordinates, providing distinguishability but no semantic enrichment. Two coordinates in different contexts receive identical positional encodings.
+
+**Learned Grid Embeddings** discretize geographic space into cells, each assigned a learned vector. This approach loses precision at cell boundaries and cannot generalize to unseen locations.
+
+**Graph-Based Embeddings** [@grover2016node2vec] treat locations as graph nodes, learning representations from network structure. However, the graph topology is often arbitrary, and spatial distances are not explicitly preserved.
+
+**Satellite Image Embeddings** [@jean2016satellite] extract features from overhead imagery. While rich in visual information, these embeddings are expensive to compute and may not capture underground or infrastructure features.
+
+Critically, none of these approaches provide formal guarantees about distance preservation. An embedding might place distant locations close together or nearby locations far apart, leading to spatial reasoning errors in downstream applications.
+
+## Our Contributions
+
+This paper develops the **Coordinate Embedding Framework (CEF)**, a theoretically grounded approach to geographic representation learning. Our contributions are:
+
+**1. Mathematical Formalization.** We provide a formal definition of coordinate embedding as a mapping from the geodesic metric space of Earth coordinates to a Euclidean embedding space. We establish the bi-Lipschitz property as the key requirement for distance preservation.
+
+**2. Four-Stage Architecture.** We design a modular embedding architecture that separates geographic context into orthogonal components: spatial features, environmental context, topographic structure, and infrastructure relationships. Each stage contributes 128 dimensions to a 512-dimensional embedding.
+
+**3. Theoretical Guarantees.** We prove:
+
+- *Continuity Theorem*: CEF is continuous with respect to geodesic distance
+- *Bi-Lipschitz Theorem*: Distances are preserved up to multiplicative factors $\alpha$, $\beta$
+- *Feature Fidelity Theorem*: Original features are recoverable from embeddings
+- *Orthogonality Lemma*: Embedding stages are approximately orthogonal
+
+**4. Empirical Validation.** We demonstrate on California geographic data:
+
+- Distance Preservation Error of 0.089 (4× better than baselines)
+- Throughput of 20,000 embeddings/second
+- All theoretical bounds validated empirically
+
+## Paper Organization
+
+Section 2 develops the theoretical framework for coordinate embedding, formalizing the metric spaces and Lipschitz conditions. Section 3 proves the central distance preservation theorems. Section 4 describes the implementation architecture and training procedure. Section 5 presents experimental results. Section 6 concludes with discussion of limitations and future directions.
+

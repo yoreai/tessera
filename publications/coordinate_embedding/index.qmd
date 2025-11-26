@@ -1,0 +1,22 @@
+# Abstract {.unnumbered}
+
+The representation of geographic coordinates as fixed-dimensional vectors---coordinate embedding---has emerged as a fundamental technique in geospatial machine learning. However, existing approaches lack rigorous theoretical foundations, leading to embeddings that may distort spatial relationships in unpredictable ways. This paper presents the **Coordinate Embedding Framework (CEF)**, a mathematically principled approach to transforming geographic coordinates into semantically rich vector representations.
+
+Our theoretical contributions establish:
+
+1. **Bi-Lipschitz Guarantees**: We prove that CEF preserves geodesic distances up to bounded multiplicative distortion, with constants $\alpha = 0.847$ and $\beta = 1.124$ empirically validated on California geographic data. This guarantee ensures that spatial reasoning remains valid in the embedding space.
+
+2. **Feature Fidelity Bounds**: We establish probabilistic bounds on the reconstruction error of original geographic features from embeddings, proving that semantic information is preserved.
+
+3. **Orthogonal Decomposition**: We prove that our four-stage embedding architecture (spatial, environmental, topographic, infrastructure) produces approximately orthogonal feature components, with 96.2% of variance explained by four principal components.
+
+4. **Computational Complexity**: We analyze time and space complexity, achieving $O(k \cdot n + d^2)$ embedding time for $n$ coordinates with $k$ nearest-neighbor queries and $d$-dimensional output.
+
+Experimental evaluation on 546,247 California addresses demonstrates that CEF achieves distance preservation error (DPE) of 0.089---4× better than prior methods---while maintaining 20,000 embeddings/second throughput. These results establish CEF as a rigorous foundation for geospatial representation learning with provable guarantees.
+
+---
+
+**Keywords:** Coordinate Embedding, Geospatial Representation Learning, Bi-Lipschitz Maps, Feature Extraction, Metric Geometry
+
+**Mathematics Subject Classification:** 68T05 (Learning and Adaptive Systems), 51F99 (Metric Geometry), 86A30 (Geodesy)
+
