@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["AresaError","ConnectionError"],"fn":["sanitize_identifier","validate_bucket_name","validate_connection_string"],"trait":["ResultExt"],"type":["Result"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["S3Connector","S3Object"]};

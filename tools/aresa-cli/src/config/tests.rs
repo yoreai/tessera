@@ -47,7 +47,7 @@ mod tests {
         let serialized = toml::to_string(&source).unwrap();
         assert!(serialized.contains("source_type = \"postgres\""));
         assert!(serialized.contains("database = \"test\""));
-        
+
         // Ensure None fields are not serialized
         assert!(!serialized.contains("host ="));
         assert!(!serialized.contains("port ="));

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["OutputFormat"],"fn":["highlight_match"],"mod":["table","theme"],"struct":["OutputRenderer"]};

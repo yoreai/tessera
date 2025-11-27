@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"fn":["get_current_branch","get_repo_status","is_binary_file","matches_pattern","system_time_to_datetime"],"struct":["ContentMatch","FileMatch","FilesystemConnector","GitRepoInfo","RepoStatus"]};

@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"enum":["Commands","ConfigAction","OutputFormat","SourceType"],"fn":["handle_config","handle_file_search","handle_list_sources","handle_natural_language_query","handle_query","handle_status","main","print_welcome"],"mod":["config","connectors","nlp","output","query"],"struct":["Cli"]};

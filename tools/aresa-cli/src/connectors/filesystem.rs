@@ -293,7 +293,7 @@ fn matches_pattern(name: &str, pattern: &str) -> bool {
     name.contains(pattern)
 }
 
-/// Convert SystemTime to DateTime<Utc>
+/// Convert SystemTime to `DateTime<Utc>`
 fn system_time_to_datetime(time: SystemTime) -> DateTime<Utc> {
     DateTime::from(time)
 }

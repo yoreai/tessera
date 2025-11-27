@@ -1,0 +1,1 @@
+window.SIDEBAR_ITEMS = {"struct":["BigQueryConnector","Cell","Field","GetQueryResultsResponse","JobReference","QueryRequest","QueryResponse","Row","Schema"]};
