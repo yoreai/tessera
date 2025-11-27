@@ -69,9 +69,10 @@ hmac = "0.12"
 sha2 = "0.10"
 
 [dev-dependencies]
-tempfile = "3.9"
+tempfile = "3.10"
 assert_cmd = "2.0"
 predicates = "3.0"
+tokio-test = "0.4"
 
 [profile.release]
 lto = true

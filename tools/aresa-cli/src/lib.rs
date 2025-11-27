@@ -26,6 +26,7 @@
 
 pub mod config;
 pub mod connectors;
+pub mod error;
 pub mod nlp;
 pub mod output;
 pub mod query;

@@ -3,19 +3,33 @@
 //! Connect to MySQL databases and execute queries.
 
 use anyhow::{Context, Result};
+use sqlx::mysql::MySqlPoolOptions;
 use sqlx::Column;
 use std::collections::HashMap;
+use std::time::Duration;
+
+/// Default connection timeout in seconds
+const DEFAULT_CONNECT_TIMEOUT: u64 = 10;
 
 /// MySQL connector using native protocol
 pub struct MySqlConnector {
+    #[allow(dead_code)]
     connection_string: String,
     pool: Option<sqlx::MySqlPool>,
 }
 
 impl MySqlConnector {
-    /// Create a new MySQL connector
+    /// Create a new MySQL connector with default timeouts
     pub async fn new(uri: &str) -> Result<Self> {
-        let pool = sqlx::MySqlPool::connect(uri)
+        Self::with_timeout(uri, DEFAULT_CONNECT_TIMEOUT).await
+    }
+
+    /// Create a new MySQL connector with custom timeout
+    pub async fn with_timeout(uri: &str, connect_timeout_secs: u64) -> Result<Self> {
+        let pool = MySqlPoolOptions::new()
+            .max_connections(5)
+            .acquire_timeout(Duration::from_secs(connect_timeout_secs))
+            .connect(uri)
             .await
             .context("Failed to connect to MySQL")?;
 

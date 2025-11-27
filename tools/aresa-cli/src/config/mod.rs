@@ -5,6 +5,9 @@
 mod credentials;
 mod sources;
 
+#[cfg(test)]
+mod tests;
+
 use anyhow::{Context, Result};
 use colored::Colorize;
 use directories::ProjectDirs;

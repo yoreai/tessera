@@ -250,14 +250,14 @@ impl<'a> QueryExecutor<'a> {
                     .context("Source not found")?;
                 let uri = source.uri.as_ref()
                     .context("MySQL URI not configured")?;
-                
+
                 let connector = MySqlConnector::new(uri).await?;
-                
+
                 let sql = parsed.sql.as_ref()
                     .context("No SQL query generated")?;
-                
+
                 let (columns, rows) = connector.execute_sql(sql, limit).await?;
-                
+
                 Ok(QueryResult {
                     columns,
                     rows,
@@ -273,7 +273,7 @@ impl<'a> QueryExecutor<'a> {
                     .context("Source not found")?;
                 let host = source.host.as_ref()
                     .context("ClickHouse host not configured")?;
-                
+
                 let connector = ClickHouseConnector::new(
                     host,
                     source.port,
@@ -281,12 +281,12 @@ impl<'a> QueryExecutor<'a> {
                     source.username.as_deref(),
                     source.password.as_deref(),
                 ).await?;
-                
+
                 let sql = parsed.sql.as_ref()
                     .context("No SQL query generated")?;
-                
+
                 let (columns, rows) = connector.execute_sql(sql, limit).await?;
-                
+
                 Ok(QueryResult {
                     columns,
                     rows,
@@ -297,20 +297,20 @@ impl<'a> QueryExecutor<'a> {
             // DuckDB / Local file analytics
             (QueryIntent::SqlQuery, TargetType::DuckDB) | (QueryIntent::AnalyzeFile, _) => {
                 let connector = DuckDbConnector::new(None).await?;
-                
+
                 // Check if we're analyzing a file
                 if let Some(path) = &parsed.path {
                     let extension = std::path::Path::new(path)
                         .extension()
                         .and_then(|s| s.to_str())
                         .unwrap_or("");
-                    
+
                     let (columns, rows) = match extension.to_lowercase().as_str() {
                         "csv" => connector.query_csv(path, parsed.sql.as_deref()).await?,
                         "json" => connector.query_json(path).await?,
                         _ => anyhow::bail!("Unsupported file type: {}", extension),
                     };
-                    
+
                     Ok(QueryResult {
                         columns,
                         rows,
@@ -319,9 +319,9 @@ impl<'a> QueryExecutor<'a> {
                 } else {
                     let sql = parsed.sql.as_ref()
                         .context("No SQL query generated")?;
-                    
+
                     let (columns, rows) = connector.execute_sql(sql, limit).await?;
-                    
+
                     Ok(QueryResult {
                         columns,
                         rows,
@@ -405,10 +405,10 @@ impl<'a> QueryExecutor<'a> {
                     .context("Source not found")?;
                 let bucket = source.bucket.as_ref()
                     .context("GCS bucket not configured")?;
-                
+
                 let connector = GcsConnector::new(bucket, source.credentials_path.as_deref()).await?;
                 let pattern = parsed.pattern.as_deref().unwrap_or("");
-                
+
                 let (columns, rows) = if pattern.is_empty() {
                     connector.list_as_results(None, limit).await?
                 } else {
@@ -434,7 +434,7 @@ impl<'a> QueryExecutor<'a> {
                         .collect();
                     (columns, rows)
                 };
-                
+
                 Ok(QueryResult {
                     columns,
                     rows,

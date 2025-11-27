@@ -16,13 +16,13 @@ pub struct DuckDbConnector {
 
 impl DuckDbConnector {
     /// Create a new DuckDB connector
-    /// 
+    ///
     /// Note: We use SQLite as a stand-in since sqlx doesn't support DuckDB directly.
     /// For full DuckDB support, we'd use the `duckdb` crate.
     /// This implementation provides similar functionality for local file queries.
     pub async fn new(database_path: Option<&str>) -> Result<Self> {
         let path = database_path.unwrap_or(":memory:");
-        
+
         let pool = sqlx::SqlitePool::connect(&format!("sqlite:{}", path))
             .await
             .context("Failed to create local analytics database")?;
@@ -98,7 +98,7 @@ impl DuckDbConnector {
 
         // For SQLite, we need to import the CSV first
         // In a real DuckDB implementation, we'd use: SELECT * FROM read_csv_auto('file.csv')
-        
+
         let table_name = path
             .file_stem()
             .and_then(|s| s.to_str())
@@ -108,7 +108,7 @@ impl DuckDbConnector {
         // Read CSV file
         let content = std::fs::read_to_string(file_path)
             .context("Failed to read CSV file")?;
-        
+
         let mut lines = content.lines();
         let header = lines.next().context("Empty CSV file")?;
         let columns: Vec<&str> = header.split(',').map(|s| s.trim()).collect();
@@ -118,13 +118,13 @@ impl DuckDbConnector {
             .iter()
             .map(|c| format!("\"{}\" TEXT", c.replace('"', "")))
             .collect();
-        
+
         let create_sql = format!(
             "CREATE TEMP TABLE IF NOT EXISTS {} ({})",
             table_name,
             column_defs.join(", ")
         );
-        
+
         sqlx::query(&create_sql)
             .execute(&self.pool)
             .await
@@ -140,12 +140,12 @@ impl DuckDbConnector {
                     table_name,
                     placeholders.join(", ")
                 );
-                
+
                 let mut query_builder = sqlx::query(&insert_sql);
                 for value in &values {
                     query_builder = query_builder.bind(*value);
                 }
-                
+
                 let _ = query_builder.execute(&self.pool).await;
             }
         }
@@ -160,7 +160,7 @@ impl DuckDbConnector {
     pub async fn query_json(&self, file_path: &str) -> Result<(Vec<String>, Vec<HashMap<String, String>>)> {
         let content = std::fs::read_to_string(file_path)
             .context("Failed to read JSON file")?;
-        
+
         let data: serde_json::Value = serde_json::from_str(&content)
             .context("Failed to parse JSON")?;
 
@@ -242,14 +242,14 @@ impl DuckDbConnector {
     pub async fn analyze_file(&self, file_path: &str) -> Result<HashMap<String, String>> {
         let path = Path::new(file_path);
         let extension = path.extension().and_then(|s| s.to_str()).unwrap_or("");
-        
+
         let mut stats = HashMap::new();
         stats.insert("file".to_string(), file_path.to_string());
         stats.insert("extension".to_string(), extension.to_string());
-        
+
         let metadata = std::fs::metadata(file_path)?;
         stats.insert("size".to_string(), humansize::format_size(metadata.len(), humansize::BINARY));
-        
+
         match extension.to_lowercase().as_str() {
             "csv" => {
                 let (columns, rows) = self.query_csv(file_path, Some("SELECT COUNT(*) as count FROM csv_data")).await?;
@@ -267,7 +267,7 @@ impl DuckDbConnector {
             }
             _ => {}
         }
-        
+
         Ok(stats)
     }
 }

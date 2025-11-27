@@ -6,11 +6,13 @@ mod node;
 mod local;
 mod bucket;
 mod cache;
+mod parallel;
 
 pub use node::{Node, Edge, NodeId, EdgeId, Value, Timestamp};
 pub use local::LocalStorage;
 pub use bucket::BucketStorage;
 pub use cache::CacheLayer;
+pub use parallel::{ParallelExecutor, ParallelTraversalResult, SnapshotReader};
 
 use anyhow::{Result, Context};
 use std::path::{Path, PathBuf};

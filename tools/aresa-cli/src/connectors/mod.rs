@@ -21,6 +21,9 @@ pub mod bigquery;
 pub mod s3;
 pub mod gcs;
 
+#[cfg(test)]
+mod tests;
+
 use anyhow::Result;
 use async_trait::async_trait;
 use std::collections::HashMap;

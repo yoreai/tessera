@@ -2,10 +2,17 @@
 
 use anyhow::{Context, Result};
 use async_trait::async_trait;
-use sqlx::{postgres::PgPool, Column, Row, TypeInfo};
+use sqlx::{postgres::PgPoolOptions, postgres::PgPool, Column, Row, TypeInfo};
 use std::collections::HashMap;
+use std::time::Duration;
 
 use super::{ColumnInfo, Connector, SchemaInfo, TableInfo};
+
+/// Default connection timeout in seconds
+const DEFAULT_CONNECT_TIMEOUT: u64 = 10;
+
+/// Default query timeout in seconds
+const DEFAULT_QUERY_TIMEOUT: u64 = 60;
 
 /// PostgreSQL connector
 pub struct PostgresConnector {
@@ -13,9 +20,17 @@ pub struct PostgresConnector {
 }
 
 impl PostgresConnector {
-    /// Create a new PostgreSQL connector
+    /// Create a new PostgreSQL connector with default timeouts
     pub async fn new(uri: &str) -> Result<Self> {
-        let pool = PgPool::connect(uri)
+        Self::with_timeout(uri, DEFAULT_CONNECT_TIMEOUT).await
+    }
+
+    /// Create a new PostgreSQL connector with custom timeout
+    pub async fn with_timeout(uri: &str, connect_timeout_secs: u64) -> Result<Self> {
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .acquire_timeout(Duration::from_secs(connect_timeout_secs))
+            .connect(uri)
             .await
             .context("Failed to connect to PostgreSQL")?;
 
