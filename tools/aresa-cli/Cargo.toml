@@ -1,0 +1,80 @@
+[package]
+name = "aresa-cli"
+version = "0.1.0"
+edition = "2021"
+authors = ["Yevheniy Chuba <yevheniyc@gmail.com>"]
+description = "Natural language interface for searching filesystems, databases, and cloud storage"
+license = "MIT"
+repository = "https://github.com/yoreai/aresa"
+keywords = ["cli", "search", "database", "natural-language", "ai"]
+categories = ["command-line-utilities", "database"]
+
+[dependencies]
+# CLI Framework
+clap = { version = "4.4", features = ["derive", "env", "color"] }
+dialoguer = "0.11"
+
+# Async Runtime
+tokio = { version = "1.35", features = ["full"] }
+futures = "0.3"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+toml = "0.8"
+
+# HTTP Client (for LLM APIs)
+reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
+
+# Database Connectors
+sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "postgres", "sqlite", "chrono", "uuid"] }
+
+# Filesystem Search
+walkdir = "2.4"
+glob = "0.3"
+regex = "1.10"
+
+# Git
+git2 = "0.18"
+
+# Secure Credential Storage
+keyring = "2.3"
+
+# Configuration
+directories = "5.0"
+
+# Beautiful Output
+colored = "2.1"
+tabled = "0.14"
+indicatif = "0.17"
+console = "0.15"
+
+# Error Handling
+thiserror = "1.0"
+anyhow = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Misc
+chrono = { version = "0.4", features = ["serde"] }
+uuid = { version = "1.6", features = ["v4"] }
+url = "2.5"
+humansize = "2.1"
+async-trait = "0.1"
+
+[dev-dependencies]
+tempfile = "3.9"
+assert_cmd = "2.0"
+predicates = "3.0"
+
+[profile.release]
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"
+
+[[bin]]
+name = "aresa"
+path = "src/main.rs"
