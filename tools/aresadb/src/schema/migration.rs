@@ -37,7 +37,7 @@ impl Migration {
             applied_at: None,
         }
     }
-    
+
     /// Generate SQL for this migration
     pub fn to_sql(&self) -> String {
         self.actions
@@ -53,55 +53,55 @@ impl Migration {
 pub enum MigrationAction {
     /// Create a new schema/table
     CreateSchema(Schema),
-    
+
     /// Drop a schema/table
     DropSchema(String),
-    
+
     /// Add a field to a schema
     AddField {
         schema: String,
         field: SchemaField,
     },
-    
+
     /// Remove a field from a schema
     RemoveField {
         schema: String,
         field_name: String,
     },
-    
+
     /// Modify a field's type or constraints
     ModifyField {
         schema: String,
         old_field: SchemaField,
         new_field: SchemaField,
     },
-    
+
     /// Rename a field
     RenameField {
         schema: String,
         old_name: String,
         new_name: String,
     },
-    
+
     /// Rename a schema
     RenameSchema {
         old_name: String,
         new_name: String,
     },
-    
+
     /// Add an index
     AddIndex {
         schema: String,
         field: String,
         unique: bool,
     },
-    
+
     /// Remove an index
     RemoveIndex {
         schema: String,
         field: String,
     },
-    
+
     /// Raw SQL for custom migrations
     RawSql(String),
 }
@@ -111,11 +111,11 @@ impl MigrationAction {
     pub fn to_sql(&self) -> String {
         match self {
             MigrationAction::CreateSchema(schema) => schema.to_sql(),
-            
+
             MigrationAction::DropSchema(name) => {
                 format!("DROP TABLE IF EXISTS {}", name)
             }
-            
+
             MigrationAction::AddField { schema, field } => {
                 let mut sql = format!(
                     "ALTER TABLE {} ADD COLUMN {} {}",
@@ -123,22 +123,22 @@ impl MigrationAction {
                     field.name,
                     field.field_type.to_sql()
                 );
-                
+
                 if !field.nullable {
                     sql.push_str(" NOT NULL");
                 }
-                
+
                 if let Some(ref default) = field.default {
                     sql.push_str(&format!(" DEFAULT {}", default));
                 }
-                
+
                 sql
             }
-            
+
             MigrationAction::RemoveField { schema, field_name } => {
                 format!("ALTER TABLE {} DROP COLUMN {}", schema, field_name)
             }
-            
+
             MigrationAction::ModifyField { schema, old_field: _, new_field } => {
                 format!(
                     "ALTER TABLE {} ALTER COLUMN {} TYPE {}",
@@ -147,18 +147,18 @@ impl MigrationAction {
                     new_field.field_type.to_sql()
                 )
             }
-            
+
             MigrationAction::RenameField { schema, old_name, new_name } => {
                 format!(
                     "ALTER TABLE {} RENAME COLUMN {} TO {}",
                     schema, old_name, new_name
                 )
             }
-            
+
             MigrationAction::RenameSchema { old_name, new_name } => {
                 format!("ALTER TABLE {} RENAME TO {}", old_name, new_name)
             }
-            
+
             MigrationAction::AddIndex { schema, field, unique } => {
                 let index_type = if *unique { "UNIQUE INDEX" } else { "INDEX" };
                 format!(
@@ -166,11 +166,11 @@ impl MigrationAction {
                     index_type, schema, field, schema, field
                 )
             }
-            
+
             MigrationAction::RemoveIndex { schema, field } => {
                 format!("DROP INDEX IF EXISTS {}_{}_idx", schema, field)
             }
-            
+
             MigrationAction::RawSql(sql) => sql.clone(),
         }
     }
@@ -183,7 +183,7 @@ impl MigrationGenerator {
     /// Generate migrations to transform old schema into new schema
     pub fn generate(old: &Schema, new: &Schema) -> Vec<MigrationAction> {
         let mut actions = Vec::new();
-        
+
         // Check for renamed schema
         if old.name != new.name {
             actions.push(MigrationAction::RenameSchema {
@@ -191,7 +191,7 @@ impl MigrationGenerator {
                 new_name: new.name.clone(),
             });
         }
-        
+
         // Find added fields
         for new_field in &new.fields {
             if old.get_field(&new_field.name).is_none() {
@@ -201,7 +201,7 @@ impl MigrationGenerator {
                 });
             }
         }
-        
+
         // Find removed fields
         for old_field in &old.fields {
             if new.get_field(&old_field.name).is_none() {
@@ -211,7 +211,7 @@ impl MigrationGenerator {
                 });
             }
         }
-        
+
         // Find modified fields
         for new_field in &new.fields {
             if let Some(old_field) = old.get_field(&new_field.name) {
@@ -222,7 +222,7 @@ impl MigrationGenerator {
                         new_field: new_field.clone(),
                     });
                 }
-                
+
                 // Check index changes
                 if new_field.indexed && !old_field.indexed {
                     actions.push(MigrationAction::AddIndex {
@@ -238,10 +238,10 @@ impl MigrationGenerator {
                 }
             }
         }
-        
+
         actions
     }
-    
+
     /// Check if a field has changed
     fn field_changed(old: &SchemaField, new: &SchemaField) -> bool {
         old.field_type != new.field_type
@@ -254,22 +254,22 @@ impl MigrationGenerator {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_migration_generation() {
         let old = Schema::new("users", vec![
             SchemaField::new("name", FieldType::String),
             SchemaField::new("email", FieldType::String),
         ]);
-        
+
         let new = Schema::new("users", vec![
             SchemaField::new("name", FieldType::String),
             SchemaField::new("email", FieldType::String),
             SchemaField::new("age", FieldType::Int),
         ]);
-        
+
         let actions = MigrationGenerator::generate(&old, &new);
-        
+
         assert_eq!(actions.len(), 1);
         if let MigrationAction::AddField { field, .. } = &actions[0] {
             assert_eq!(field.name, "age");
@@ -277,16 +277,17 @@ mod tests {
             panic!("Expected AddField action");
         }
     }
-    
+
     #[test]
     fn test_migration_sql() {
         let action = MigrationAction::AddField {
             schema: "users".to_string(),
             field: SchemaField::new("age", FieldType::Int).nullable(false),
         };
-        
+
         let sql = action.to_sql();
         assert!(sql.contains("ALTER TABLE users ADD COLUMN age BIGINT NOT NULL"));
     }
 }
+
 

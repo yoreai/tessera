@@ -85,11 +85,11 @@ impl QueryPlanner {
             indexed_fields: HashSet::new(),
         }
     }
-    
+
     /// Create with schema information
     pub fn with_schemas(schemas: Vec<Schema>) -> Self {
         let mut indexed_fields = HashSet::new();
-        
+
         // Extract indexed fields from schemas
         for schema in &schemas {
             for field in &schema.fields {
@@ -98,19 +98,19 @@ impl QueryPlanner {
                 }
             }
         }
-        
+
         Self {
             schemas,
             indexed_fields,
         }
     }
-    
+
     /// Plan a query
     pub fn plan(&self, query: &ParsedQuery) -> Result<QueryPlan> {
         let mut steps = Vec::new();
         let mut estimated_cost = 0.0;
         let mut uses_index = false;
-        
+
         match query.operation {
             QueryOperation::Select => {
                 // Determine scan strategy
@@ -118,7 +118,7 @@ impl QueryPlanner {
                 steps.push(scan_step);
                 estimated_cost += scan_cost;
                 uses_index = found_index;
-                
+
                 // Add remaining filters
                 let index_conditions: HashSet<String> = if uses_index {
                     query.conditions.iter()
@@ -128,20 +128,20 @@ impl QueryPlanner {
                 } else {
                     HashSet::new()
                 };
-                
+
                 let remaining_conditions: Vec<Condition> = query.conditions
                     .iter()
                     .filter(|c| !index_conditions.contains(&c.column))
                     .cloned()
                     .collect();
-                
+
                 if !remaining_conditions.is_empty() {
                     steps.push(PlanStep::Filter {
                         conditions: remaining_conditions,
                     });
                     estimated_cost += 0.1; // Filter cost per row
                 }
-                
+
                 // Add sorting
                 for order in &query.order_by {
                     steps.push(PlanStep::Sort {
@@ -150,7 +150,7 @@ impl QueryPlanner {
                     });
                     estimated_cost += 0.5; // Sort cost (n log n)
                 }
-                
+
                 // Add limit
                 if let Some(limit) = query.limit {
                     steps.push(PlanStep::Limit {
@@ -158,7 +158,7 @@ impl QueryPlanner {
                         offset: query.offset.unwrap_or(0),
                     });
                 }
-                
+
                 // Add projection if specific columns requested
                 if !query.columns.is_empty() {
                     steps.push(PlanStep::Project {
@@ -166,7 +166,7 @@ impl QueryPlanner {
                     });
                 }
             }
-            
+
             QueryOperation::Insert => {
                 if let Some(data) = &query.data {
                     steps.push(PlanStep::InsertNode {
@@ -176,21 +176,21 @@ impl QueryPlanner {
                     estimated_cost = 1.0; // Insert is constant time
                 }
             }
-            
+
             QueryOperation::Update => {
                 // First find nodes to update
                 let (scan_step, scan_cost, found_index) = self.plan_scan(&query.target, &query.conditions);
                 steps.push(scan_step);
                 estimated_cost += scan_cost;
                 uses_index = found_index;
-                
+
                 // Filter
                 if !query.conditions.is_empty() {
                     steps.push(PlanStep::Filter {
                         conditions: query.conditions.clone(),
                     });
                 }
-                
+
                 // Update
                 if let Some(data) = &query.data {
                     steps.push(PlanStep::UpdateNodes {
@@ -199,26 +199,26 @@ impl QueryPlanner {
                     estimated_cost += 0.5; // Update cost per row
                 }
             }
-            
+
             QueryOperation::Delete => {
                 // First find nodes to delete
                 let (scan_step, scan_cost, found_index) = self.plan_scan(&query.target, &query.conditions);
                 steps.push(scan_step);
                 estimated_cost += scan_cost;
                 uses_index = found_index;
-                
+
                 // Filter
                 if !query.conditions.is_empty() {
                     steps.push(PlanStep::Filter {
                         conditions: query.conditions.clone(),
                     });
                 }
-                
+
                 // Delete
                 steps.push(PlanStep::DeleteNodes);
                 estimated_cost += 0.5; // Delete cost per row
             }
-            
+
             QueryOperation::Traverse => {
                 steps.push(PlanStep::Traverse {
                     start_node: query.target.clone(),
@@ -227,20 +227,20 @@ impl QueryPlanner {
                 });
                 estimated_cost = 10.0; // Traversal is expensive
             }
-            
+
             QueryOperation::CreateSchema | QueryOperation::DropSchema => {
                 // Schema operations are handled separately
                 estimated_cost = 1.0;
             }
         }
-        
+
         Ok(QueryPlan {
             steps,
             estimated_cost,
             uses_index,
         })
     }
-    
+
     /// Plan the scan strategy
     fn plan_scan(&self, node_type: &str, conditions: &[Condition]) -> (PlanStep, f64, bool) {
         // Check if any condition can use an index
@@ -258,7 +258,7 @@ impl QueryPlanner {
                 );
             }
         }
-        
+
         // No index available - full scan
         (
             PlanStep::FullScan {
@@ -268,14 +268,14 @@ impl QueryPlanner {
             false,
         )
     }
-    
+
     /// Explain the query plan as a string
     pub fn explain(&self, plan: &QueryPlan) -> String {
         let mut lines = Vec::new();
         lines.push(format!("Query Plan (estimated cost: {:.2})", plan.estimated_cost));
         lines.push(format!("Uses index: {}", plan.uses_index));
         lines.push("Steps:".to_string());
-        
+
         for (i, step) in plan.steps.iter().enumerate() {
             let step_str = match step {
                 PlanStep::FullScan { node_type } => {
@@ -320,7 +320,7 @@ impl QueryPlanner {
             };
             lines.push(step_str);
         }
-        
+
         lines.join("\n")
     }
 }
@@ -336,11 +336,11 @@ mod tests {
     use super::*;
     use crate::query::Operator;
     use crate::storage::Value;
-    
+
     #[test]
     fn test_plan_select() {
         let planner = QueryPlanner::new();
-        
+
         let query = ParsedQuery {
             operation: QueryOperation::Select,
             target: "users".to_string(),
@@ -355,17 +355,17 @@ mod tests {
             offset: None,
             data: None,
         };
-        
+
         let plan = planner.plan(&query).unwrap();
         assert!(!plan.uses_index); // No index defined
         assert!(plan.steps.len() >= 2); // At least scan + filter
     }
-    
+
     #[test]
     fn test_plan_with_index() {
         let mut planner = QueryPlanner::new();
         planner.indexed_fields.insert(("users".to_string(), "email".to_string()));
-        
+
         let query = ParsedQuery {
             operation: QueryOperation::Select,
             target: "users".to_string(),
@@ -380,9 +380,10 @@ mod tests {
             offset: None,
             data: None,
         };
-        
+
         let plan = planner.plan(&query).unwrap();
         assert!(plan.uses_index);
     }
 }
+
 

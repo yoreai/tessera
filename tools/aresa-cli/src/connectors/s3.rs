@@ -4,7 +4,6 @@
 
 use anyhow::{Context, Result};
 use chrono::{DateTime, Utc};
-use serde::Deserialize;
 use std::collections::HashMap;
 
 /// S3 connector
@@ -34,7 +33,7 @@ impl S3Connector {
         secret_key: Option<&str>,
     ) -> Result<Self> {
         let region = region.unwrap_or("us-east-1").to_string();
-        
+
         // Try to get credentials from environment or AWS config
         let (access_key, secret_key) = match (access_key, secret_key) {
             (Some(ak), Some(sk)) => (ak.to_string(), sk.to_string()),
@@ -71,13 +70,13 @@ impl S3Connector {
 
         loop {
             let response = self.list_objects_page(prefix, continuation_token.as_deref()).await?;
-            
+
             objects.extend(response.objects);
-            
+
             if objects.len() >= limit || response.continuation_token.is_none() {
                 break;
             }
-            
+
             continuation_token = response.continuation_token;
         }
 
@@ -93,7 +92,7 @@ impl S3Connector {
     ) -> Result<ListObjectsResponse> {
         let host = format!("{}.s3.{}.amazonaws.com", self.bucket, self.region);
         let mut url = format!("https://{}/?list-type=2", host);
-        
+
         if let Some(prefix) = prefix {
             url.push_str(&format!("&prefix={}", urlencoding::encode(prefix)));
         }
@@ -105,11 +104,11 @@ impl S3Connector {
         let now = Utc::now();
         let date_stamp = now.format("%Y%m%d").to_string();
         let amz_date = now.format("%Y%m%dT%H%M%SZ").to_string();
-        
+
         let authorization = self.sign_request(
             "GET",
             "/",
-            &format!("list-type=2{}{}", 
+            &format!("list-type=2{}{}",
                 prefix.map(|p| format!("&prefix={}", p)).unwrap_or_default(),
                 continuation_token.map(|t| format!("&continuation-token={}", t)).unwrap_or_default()
             ),
@@ -145,7 +144,7 @@ impl S3Connector {
     ) -> Result<String> {
         use hmac::{Hmac, Mac};
         use sha2::{Sha256, Digest};
-        
+
         type HmacSha256 = Hmac<Sha256>;
 
         // Create canonical request
@@ -154,7 +153,7 @@ impl S3Connector {
             host, amz_date
         );
         let signed_headers = "host;x-amz-content-sha256;x-amz-date";
-        
+
         let canonical_request = format!(
             "{}\n{}\n{}\n{}\n{}\nUNSIGNED-PAYLOAD",
             method, path, query, canonical_headers, signed_headers
@@ -163,11 +162,11 @@ impl S3Connector {
         // Create string to sign
         let algorithm = "AWS4-HMAC-SHA256";
         let credential_scope = format!("{}/{}/s3/aws4_request", date_stamp, self.region);
-        
+
         let mut hasher = Sha256::new();
         hasher.update(canonical_request.as_bytes());
         let canonical_request_hash = hex::encode(hasher.finalize());
-        
+
         let string_to_sign = format!(
             "{}\n{}\n{}\n{}",
             algorithm, amz_date, credential_scope, canonical_request_hash
@@ -175,23 +174,23 @@ impl S3Connector {
 
         // Calculate signature
         let k_secret = format!("AWS4{}", self.secret_key);
-        
+
         let mut mac = HmacSha256::new_from_slice(k_secret.as_bytes())?;
         mac.update(date_stamp.as_bytes());
         let k_date = mac.finalize().into_bytes();
-        
+
         let mut mac = HmacSha256::new_from_slice(&k_date)?;
         mac.update(self.region.as_bytes());
         let k_region = mac.finalize().into_bytes();
-        
+
         let mut mac = HmacSha256::new_from_slice(&k_region)?;
         mac.update(b"s3");
         let k_service = mac.finalize().into_bytes();
-        
+
         let mut mac = HmacSha256::new_from_slice(&k_service)?;
         mac.update(b"aws4_request");
         let k_signing = mac.finalize().into_bytes();
-        
+
         let mut mac = HmacSha256::new_from_slice(&k_signing)?;
         mac.update(string_to_sign.as_bytes());
         let signature = hex::encode(mac.finalize().into_bytes());
@@ -224,7 +223,7 @@ impl S3Connector {
             let start = pos + start;
             if let Some(end) = xml[start..].find("</Contents>") {
                 let content = &xml[start..start + end + 11];
-                
+
                 let key = extract_xml_value(content, "Key").unwrap_or_default();
                 let size: u64 = extract_xml_value(content, "Size")
                     .and_then(|s| s.parse().ok())
@@ -263,7 +262,7 @@ impl S3Connector {
     ) -> Result<Vec<S3Object>> {
         // List all objects and filter by pattern
         let objects = self.list_objects(None, None).await?;
-        
+
         let pattern = pattern.to_lowercase();
         let filtered: Vec<S3Object> = objects
             .into_iter()
@@ -281,7 +280,7 @@ impl S3Connector {
         limit: Option<usize>,
     ) -> Result<(Vec<String>, Vec<HashMap<String, String>>)> {
         let objects = self.list_objects(prefix, limit).await?;
-        
+
         let columns = vec![
             "key".to_string(),
             "size".to_string(),
@@ -314,7 +313,7 @@ struct ListObjectsResponse {
 fn extract_xml_value(xml: &str, tag: &str) -> Option<String> {
     let start_tag = format!("<{}>", tag);
     let end_tag = format!("</{}>", tag);
-    
+
     if let Some(start) = xml.find(&start_tag) {
         let value_start = start + start_tag.len();
         if let Some(end) = xml[value_start..].find(&end_tag) {
@@ -323,4 +322,5 @@ fn extract_xml_value(xml: &str, tag: &str) -> Option<String> {
     }
     None
 }
+
 

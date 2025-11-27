@@ -66,7 +66,7 @@ impl Default for ReplHelper {
 impl Highlighter for ReplHelper {
     fn highlight<'l>(&self, line: &'l str, _pos: usize) -> Cow<'l, str> {
         let mut result = line.to_string();
-        
+
         // Highlight SQL keywords
         let sql_keywords = [
             "SELECT", "FROM", "WHERE", "INSERT", "INTO", "VALUES", "UPDATE",
@@ -76,7 +76,7 @@ impl Highlighter for ReplHelper {
             "AVG", "MIN", "MAX", "LIKE", "IN", "BETWEEN", "IS", "CREATE",
             "DROP", "ALTER", "TABLE", "INDEX",
         ];
-        
+
         for keyword in &sql_keywords {
             let pattern = format!(r"\b{}\b", keyword);
             if let Ok(re) = regex::Regex::new(&pattern) {
@@ -84,7 +84,7 @@ impl Highlighter for ReplHelper {
                     format!("\x1b[34;1m{}\x1b[0m", &caps[0])
                 }).to_string();
             }
-            
+
             // Also match lowercase
             let pattern_lower = format!(r"\b{}\b", keyword.to_lowercase());
             if let Ok(re) = regex::Regex::new(&pattern_lower) {
@@ -93,39 +93,39 @@ impl Highlighter for ReplHelper {
                 }).to_string();
             }
         }
-        
+
         // Highlight strings
         if let Ok(re) = regex::Regex::new(r#"'[^']*'|"[^"]*""#) {
             result = re.replace_all(&result, |caps: &regex::Captures| {
                 format!("\x1b[32m{}\x1b[0m", &caps[0])
             }).to_string();
         }
-        
+
         // Highlight numbers
         if let Ok(re) = regex::Regex::new(r"\b\d+(\.\d+)?\b") {
             result = re.replace_all(&result, |caps: &regex::Captures| {
                 format!("\x1b[33m{}\x1b[0m", &caps[0])
             }).to_string();
         }
-        
+
         // Highlight commands (starting with .)
         if let Ok(re) = regex::Regex::new(r"^\.[a-z]+") {
             result = re.replace_all(&result, |caps: &regex::Captures| {
                 format!("\x1b[35;1m{}\x1b[0m", &caps[0])
             }).to_string();
         }
-        
+
         Cow::Owned(result)
     }
-    
+
     fn highlight_prompt<'b, 's: 'b, 'p: 'b>(&'s self, prompt: &'p str, _default: bool) -> Cow<'b, str> {
         Cow::Borrowed(prompt)
     }
-    
+
     fn highlight_hint<'h>(&self, hint: &'h str) -> Cow<'h, str> {
         Cow::Owned(format!("\x1b[90m{}\x1b[0m", hint))
     }
-    
+
     fn highlight_char(&self, _line: &str, _pos: usize, _forced: bool) -> bool {
         true
     }
@@ -141,7 +141,7 @@ impl Hint for CommandHint {
     fn display(&self) -> &str {
         &self.display
     }
-    
+
     fn completion(&self) -> Option<&str> {
         if self.complete_up_to > 0 {
             Some(&self.display[..self.complete_up_to])
@@ -153,14 +153,14 @@ impl Hint for CommandHint {
 
 impl Hinter for ReplHelper {
     type Hint = CommandHint;
-    
+
     fn hint(&self, line: &str, pos: usize, _ctx: &rustyline::Context<'_>) -> Option<Self::Hint> {
         if line.is_empty() || pos < line.len() {
             return None;
         }
-        
+
         let line_lower = line.to_lowercase();
-        
+
         // Find matching keywords
         for keyword in &self.keywords {
             let keyword_lower = keyword.to_lowercase();
@@ -172,7 +172,7 @@ impl Hinter for ReplHelper {
                 });
             }
         }
-        
+
         None
     }
 }
@@ -180,23 +180,23 @@ impl Hinter for ReplHelper {
 impl Validator for ReplHelper {
     fn validate(&self, ctx: &mut ValidationContext) -> rustyline::Result<ValidationResult> {
         let input = ctx.input();
-        
+
         // Check for unclosed quotes
         let single_quotes = input.matches('\'').count();
         let double_quotes = input.matches('"').count();
-        
+
         if single_quotes % 2 != 0 || double_quotes % 2 != 0 {
             return Ok(ValidationResult::Incomplete);
         }
-        
+
         // Check for unclosed parentheses
         let open_parens = input.matches('(').count();
         let close_parens = input.matches(')').count();
-        
+
         if open_parens > close_parens {
             return Ok(ValidationResult::Incomplete);
         }
-        
+
         Ok(ValidationResult::Valid(None))
     }
 }
@@ -215,22 +215,22 @@ impl Repl {
     pub async fn new(db_path: &str) -> Result<Self> {
         let db = Database::open(db_path).await?;
         let nlp = NlpProcessor::new()?;
-        
+
         let mut editor = Editor::new()?;
         editor.set_helper(Some(ReplHelper::default()));
         editor.set_auto_add_history(true);
-        
+
         // Load history
         let history_path = dirs::config_dir()
             .map(|p| p.join("aresadb/history.txt"));
-        
+
         if let Some(ref path) = history_path {
             if let Some(parent) = path.parent() {
                 let _ = std::fs::create_dir_all(parent);
             }
             let _ = editor.load_history(path);
         }
-        
+
         Ok(Self {
             editor,
             db,
@@ -239,22 +239,22 @@ impl Repl {
             history_path,
         })
     }
-    
+
     /// Run the REPL
     pub async fn run(&mut self) -> Result<()> {
         self.print_welcome();
-        
+
         loop {
             let prompt = format!("{} ", "aresadb>".bright_cyan().bold());
-            
+
             match self.editor.readline(&prompt) {
                 Ok(line) => {
                     let line = line.trim();
-                    
+
                     if line.is_empty() {
                         continue;
                     }
-                    
+
                     // Handle commands
                     if line.starts_with('.') {
                         if self.handle_command(line).await? {
@@ -262,7 +262,7 @@ impl Repl {
                         }
                         continue;
                     }
-                    
+
                     // Execute query
                     self.execute_input(line).await;
                 }
@@ -279,15 +279,15 @@ impl Repl {
                 }
             }
         }
-        
+
         // Save history
         if let Some(ref path) = self.history_path {
             let _ = self.editor.save_history(path);
         }
-        
+
         Ok(())
     }
-    
+
     fn print_welcome(&self) {
         println!();
         println!(
@@ -302,11 +302,11 @@ impl Repl {
         println!("Type {} for help, {} to exit", ".help".bright_green(), ".exit".bright_green());
         println!();
     }
-    
+
     async fn handle_command(&mut self, cmd: &str) -> Result<bool> {
         let parts: Vec<&str> = cmd.split_whitespace().collect();
         let command = parts.first().unwrap_or(&"");
-        
+
         match *command {
             ".help" | ".h" => {
                 self.print_help();
@@ -350,10 +350,10 @@ impl Repl {
                 println!("Type .help for available commands");
             }
         }
-        
+
         Ok(false)
     }
-    
+
     fn print_help(&self) {
         println!("{}", "AresaDB Commands:".bright_yellow().bold());
         println!();
@@ -372,10 +372,10 @@ impl Repl {
         println!("  {} {}", "Insert:".bright_cyan(), "INSERT INTO users (name, age) VALUES ('John', 30)");
         println!();
     }
-    
+
     async fn show_status(&self) -> Result<()> {
         let status = self.db.status().await?;
-        
+
         println!();
         println!("{}", "Database Status".bright_yellow().bold());
         println!("─────────────────────────────────────");
@@ -390,18 +390,18 @@ impl Repl {
             humansize::format_size(status.size_bytes, humansize::BINARY)
         );
         println!();
-        
+
         Ok(())
     }
-    
+
     async fn show_tables(&self) -> Result<()> {
         use crate::schema::SchemaManager;
-        
+
         let manager = SchemaManager::new(
             Database::open(self.db.path()).await?
         );
         let schemas = manager.list_schemas().await?;
-        
+
         if schemas.is_empty() {
             println!("No schemas defined. Use 'aresadb schema create' to create one.");
         } else {
@@ -412,17 +412,17 @@ impl Repl {
             }
             println!();
         }
-        
+
         Ok(())
     }
-    
+
     async fn show_schema(&self, name: &str) -> Result<()> {
         use crate::schema::SchemaManager;
-        
+
         let manager = SchemaManager::new(
             Database::open(self.db.path()).await?
         );
-        
+
         match manager.get_schema(name).await {
             Ok(schema) => {
                 println!();
@@ -439,13 +439,13 @@ impl Repl {
                     if field.indexed {
                         attrs.push("INDEXED");
                     }
-                    
+
                     let attrs_str = if attrs.is_empty() {
                         String::new()
                     } else {
                         format!(" ({})", attrs.join(", "))
                     };
-                    
+
                     println!(
                         "  {} {:?}{}",
                         field.name.bright_green(),
@@ -459,15 +459,15 @@ impl Repl {
                 println!("Schema not found: {}", name);
             }
         }
-        
+
         Ok(())
     }
-    
+
     async fn execute_input(&self, input: &str) {
         use std::time::Instant;
-        
+
         let start = Instant::now();
-        
+
         // Try to parse as SQL first
         let result = if input.to_uppercase().starts_with("SELECT")
             || input.to_uppercase().starts_with("INSERT")
@@ -491,18 +491,18 @@ impl Repl {
                 Err(e) => Err(e),
             }
         };
-        
+
         let elapsed = start.elapsed();
-        
+
         match result {
             Ok(mut query_result) => {
                 query_result.execution_time_ms = elapsed.as_millis() as u64;
-                
+
                 let renderer = Renderer::new(self.format);
                 if let Err(e) = renderer.render_results(&query_result) {
                     eprintln!("{} {}", "Error rendering:".bright_red(), e);
                 }
-                
+
                 println!(
                     "{} {} rows in {:.2}ms",
                     "→".bright_black(),
@@ -514,7 +514,7 @@ impl Repl {
                 eprintln!("{} {}", "Error:".bright_red().bold(), e);
             }
         }
-        
+
         println!();
     }
 }
@@ -522,7 +522,7 @@ impl Repl {
 // Use dirs crate for platform-specific config paths
 mod dirs {
     use std::path::PathBuf;
-    
+
     pub fn config_dir() -> Option<PathBuf> {
         #[cfg(target_os = "macos")]
         {
@@ -530,7 +530,7 @@ mod dirs {
                 .ok()
                 .map(|h| PathBuf::from(h).join(".config"))
         }
-        
+
         #[cfg(target_os = "linux")]
         {
             std::env::var("XDG_CONFIG_HOME")
@@ -542,18 +542,19 @@ mod dirs {
                         .map(|h| PathBuf::from(h).join(".config"))
                 })
         }
-        
+
         #[cfg(target_os = "windows")]
         {
             std::env::var("APPDATA")
                 .ok()
                 .map(PathBuf::from)
         }
-        
+
         #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
         {
             None
         }
     }
 }
+
 

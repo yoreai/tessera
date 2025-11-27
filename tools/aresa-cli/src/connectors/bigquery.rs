@@ -76,10 +76,10 @@ impl BigQueryConnector {
     /// Create a new BigQuery connector
     pub async fn new(project_id: &str, credentials_path: Option<&str>) -> Result<Self> {
         let client = reqwest::Client::new();
-        
+
         // Get access token from service account or application default credentials
         let access_token = Self::get_access_token(credentials_path).await?;
-        
+
         Ok(Self {
             project_id: project_id.to_string(),
             client,
@@ -93,7 +93,7 @@ impl BigQueryConnector {
         if let Some(path) = credentials_path {
             return Self::get_service_account_token(path).await;
         }
-        
+
         // Try to get from gcloud CLI
         Self::get_gcloud_token().await
     }
@@ -101,27 +101,27 @@ impl BigQueryConnector {
     /// Get token from service account JSON
     async fn get_service_account_token(path: &str) -> Result<String> {
         use std::fs;
-        
+
         #[derive(Deserialize)]
         struct ServiceAccount {
             client_email: String,
             private_key: String,
             token_uri: String,
         }
-        
+
         let content = fs::read_to_string(path)
             .context("Failed to read service account file")?;
         let sa: ServiceAccount = serde_json::from_str(&content)
             .context("Failed to parse service account JSON")?;
-        
+
         // Create JWT and exchange for access token
         // This is a simplified implementation - production would use proper JWT signing
         let client = reqwest::Client::new();
-        
+
         // For now, we'll use gcloud fallback
         // Full implementation would sign JWT with private_key
         let _ = (sa.client_email, sa.private_key, sa.token_uri, client);
-        
+
         Self::get_gcloud_token().await
     }
 
@@ -131,17 +131,17 @@ impl BigQueryConnector {
             .args(["auth", "print-access-token"])
             .output()
             .context("Failed to run gcloud. Make sure Google Cloud SDK is installed.")?;
-        
+
         if !output.status.success() {
             let stderr = String::from_utf8_lossy(&output.stderr);
             anyhow::bail!("gcloud auth failed: {}", stderr);
         }
-        
+
         let token = String::from_utf8(output.stdout)
             .context("Invalid token encoding")?
             .trim()
             .to_string();
-        
+
         Ok(token)
     }
 
@@ -231,7 +231,7 @@ impl BigQueryConnector {
 
         loop {
             let mut request = self.client.get(&url).bearer_auth(&self.access_token);
-            
+
             if let Some(token) = &page_token {
                 request = request.query(&[("pageToken", token)]);
             }
@@ -342,4 +342,5 @@ impl BigQueryConnector {
             .collect())
     }
 }
+
 

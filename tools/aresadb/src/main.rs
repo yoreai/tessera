@@ -424,23 +424,23 @@ fn print_welcome() {
 
 async fn handle_init(path: &str, name: Option<&str>) -> Result<()> {
     use storage::Database;
-    
+
     let db_name = name.unwrap_or_else(|| {
         std::path::Path::new(path)
             .file_name()
             .and_then(|n| n.to_str())
             .unwrap_or("aresadb")
     });
-    
+
     println!(
         "{} Initializing database '{}' at {}...",
         "●".bright_blue(),
         db_name.bright_yellow(),
         path.bright_cyan()
     );
-    
+
     Database::create(path, db_name).await?;
-    
+
     println!(
         "{} Database initialized successfully!",
         "✓".bright_green().bold()
@@ -452,7 +452,7 @@ async fn handle_init(path: &str, name: Option<&str>) -> Result<()> {
         format!("cd {} && aresadb schema create users --fields \"name:string, email:string\"", path)
             .bright_green()
     );
-    
+
     Ok(())
 }
 
@@ -460,14 +460,14 @@ async fn handle_query(db_path: &str, sql: &str, format: OutputFormat, limit: Opt
     use storage::Database;
     use query::QueryEngine;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
     let engine = QueryEngine::new(db);
     let results = engine.execute_sql(sql, limit).await?;
-    
+
     let renderer = Renderer::new(format);
     renderer.render_results(&results)?;
-    
+
     Ok(())
 }
 
@@ -475,10 +475,10 @@ async fn handle_schema(db_path: &str, action: SchemaAction) -> Result<()> {
     use storage::Database;
     use schema::SchemaManager;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
     let manager = SchemaManager::new(db);
-    
+
     match action {
         SchemaAction::Create { name, fields } => {
             manager.create_schema(&name, &fields).await?;
@@ -524,7 +524,7 @@ async fn handle_schema(db_path: &str, action: SchemaAction) -> Result<()> {
             );
         }
     }
-    
+
     Ok(())
 }
 
@@ -537,10 +537,10 @@ async fn handle_view(
 ) -> Result<()> {
     use storage::Database;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
     let renderer = Renderer::new(format);
-    
+
     match mode {
         ViewMode::Table => {
             let rows = db.get_all_by_type(name, limit).await?;
@@ -555,7 +555,7 @@ async fn handle_view(
             renderer.render_as_kv(&kvs)?;
         }
     }
-    
+
     Ok(())
 }
 
@@ -569,86 +569,86 @@ async fn handle_traverse(
     use storage::Database;
     use query::QueryEngine;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
     let engine = QueryEngine::new(db);
-    
+
     let edge_types: Option<Vec<&str>> = edges.map(|e| e.split(',').collect());
     let results = engine.traverse(node_id, depth, edge_types).await?;
-    
+
     let renderer = Renderer::new(format);
     renderer.render_traversal(&results)?;
-    
+
     Ok(())
 }
 
 async fn handle_push(db_path: &str, url: &str) -> Result<()> {
     use storage::Database;
-    
+
     println!(
         "{} Pushing database to {}...",
         "●".bright_blue(),
         url.bright_cyan()
     );
-    
+
     let db = Database::open(db_path).await?;
     db.push_to_bucket(url).await?;
-    
+
     println!(
         "{} Database pushed successfully!",
         "✓".bright_green().bold()
     );
-    
+
     Ok(())
 }
 
 async fn handle_connect(url: &str, readonly: bool) -> Result<()> {
     use storage::Database;
-    
+
     println!(
         "{} Connecting to {}...",
         "●".bright_blue(),
         url.bright_cyan()
     );
-    
+
     let _db = Database::connect_bucket(url, readonly).await?;
-    
+
     println!(
         "{} Connected! Use {} to start querying.",
         "✓".bright_green().bold(),
         "aresadb repl".bright_green()
     );
-    
+
     Ok(())
 }
 
 async fn handle_sync(db_path: &str, url: &str) -> Result<()> {
     use storage::Database;
-    
+
     println!(
         "{} Syncing with {}...",
         "●".bright_blue(),
         url.bright_cyan()
     );
-    
+
     let db = Database::open(db_path).await?;
     let stats = db.sync_with_bucket(url).await?;
-    
+
     println!(
         "{} Synced: {} uploaded, {} downloaded",
         "✓".bright_green().bold(),
         stats.uploaded,
         stats.downloaded
     );
-    
+
     Ok(())
 }
 
 async fn handle_config(action: ConfigAction) -> Result<()> {
     use cli::config::Config;
-    
+
     let config = Config::load()?;
-    
+
     match action {
         ConfigAction::Set { key, value } => {
             config.set(&key, &value)?;
@@ -670,16 +670,16 @@ async fn handle_config(action: ConfigAction) -> Result<()> {
             config.print_all()?;
         }
     }
-    
+
     Ok(())
 }
 
 async fn handle_status(db_path: &str) -> Result<()> {
     use storage::Database;
-    
+
     let db = Database::open(db_path).await?;
     let status = db.status().await?;
-    
+
     println!("{}", "Database Status".bright_yellow().bold());
     println!("─────────────────────────────────────");
     println!("  {} {}", "Name:".bright_cyan(), status.name);
@@ -688,59 +688,59 @@ async fn handle_status(db_path: &str) -> Result<()> {
     println!("  {} {}", "Edges:".bright_cyan(), status.edge_count);
     println!("  {} {}", "Schemas:".bright_cyan(), status.schema_count);
     println!("  {} {}", "Size:".bright_cyan(), humansize::format_size(status.size_bytes, humansize::BINARY));
-    
+
     Ok(())
 }
 
 async fn handle_insert(db_path: &str, node_type: &str, props_json: &str, format: OutputFormat) -> Result<()> {
     use storage::Database;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
     let props: serde_json::Value = serde_json::from_str(props_json)?;
-    
+
     let node = db.insert_node(node_type, props).await?;
-    
+
     let renderer = Renderer::new(format);
     renderer.render_node(&node)?;
-    
+
     println!(
         "{} Inserted node {}",
         "✓".bright_green().bold(),
         node.id.to_string().bright_yellow()
     );
-    
+
     Ok(())
 }
 
 async fn handle_get(db_path: &str, id: &str, format: OutputFormat) -> Result<()> {
     use storage::Database;
     use output::Renderer;
-    
+
     let db = Database::open(db_path).await?;
-    
+
     if let Some(node) = db.get_node(id).await? {
         let renderer = Renderer::new(format);
         renderer.render_node(&node)?;
     } else {
         println!("{} Node not found: {}", "!".bright_red(), id);
     }
-    
+
     Ok(())
 }
 
 async fn handle_delete(db_path: &str, id: &str) -> Result<()> {
     use storage::Database;
-    
+
     let db = Database::open(db_path).await?;
     db.delete_node(id).await?;
-    
+
     println!(
         "{} Deleted node {}",
         "✓".bright_green().bold(),
         id.bright_yellow()
     );
-    
+
     Ok(())
 }
 
@@ -755,7 +755,7 @@ async fn handle_natural_language(
     use query::QueryEngine;
     use ai::NlpProcessor;
     use output::Renderer;
-    
+
     let spinner = ProgressBar::new_spinner();
     spinner.set_style(
         ProgressStyle::default_spinner()
@@ -767,20 +767,21 @@ async fn handle_natural_language(
 
     let db = Database::open(db_path).await?;
     let nlp = NlpProcessor::new()?;
-    
+
     // Parse natural language to SQL or operations
     let parsed = nlp.parse(query, &db).await?;
-    
+
     spinner.set_message("Executing query...");
-    
+
     let engine = QueryEngine::new(db);
     let results = engine.execute_parsed(&parsed, limit).await?;
-    
+
     spinner.finish_and_clear();
-    
+
     let renderer = Renderer::new(format);
     renderer.render_results(&results)?;
-    
+
     Ok(())
 }
+
 

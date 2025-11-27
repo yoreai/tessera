@@ -24,17 +24,17 @@ impl NlpProcessor {
             .timeout(std::time::Duration::from_secs(30))
             .build()
             .ok();
-        
+
         Ok(Self { config, client })
     }
-    
+
     /// Parse a natural language query
     pub async fn parse(&self, query: &str, db: &Database) -> Result<ParsedQuery> {
         // First try rule-based parsing for common patterns
         if let Some(parsed) = self.parse_with_rules(query, db).await? {
             return Ok(parsed);
         }
-        
+
         // Fall back to LLM if configured
         if self.config.llm.provider.is_empty() {
             // No LLM configured - use best-effort rule parsing
@@ -43,17 +43,17 @@ impl NlpProcessor {
             self.parse_with_llm(query, db).await
         }
     }
-    
+
     /// Rule-based parsing for common patterns
     async fn parse_with_rules(&self, query: &str, db: &Database) -> Result<Option<ParsedQuery>> {
         let query_lower = query.to_lowercase();
         let words: Vec<&str> = query_lower.split_whitespace().collect();
-        
+
         // Pattern: "show all <type>" or "list all <type>" or "get all <type>"
-        if (query_lower.starts_with("show all") 
+        if (query_lower.starts_with("show all")
             || query_lower.starts_with("list all")
             || query_lower.starts_with("get all")
-            || query_lower.starts_with("find all")) 
+            || query_lower.starts_with("find all"))
         {
             if let Some(node_type) = words.get(2) {
                 let node_type = node_type.trim_end_matches('s'); // Remove plural
@@ -69,7 +69,7 @@ impl NlpProcessor {
                 }));
             }
         }
-        
+
         // Pattern: "show <type>" or "list <type>"
         if query_lower.starts_with("show ") || query_lower.starts_with("list ") {
             if let Some(node_type) = words.get(1) {
@@ -86,22 +86,22 @@ impl NlpProcessor {
                 }));
             }
         }
-        
+
         // Pattern: "add <type> <name> with <field> <value>"
         if query_lower.starts_with("add ") || query_lower.starts_with("create ") || query_lower.starts_with("insert ") {
             return self.parse_insert_pattern(&words);
         }
-        
+
         // Pattern: "find <type> where/with <field> <op> <value>"
         if query_lower.starts_with("find ") || query_lower.starts_with("search ") {
             return self.parse_find_pattern(&words);
         }
-        
+
         // Pattern: "delete <type> where <field> = <value>"
         if query_lower.starts_with("delete ") || query_lower.starts_with("remove ") {
             return self.parse_delete_pattern(&words);
         }
-        
+
         // Pattern: "count <type>"
         if query_lower.starts_with("count ") {
             if let Some(node_type) = words.get(1) {
@@ -118,31 +118,31 @@ impl NlpProcessor {
                 }));
             }
         }
-        
+
         Ok(None)
     }
-    
+
     /// Parse insert pattern
     fn parse_insert_pattern(&self, words: &[&str]) -> Result<Option<ParsedQuery>> {
         // "add user John with email john@example.com age 30"
         if words.len() < 3 {
             return Ok(None);
         }
-        
+
         let node_type = words[1].trim_end_matches('s');
         let mut data = BTreeMap::new();
-        
+
         // Check if second word might be a name
         if words.len() > 2 && !["with", "where", "having"].contains(&words[2]) {
             data.insert("name".to_string(), Value::String(words[2].to_string()));
         }
-        
+
         // Parse "with" or "having" clauses
         let mut i = 3;
         if words.get(3) == Some(&"with") || words.get(3) == Some(&"having") {
             i = 4;
         }
-        
+
         while i < words.len() {
             let field = words[i];
             if let Some(value_str) = words.get(i + 1) {
@@ -153,11 +153,11 @@ impl NlpProcessor {
                 break;
             }
         }
-        
+
         if data.is_empty() {
             return Ok(None);
         }
-        
+
         Ok(Some(ParsedQuery {
             operation: QueryOperation::Insert,
             target: node_type.to_string(),
@@ -169,7 +169,7 @@ impl NlpProcessor {
             data: Some(data),
         }))
     }
-    
+
     /// Parse find pattern
     fn parse_find_pattern(&self, words: &[&str]) -> Result<Option<ParsedQuery>> {
         // "find users where age > 25"
@@ -177,21 +177,21 @@ impl NlpProcessor {
         if words.len() < 2 {
             return Ok(None);
         }
-        
+
         let node_type = words[1].trim_end_matches('s');
         let mut conditions = Vec::new();
         let mut limit = None;
-        
+
         // Find "where", "with", or "having" keyword
         let condition_start = words.iter()
             .position(|w| *w == "where" || *w == "with" || *w == "having")
             .map(|p| p + 1);
-        
+
         if let Some(start) = condition_start {
             let mut i = start;
             while i < words.len() {
                 let field = words[i];
-                
+
                 // Check for operator
                 if let Some(op_word) = words.get(i + 1) {
                     let (operator, value_idx) = match *op_word {
@@ -207,7 +207,7 @@ impl NlpProcessor {
                             (Operator::Eq, i + 1)
                         }
                     };
-                    
+
                     if let Some(value_str) = words.get(value_idx) {
                         // Skip "than" if present
                         let actual_value = if *value_str == "than" {
@@ -215,7 +215,7 @@ impl NlpProcessor {
                         } else {
                             Some(value_str)
                         };
-                        
+
                         if let Some(v) = actual_value {
                             let value = self.parse_value(v);
                             conditions.push(Condition {
@@ -224,7 +224,7 @@ impl NlpProcessor {
                                 value,
                             });
                         }
-                        
+
                         i = value_idx + 2;
                     } else {
                         break;
@@ -232,28 +232,28 @@ impl NlpProcessor {
                 } else {
                     break;
                 }
-                
+
                 // Skip "and" connector
                 if words.get(i) == Some(&"and") {
                     i += 1;
                 }
             }
         }
-        
+
         // Check for limit
         if let Some(limit_pos) = words.iter().position(|w| *w == "limit") {
             if let Some(n) = words.get(limit_pos + 1) {
                 limit = n.parse().ok();
             }
         }
-        
+
         // Check for "first N" or "top N"
         if let Some(first_pos) = words.iter().position(|w| *w == "first" || *w == "top") {
             if let Some(n) = words.get(first_pos + 1) {
                 limit = n.parse().ok();
             }
         }
-        
+
         Ok(Some(ParsedQuery {
             operation: QueryOperation::Select,
             target: node_type.to_string(),
@@ -265,21 +265,21 @@ impl NlpProcessor {
             data: None,
         }))
     }
-    
+
     /// Parse delete pattern
     fn parse_delete_pattern(&self, words: &[&str]) -> Result<Option<ParsedQuery>> {
         // "delete users where id = xyz"
         if words.len() < 2 {
             return Ok(None);
         }
-        
+
         let node_type = words[1].trim_end_matches('s');
         let mut conditions = Vec::new();
-        
+
         if let Some(where_pos) = words.iter().position(|w| *w == "where") {
             let field = words.get(where_pos + 1);
             let value = words.get(where_pos + 3).or(words.get(where_pos + 2));
-            
+
             if let (Some(f), Some(v)) = (field, value) {
                 conditions.push(Condition {
                     column: f.to_string(),
@@ -288,7 +288,7 @@ impl NlpProcessor {
                 });
             }
         }
-        
+
         Ok(Some(ParsedQuery {
             operation: QueryOperation::Delete,
             target: node_type.to_string(),
@@ -300,7 +300,7 @@ impl NlpProcessor {
             data: None,
         }))
     }
-    
+
     /// Parse a value string to a Value
     fn parse_value(&self, s: &str) -> Value {
         // Try to parse as number
@@ -310,7 +310,7 @@ impl NlpProcessor {
         if let Ok(f) = s.parse::<f64>() {
             return Value::Float(f);
         }
-        
+
         // Try to parse as boolean
         match s.to_lowercase().as_str() {
             "true" | "yes" => return Value::Bool(true),
@@ -318,19 +318,19 @@ impl NlpProcessor {
             "null" | "none" => return Value::Null,
             _ => {}
         }
-        
+
         // Default to string
         Value::String(s.to_string())
     }
-    
+
     /// Parse with LLM
     async fn parse_with_llm(&self, query: &str, db: &Database) -> Result<ParsedQuery> {
         let client = self.client.as_ref()
             .ok_or_else(|| anyhow::anyhow!("HTTP client not available"))?;
-        
+
         // Get schema context
         let schema_context = self.get_schema_context(db).await?;
-        
+
         let prompt = format!(
             r#"You are a database query assistant. Convert the following natural language query to a structured JSON response.
 
@@ -355,23 +355,23 @@ Respond with JSON in this exact format:
 Only respond with the JSON, no explanation."#,
             schema_context, query
         );
-        
+
         let response = match self.config.llm.provider.as_str() {
             "openai" => self.call_openai(client, &prompt).await?,
             "anthropic" => self.call_anthropic(client, &prompt).await?,
             _ => bail!("Unsupported LLM provider: {}", self.config.llm.provider),
         };
-        
+
         self.parse_llm_response(&response)
     }
-    
+
     /// Get schema context for LLM prompt
     async fn get_schema_context(&self, db: &Database) -> Result<String> {
         use crate::schema::SchemaManager;
-        
+
         let manager = SchemaManager::new(Database::open(db.path()).await?);
         let schemas = manager.list_schemas().await?;
-        
+
         let mut context = Vec::new();
         for schema in schemas {
             let fields: Vec<String> = schema.fields.iter()
@@ -379,24 +379,24 @@ Only respond with the JSON, no explanation."#,
                 .collect();
             context.push(format!("{}:\n{}", schema.name, fields.join("\n")));
         }
-        
+
         if context.is_empty() {
             Ok("(no schemas defined - data is schema-less)".to_string())
         } else {
             Ok(context.join("\n\n"))
         }
     }
-    
+
     /// Call OpenAI API
     async fn call_openai(&self, client: &reqwest::Client, prompt: &str) -> Result<String> {
         let api_key = self.config.llm.api_key.as_ref()
             .ok_or_else(|| anyhow::anyhow!("OpenAI API key not configured. Run: aresadb config set llm.api_key <key>"))?;
-        
+
         let base_url = self.config.llm.base_url.as_deref()
             .unwrap_or("https://api.openai.com/v1");
         let model = self.config.llm.model.as_deref()
             .unwrap_or("gpt-4o-mini");
-        
+
         let body = serde_json::json!({
             "model": model,
             "messages": [
@@ -405,7 +405,7 @@ Only respond with the JSON, no explanation."#,
             "temperature": 0.1,
             "max_tokens": 1000
         });
-        
+
         let response = client
             .post(format!("{}/chat/completions", base_url))
             .header("Authorization", format!("Bearer {}", api_key))
@@ -413,25 +413,25 @@ Only respond with the JSON, no explanation."#,
             .json(&body)
             .send()
             .await?;
-        
+
         let data: serde_json::Value = response.json().await?;
-        
+
         data["choices"][0]["message"]["content"]
             .as_str()
             .map(|s| s.to_string())
             .ok_or_else(|| anyhow::anyhow!("Invalid OpenAI response"))
     }
-    
+
     /// Call Anthropic API
     async fn call_anthropic(&self, client: &reqwest::Client, prompt: &str) -> Result<String> {
         let api_key = self.config.llm.api_key.as_ref()
             .ok_or_else(|| anyhow::anyhow!("Anthropic API key not configured. Run: aresadb config set llm.api_key <key>"))?;
-        
+
         let base_url = self.config.llm.base_url.as_deref()
             .unwrap_or("https://api.anthropic.com/v1");
         let model = self.config.llm.model.as_deref()
             .unwrap_or("claude-3-haiku-20240307");
-        
+
         let body = serde_json::json!({
             "model": model,
             "max_tokens": 1000,
@@ -439,7 +439,7 @@ Only respond with the JSON, no explanation."#,
                 {"role": "user", "content": prompt}
             ]
         });
-        
+
         let response = client
             .post(format!("{}/messages", base_url))
             .header("x-api-key", api_key)
@@ -448,15 +448,15 @@ Only respond with the JSON, no explanation."#,
             .json(&body)
             .send()
             .await?;
-        
+
         let data: serde_json::Value = response.json().await?;
-        
+
         data["content"][0]["text"]
             .as_str()
             .map(|s| s.to_string())
             .ok_or_else(|| anyhow::anyhow!("Invalid Anthropic response"))
     }
-    
+
     /// Parse LLM response into ParsedQuery
     fn parse_llm_response(&self, response: &str) -> Result<ParsedQuery> {
         // Extract JSON from response (might have markdown code blocks)
@@ -469,9 +469,9 @@ Only respond with the JSON, no explanation."#,
         } else {
             response.trim()
         };
-        
+
         let parsed: LlmQueryResponse = serde_json::from_str(json_str)?;
-        
+
         let operation = match parsed.operation.as_str() {
             "select" => QueryOperation::Select,
             "insert" => QueryOperation::Insert,
@@ -479,7 +479,7 @@ Only respond with the JSON, no explanation."#,
             "delete" => QueryOperation::Delete,
             _ => bail!("Unknown operation: {}", parsed.operation),
         };
-        
+
         let conditions: Vec<Condition> = parsed.conditions
             .unwrap_or_default()
             .into_iter()
@@ -499,7 +499,7 @@ Only respond with the JSON, no explanation."#,
                 value: Value::from_json(c.value).unwrap_or(Value::Null),
             })
             .collect();
-        
+
         let order_by: Vec<OrderBy> = parsed.order_by
             .unwrap_or_default()
             .into_iter()
@@ -508,7 +508,7 @@ Only respond with the JSON, no explanation."#,
                 descending: o.descending.unwrap_or(false),
             })
             .collect();
-        
+
         let data: Option<BTreeMap<String, Value>> = parsed.data
             .map(|obj| {
                 obj.as_object()
@@ -519,7 +519,7 @@ Only respond with the JSON, no explanation."#,
                     })
                     .unwrap_or_default()
             });
-        
+
         Ok(ParsedQuery {
             operation,
             target: parsed.target,
@@ -531,18 +531,18 @@ Only respond with the JSON, no explanation."#,
             data,
         })
     }
-    
+
     /// Fallback parsing when no LLM is configured
     fn parse_fallback(&self, query: &str) -> Result<ParsedQuery> {
         // Extract likely table name from query
         let words: Vec<&str> = query.split_whitespace().collect();
-        
+
         // Look for common patterns
         let target = words.iter()
             .find(|w| !["show", "find", "get", "list", "all", "from", "where", "the", "a", "an"].contains(&w.to_lowercase().as_str()))
             .map(|s| s.trim_end_matches('s').to_string())
             .unwrap_or_else(|| "data".to_string());
-        
+
         Ok(ParsedQuery {
             operation: QueryOperation::Select,
             target,
@@ -584,18 +584,19 @@ struct LlmOrderBy {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_parse_value() {
         let nlp = NlpProcessor {
             config: Config::default(),
             client: None,
         };
-        
+
         assert_eq!(nlp.parse_value("42"), Value::Int(42));
         assert_eq!(nlp.parse_value("3.14"), Value::Float(3.14));
         assert_eq!(nlp.parse_value("true"), Value::Bool(true));
         assert_eq!(nlp.parse_value("hello"), Value::String("hello".to_string()));
     }
 }
+
 

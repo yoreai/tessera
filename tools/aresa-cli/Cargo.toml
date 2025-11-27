@@ -27,7 +27,7 @@ toml = "0.8"
 reqwest = { version = "0.11", features = ["json", "rustls-tls"], default-features = false }
 
 # Database Connectors
-sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "postgres", "sqlite", "chrono", "uuid"] }
+sqlx = { version = "0.7", features = ["runtime-tokio", "tls-rustls", "postgres", "sqlite", "mysql", "chrono", "uuid"] }
 
 # Filesystem Search
 walkdir = "2.4"

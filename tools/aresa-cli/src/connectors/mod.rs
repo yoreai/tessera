@@ -1,10 +1,25 @@
 //! Data source connectors
+//!
+//! Supported connectors:
+//! - **Filesystem**: File search, content search, git repo detection
+//! - **PostgreSQL**: Full SQL support with connection pooling
+//! - **MySQL**: Full SQL support with connection pooling
+//! - **SQLite**: Local database queries
+//! - **DuckDB**: Local analytics on CSV/JSON/Parquet files
+//! - **ClickHouse**: OLAP database via HTTP interface
+//! - **BigQuery**: Google BigQuery via REST API
+//! - **S3**: AWS S3 object storage
+//! - **GCS**: Google Cloud Storage
 
 pub mod filesystem;
 pub mod postgres;
+pub mod mysql;
 pub mod sqlite;
+pub mod duckdb;
+pub mod clickhouse;
 pub mod bigquery;
 pub mod s3;
+pub mod gcs;
 
 use anyhow::Result;
 use async_trait::async_trait;

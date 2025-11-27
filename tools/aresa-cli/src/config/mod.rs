@@ -103,19 +103,27 @@ impl ConfigManager {
     ) -> Result<()> {
         let source_type = match source_type_str.to_lowercase().as_str() {
             "postgres" => SourceType::Postgres,
+            "mysql" => SourceType::MySQL,
+            "sqlite" => SourceType::SQLite,
+            "duckdb" => SourceType::DuckDB,
+            "clickhouse" => SourceType::ClickHouse,
             "bigquery" => SourceType::BigQuery,
             "s3" => SourceType::S3,
-            "gcs" => SourceType::Gcs,
-            "sqlite" => SourceType::Sqlite,
-            "duckdb" => SourceType::DuckDb,
+            "gcs" => SourceType::GCS,
             _ => return Err(anyhow::anyhow!("Unknown source type: {}", source_type_str)),
         };
 
         let source = DataSource {
             source_type,
             uri: uri.map(String::from),
+            host: None,
+            port: None,
+            database: None,
+            username: None,
+            password: None,
             project: project.map(String::from),
             bucket: bucket.map(String::from),
+            region: None,
             credentials_path: credentials_path.map(String::from),
         };
 
@@ -200,11 +208,26 @@ impl ConfigManager {
                     .context("Failed to connect to PostgreSQL")?;
                 sqlx::query("SELECT 1").execute(&pool).await?;
             }
-            SourceType::Sqlite | SourceType::DuckDb => {
+            SourceType::MySQL => {
+                let uri = self.get_uri(name)?;
+                let pool = sqlx::MySqlPool::connect(&uri).await
+                    .context("Failed to connect to MySQL")?;
+                sqlx::query("SELECT 1").execute(&pool).await?;
+            }
+            SourceType::SQLite | SourceType::DuckDB => {
                 let uri = self.get_uri(name)?;
                 let pool = sqlx::SqlitePool::connect(&uri).await
                     .context("Failed to connect to SQLite")?;
                 sqlx::query("SELECT 1").execute(&pool).await?;
+            }
+            SourceType::ClickHouse => {
+                let host = source.host.as_ref()
+                    .context("ClickHouse host not configured")?;
+                let port = source.port.unwrap_or(8123);
+                let url = format!("http://{}:{}/ping", host, port);
+                let client = reqwest::Client::new();
+                client.get(&url).send().await
+                    .context("Failed to connect to ClickHouse")?;
             }
             SourceType::BigQuery => {
                 // BigQuery connection test would go here
@@ -214,7 +237,7 @@ impl ConfigManager {
                 // S3 connection test would go here
                 println!("{}", "S3 connection test not yet implemented".yellow());
             }
-            SourceType::Gcs => {
+            SourceType::GCS => {
                 // GCS connection test would go here
                 println!("{}", "GCS connection test not yet implemented".yellow());
             }

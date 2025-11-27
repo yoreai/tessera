@@ -92,7 +92,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -122,47 +122,48 @@ jobs:
             artifacts/**/*
           body: |
             ## ARESA CLI v${{ steps.version.outputs.version }}
-            
+
             Natural language interface for searching filesystems, databases, and cloud storage.
-            
+
             ### Installation
-            
+
             **macOS (Apple Silicon)**
             ```bash
             curl -L https://github.com/yoreai/aresa/releases/download/cli-v${{ steps.version.outputs.version }}/aresa-darwin-arm64.tar.gz | tar xz
             sudo mv aresa /usr/local/bin/
             ```
-            
+
             **macOS (Intel)**
             ```bash
             curl -L https://github.com/yoreai/aresa/releases/download/cli-v${{ steps.version.outputs.version }}/aresa-darwin-x64.tar.gz | tar xz
             sudo mv aresa /usr/local/bin/
             ```
-            
+
             **Linux (x64)**
             ```bash
             curl -L https://github.com/yoreai/aresa/releases/download/cli-v${{ steps.version.outputs.version }}/aresa-linux-x64.tar.gz | tar xz
             sudo mv aresa /usr/local/bin/
             ```
-            
+
             **Windows**
             Download `aresa-windows-x64.exe.zip` and extract to your PATH.
-            
+
             ### Quick Start
-            
+
             ```bash
             # Configure LLM
             aresa config set-llm openai --api-key sk-...
-            
+
             # Add a database
             aresa config add postgres mydb --uri postgresql://...
-            
+
             # Search!
             aresa "find python files with TODO comments"
             aresa "show me users who signed up last week"
             ```
-            
+
             ### Checksums
-            
+
             See `.sha256` files for verification.
+
 

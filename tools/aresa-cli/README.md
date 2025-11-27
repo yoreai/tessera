@@ -10,7 +10,7 @@ Part of the **Autonomous Research Engineering & Synthesis Architecture** (ARESA)
 - ⚡ **Blazing Fast** — Built in Rust with async I/O
 - 🎨 **Beautiful Output** — Rich terminal formatting with tables and colors
 - 🔒 **Secure** — Credentials stored in OS keychain (macOS Keychain, Windows Credential Manager, Linux Secret Service)
-- 🌐 **Universal Search** — Files, PostgreSQL, BigQuery, SQLite/DuckDB, S3, GCS
+- 🌐 **Universal Search** — Files, PostgreSQL, MySQL, ClickHouse, BigQuery, SQLite/DuckDB, S3, GCS
 
 ## Installation
 
@@ -159,7 +159,8 @@ Sensitive credentials (database URIs, API keys) are stored securely in the OS ke
 ├─────────────────────────────────────────────────────────────┤
 │  Connectors (async, parallel)                               │
 │  ├── Filesystem (ripgrep-style)                            │
-│  ├── PostgreSQL                                            │
+│  ├── PostgreSQL / MySQL                                    │
+│  ├── ClickHouse (HTTP)                                     │
 │  ├── BigQuery                                              │
 │  ├── SQLite/DuckDB                                         │
 │  └── S3/GCS                                                │
@@ -188,4 +189,5 @@ MIT License — see [LICENSE](../../LICENSE) for details.
 ## Author
 
 **Yevheniy Chuba** — [YoreAI](https://yoreai.com)
+
 

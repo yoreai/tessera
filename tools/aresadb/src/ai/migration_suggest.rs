@@ -21,22 +21,22 @@ impl MigrationSuggester {
             .timeout(std::time::Duration::from_secs(60))
             .build()
             .ok();
-        
+
         Ok(Self { config, client })
     }
-    
+
     /// Suggest migrations based on old and new schemas
     pub async fn suggest(&self, old: &Schema, new: &Schema) -> Result<MigrationSuggestion> {
         // Generate basic migrations using rule-based approach
         let actions = MigrationGenerator::generate(old, new);
-        
+
         // If LLM is configured, get AI suggestions
         let ai_notes = if self.config.llm.api_key.is_some() {
             self.get_ai_suggestions(old, new, &actions).await?
         } else {
             Vec::new()
         };
-        
+
         Ok(MigrationSuggestion {
             actions,
             ai_notes,
@@ -44,11 +44,11 @@ impl MigrationSuggester {
             needs_review: self.needs_manual_review(&actions),
         })
     }
-    
+
     /// Detect schema changes by comparing with stored version
     pub fn detect_changes(&self, old: &Schema, new: &Schema) -> Vec<SchemaChange> {
         let mut changes = Vec::new();
-        
+
         // Check for schema rename
         if old.name != new.name {
             changes.push(SchemaChange::Renamed {
@@ -56,7 +56,7 @@ impl MigrationSuggester {
                 new_name: new.name.clone(),
             });
         }
-        
+
         // Check for added fields
         for field in &new.fields {
             if old.get_field(&field.name).is_none() {
@@ -66,7 +66,7 @@ impl MigrationSuggester {
                 });
             }
         }
-        
+
         // Check for removed fields
         for field in &old.fields {
             if new.get_field(&field.name).is_none() {
@@ -75,7 +75,7 @@ impl MigrationSuggester {
                 });
             }
         }
-        
+
         // Check for modified fields
         for new_field in &new.fields {
             if let Some(old_field) = old.get_field(&new_field.name) {
@@ -86,7 +86,7 @@ impl MigrationSuggester {
                         new_type: format!("{:?}", new_field.field_type),
                     });
                 }
-                
+
                 if old_field.nullable != new_field.nullable {
                     changes.push(SchemaChange::NullabilityChanged {
                         field_name: new_field.name.clone(),
@@ -95,10 +95,10 @@ impl MigrationSuggester {
                 }
             }
         }
-        
+
         changes
     }
-    
+
     /// Get AI suggestions for migrations
     async fn get_ai_suggestions(
         &self,
@@ -110,12 +110,12 @@ impl MigrationSuggester {
             Some(c) => c,
             None => return Ok(Vec::new()),
         };
-        
+
         let api_key = match &self.config.llm.api_key {
             Some(k) => k,
             None => return Ok(Vec::new()),
         };
-        
+
         let prompt = format!(
             r#"Analyze the following database schema migration and provide suggestions:
 
@@ -141,9 +141,9 @@ Be concise, respond with a JSON array of strings."#,
             new.fields.iter().map(|f| &f.name).collect::<Vec<_>>(),
             actions.iter().map(|a| format!("- {:?}", a)).collect::<Vec<_>>().join("\n")
         );
-        
+
         let response = self.call_llm(client, api_key, &prompt).await?;
-        
+
         // Parse response as JSON array
         if let Ok(notes) = serde_json::from_str::<Vec<String>>(&response) {
             Ok(notes)
@@ -155,31 +155,31 @@ Be concise, respond with a JSON array of strings."#,
                 .collect())
         }
     }
-    
+
     async fn call_llm(&self, client: &reqwest::Client, api_key: &str, prompt: &str) -> Result<String> {
         let provider = &self.config.llm.provider;
-        
+
         match provider.as_str() {
             "openai" => {
                 let base_url = self.config.llm.base_url.as_deref()
                     .unwrap_or("https://api.openai.com/v1");
                 let model = self.config.llm.model.as_deref()
                     .unwrap_or("gpt-4o-mini");
-                
+
                 let body = serde_json::json!({
                     "model": model,
                     "messages": [{"role": "user", "content": prompt}],
                     "temperature": 0.3,
                     "max_tokens": 500
                 });
-                
+
                 let response = client
                     .post(format!("{}/chat/completions", base_url))
                     .header("Authorization", format!("Bearer {}", api_key))
                     .json(&body)
                     .send()
                     .await?;
-                
+
                 let data: serde_json::Value = response.json().await?;
                 Ok(data["choices"][0]["message"]["content"]
                     .as_str()
@@ -191,13 +191,13 @@ Be concise, respond with a JSON array of strings."#,
                     .unwrap_or("https://api.anthropic.com/v1");
                 let model = self.config.llm.model.as_deref()
                     .unwrap_or("claude-3-haiku-20240307");
-                
+
                 let body = serde_json::json!({
                     "model": model,
                     "max_tokens": 500,
                     "messages": [{"role": "user", "content": prompt}]
                 });
-                
+
                 let response = client
                     .post(format!("{}/messages", base_url))
                     .header("x-api-key", api_key)
@@ -205,7 +205,7 @@ Be concise, respond with a JSON array of strings."#,
                     .json(&body)
                     .send()
                     .await?;
-                
+
                 let data: serde_json::Value = response.json().await?;
                 Ok(data["content"][0]["text"]
                     .as_str()
@@ -215,11 +215,11 @@ Be concise, respond with a JSON array of strings."#,
             _ => Ok(String::new()),
         }
     }
-    
+
     /// Estimate migration risk level
     fn estimate_risk(&self, actions: &[MigrationAction]) -> RiskLevel {
         let mut risk = RiskLevel::Low;
-        
+
         for action in actions {
             let action_risk = match action {
                 MigrationAction::CreateSchema(_) => RiskLevel::Low,
@@ -239,15 +239,15 @@ Be concise, respond with a JSON array of strings."#,
                 MigrationAction::RemoveIndex { .. } => RiskLevel::Low,
                 MigrationAction::RawSql(_) => RiskLevel::High,
             };
-            
+
             if action_risk > risk {
                 risk = action_risk;
             }
         }
-        
+
         risk
     }
-    
+
     /// Determine if migration needs manual review
     fn needs_manual_review(&self, actions: &[MigrationAction]) -> bool {
         actions.iter().any(|action| {
@@ -343,4 +343,5 @@ impl std::fmt::Display for SchemaChange {
         }
     }
 }
+
 

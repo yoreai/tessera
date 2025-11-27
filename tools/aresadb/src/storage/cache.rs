@@ -36,19 +36,19 @@ impl CacheLayer {
                 value.size.min(u32::MAX as usize) as u32
             })
             .build();
-        
+
         Self {
             cache,
             max_size: max_size_bytes,
             current_size: std::sync::atomic::AtomicU64::new(0),
         }
     }
-    
+
     /// Get an entry from cache
     pub fn get(&self, key: &str) -> Option<Bytes> {
         self.cache.get(key).map(|entry| entry.data.clone())
     }
-    
+
     /// Put an entry in cache
     pub fn put(&self, key: &str, data: Bytes) {
         let size = data.len();
@@ -56,44 +56,44 @@ impl CacheLayer {
             data,
             size,
         });
-        
+
         self.cache.insert(key.to_string(), entry);
         self.current_size.fetch_add(size as u64, std::sync::atomic::Ordering::Relaxed);
     }
-    
+
     /// Remove an entry from cache
     pub fn remove(&self, key: &str) {
         if let Some(entry) = self.cache.remove(key) {
             self.current_size.fetch_sub(entry.size as u64, std::sync::atomic::Ordering::Relaxed);
         }
     }
-    
+
     /// Clear all entries from cache
     pub fn clear(&self) {
         self.cache.invalidate_all();
         self.current_size.store(0, std::sync::atomic::Ordering::Relaxed);
     }
-    
+
     /// Get current cache size in bytes
     pub fn size(&self) -> u64 {
         self.current_size.load(std::sync::atomic::Ordering::Relaxed)
     }
-    
+
     /// Get maximum cache size in bytes
     pub fn max_size(&self) -> u64 {
         self.max_size
     }
-    
+
     /// Get number of entries in cache
     pub fn entry_count(&self) -> u64 {
         self.cache.entry_count()
     }
-    
+
     /// Check if key exists in cache
     pub fn contains(&self, key: &str) -> bool {
         self.cache.contains_key(key)
     }
-    
+
     /// Get or fetch: returns cached value or fetches from provided async function
     pub async fn get_or_fetch<F, Fut>(&self, key: &str, fetch: F) -> Result<Bytes>
     where
@@ -104,13 +104,13 @@ impl CacheLayer {
         if let Some(data) = self.get(key) {
             return Ok(data);
         }
-        
+
         // Fetch data
         let data = fetch().await?;
-        
+
         // Store in cache
         self.put(key, data.clone());
-        
+
         Ok(data)
     }
 }
@@ -129,7 +129,7 @@ impl CacheLayer {
     pub fn stats(&self) -> CacheStats {
         let size = self.size();
         let max_size = self.max_size();
-        
+
         CacheStats {
             entries: self.entry_count(),
             size_bytes: size,
@@ -142,53 +142,53 @@ impl CacheLayer {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_cache_basic() {
         let cache = CacheLayer::new(1024 * 1024); // 1MB
-        
+
         // Put and get
         cache.put("key1", Bytes::from("hello"));
         let data = cache.get("key1").unwrap();
         assert_eq!(&data[..], b"hello");
-        
+
         // Non-existent key
         assert!(cache.get("key2").is_none());
     }
-    
+
     #[test]
     fn test_cache_remove() {
         let cache = CacheLayer::new(1024 * 1024);
-        
+
         cache.put("key1", Bytes::from("hello"));
         assert!(cache.contains("key1"));
-        
+
         cache.remove("key1");
         assert!(!cache.contains("key1"));
     }
-    
+
     #[test]
     fn test_cache_clear() {
         let cache = CacheLayer::new(1024 * 1024);
-        
+
         cache.put("key1", Bytes::from("hello"));
         cache.put("key2", Bytes::from("world"));
         assert_eq!(cache.entry_count(), 2);
-        
+
         cache.clear();
         assert_eq!(cache.entry_count(), 0);
     }
-    
+
     #[tokio::test]
     async fn test_get_or_fetch() {
         let cache = CacheLayer::new(1024 * 1024);
-        
+
         // First call should fetch
         let data = cache.get_or_fetch("key1", || async {
             Ok(Bytes::from("fetched"))
         }).await.unwrap();
         assert_eq!(&data[..], b"fetched");
-        
+
         // Second call should use cache
         let data = cache.get_or_fetch("key1", || async {
             Ok(Bytes::from("should not see this"))
@@ -196,4 +196,5 @@ mod tests {
         assert_eq!(&data[..], b"fetched");
     }
 }
+
 

@@ -19,6 +19,8 @@ pub enum QueryIntent {
     DescribeTable,
     /// Search blob storage
     SearchBlobs,
+    /// Analyze a local file (CSV, JSON, Parquet)
+    AnalyzeFile,
     /// Unknown/unsupported intent
     Unknown,
 }
@@ -28,10 +30,13 @@ pub enum QueryIntent {
 pub enum TargetType {
     Filesystem,
     Postgres,
+    MySQL,
+    SQLite,
+    DuckDB,
+    ClickHouse,
     BigQuery,
-    Sqlite,
     S3,
-    Gcs,
+    GCS,
     Unknown,
 }
 
@@ -40,10 +45,13 @@ impl std::fmt::Display for TargetType {
         match self {
             TargetType::Filesystem => write!(f, "filesystem"),
             TargetType::Postgres => write!(f, "PostgreSQL"),
+            TargetType::MySQL => write!(f, "MySQL"),
+            TargetType::SQLite => write!(f, "SQLite"),
+            TargetType::DuckDB => write!(f, "DuckDB"),
+            TargetType::ClickHouse => write!(f, "ClickHouse"),
             TargetType::BigQuery => write!(f, "BigQuery"),
-            TargetType::Sqlite => write!(f, "SQLite"),
             TargetType::S3 => write!(f, "S3"),
-            TargetType::Gcs => write!(f, "GCS"),
+            TargetType::GCS => write!(f, "GCS"),
             TargetType::Unknown => write!(f, "unknown"),
         }
     }
@@ -92,4 +100,5 @@ pub struct TimeRange {
     pub end: Option<String>,
     pub relative: Option<String>,
 }
+
 

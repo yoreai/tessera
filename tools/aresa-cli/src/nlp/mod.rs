@@ -6,3 +6,4 @@ mod intent;
 pub use parser::QueryParser;
 pub use intent::{ParsedQuery, QueryIntent, TargetType};
 
+

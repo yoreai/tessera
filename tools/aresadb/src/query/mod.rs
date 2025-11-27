@@ -37,32 +37,32 @@ impl QueryResult {
             execution_time_ms: 0,
         }
     }
-    
+
     /// Create from nodes
     pub fn from_nodes(nodes: Vec<Node>) -> Self {
         if nodes.is_empty() {
             return Self::empty();
         }
-        
+
         // Collect all unique column names
         let mut column_set = std::collections::HashSet::new();
         column_set.insert("id".to_string());
         column_set.insert("type".to_string());
-        
+
         for node in &nodes {
             for key in node.properties.keys() {
                 column_set.insert(key.clone());
             }
         }
-        
+
         let mut columns: Vec<String> = column_set.into_iter().collect();
         columns.sort();
-        
+
         // Ensure id and type are first
         columns.retain(|c| c != "id" && c != "type");
         columns.insert(0, "type".to_string());
         columns.insert(0, "id".to_string());
-        
+
         // Build rows
         let rows: Vec<Vec<Value>> = nodes
             .iter()
@@ -81,7 +81,7 @@ impl QueryResult {
                     .collect()
             })
             .collect();
-        
+
         Self {
             columns,
             rows,
@@ -89,20 +89,20 @@ impl QueryResult {
             execution_time_ms: 0,
         }
     }
-    
+
     /// Create from edges
     pub fn from_edges(edges: Vec<Edge>) -> Self {
         if edges.is_empty() {
             return Self::empty();
         }
-        
+
         let columns = vec![
             "id".to_string(),
             "from".to_string(),
             "to".to_string(),
             "type".to_string(),
         ];
-        
+
         let rows: Vec<Vec<Value>> = edges
             .iter()
             .map(|edge| {
@@ -114,7 +114,7 @@ impl QueryResult {
                 ]
             })
             .collect();
-        
+
         Self {
             columns,
             rows,
@@ -122,17 +122,17 @@ impl QueryResult {
             execution_time_ms: 0,
         }
     }
-    
+
     /// Get row count
     pub fn row_count(&self) -> usize {
         self.rows.len()
     }
-    
+
     /// Check if result is empty
     pub fn is_empty(&self) -> bool {
         self.rows.is_empty()
     }
-    
+
     /// Convert to JSON
     pub fn to_json(&self) -> serde_json::Value {
         serde_json::json!({
@@ -300,4 +300,5 @@ pub struct OrderBy {
     pub column: String,
     pub descending: bool,
 }
+
 

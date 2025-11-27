@@ -122,7 +122,7 @@ impl<'a> QueryParser<'a> {
         } else if query_lower.contains("postgres") {
             TargetType::Postgres
         } else if query_lower.contains("sqlite") {
-            TargetType::Sqlite
+            TargetType::SQLite
         } else {
             // Try to find a configured source
             TargetType::Unknown
@@ -343,10 +343,13 @@ Be concise and accurate. Generate valid SQL for database queries."#,
         let target_type = match parsed.target_type.as_str() {
             "filesystem" => TargetType::Filesystem,
             "postgres" => TargetType::Postgres,
+            "mysql" => TargetType::MySQL,
+            "sqlite" => TargetType::SQLite,
+            "duckdb" => TargetType::DuckDB,
+            "clickhouse" => TargetType::ClickHouse,
             "bigquery" => TargetType::BigQuery,
-            "sqlite" => TargetType::Sqlite,
             "s3" => TargetType::S3,
-            "gcs" => TargetType::Gcs,
+            "gcs" => TargetType::GCS,
             _ => TargetType::Unknown,
         };
 
@@ -396,4 +399,5 @@ fn extract_table_name(query: &str) -> Option<String> {
     re.captures(&query.to_lowercase())
         .map(|c| c.get(1).unwrap().as_str().to_string())
 }
+
 

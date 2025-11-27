@@ -26,22 +26,22 @@ impl QueryParser {
             dialect: GenericDialect {},
         }
     }
-    
+
     /// Parse a SQL query string
     pub fn parse(&self, sql: &str) -> Result<ParsedQuery> {
         let statements = Parser::parse_sql(&self.dialect, sql)?;
-        
+
         if statements.is_empty() {
             bail!("No SQL statement found");
         }
-        
+
         if statements.len() > 1 {
             bail!("Multiple statements not supported");
         }
-        
+
         self.convert_statement(&statements[0])
     }
-    
+
     /// Convert a SQL AST statement to ParsedQuery
     fn convert_statement(&self, stmt: &Statement) -> Result<ParsedQuery> {
         match stmt {
@@ -49,14 +49,14 @@ impl QueryParser {
             Statement::Insert { table_name, columns, source, .. } => {
                 let target = table_name.to_string();
                 let column_names: Vec<String> = columns.iter().map(|c| c.to_string()).collect();
-                
+
                 // Extract values from source
                 let data = if let Some(source) = source {
                     self.extract_insert_values(&column_names, source)?
                 } else {
                     None
                 };
-                
+
                 Ok(ParsedQuery {
                     operation: QueryOperation::Insert,
                     target,
@@ -73,20 +73,20 @@ impl QueryParser {
                     TableFactor::Table { name, .. } => name.to_string(),
                     _ => bail!("Complex table references not supported"),
                 };
-                
+
                 let mut data = BTreeMap::new();
                 for assignment in assignments {
                     let column = assignment.id.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(".");
                     let value = self.convert_expr(&assignment.value)?;
                     data.insert(column, value);
                 }
-                
+
                 let conditions = selection
                     .as_ref()
                     .map(|expr| self.extract_conditions(expr))
                     .transpose()?
                     .unwrap_or_default();
-                
+
                 Ok(ParsedQuery {
                     operation: QueryOperation::Update,
                     target,
@@ -105,13 +105,13 @@ impl QueryParser {
                         _ => "unknown".to_string(),
                     })
                     .unwrap_or_else(|| "unknown".to_string());
-                
+
                 let conditions = selection
                     .as_ref()
                     .map(|expr| self.extract_conditions(expr))
                     .transpose()?
                     .unwrap_or_default();
-                
+
                 Ok(ParsedQuery {
                     operation: QueryOperation::Delete,
                     target,
@@ -126,17 +126,17 @@ impl QueryParser {
             _ => bail!("Unsupported SQL statement type"),
         }
     }
-    
+
     /// Convert a SELECT query
     fn convert_query(&self, query: &Query) -> Result<ParsedQuery> {
         let select = match &*query.body {
             SetExpr::Select(select) => select,
             _ => bail!("Only SELECT queries are supported"),
         };
-        
+
         self.convert_select(select, query)
     }
-    
+
     /// Convert a SELECT statement
     fn convert_select(&self, select: &Select, query: &Query) -> Result<ParsedQuery> {
         // Extract table name
@@ -148,7 +148,7 @@ impl QueryParser {
                 _ => "unknown".to_string(),
             })
             .unwrap_or_else(|| "unknown".to_string());
-        
+
         // Extract columns
         let columns: Vec<String> = select
             .projection
@@ -162,7 +162,7 @@ impl QueryParser {
                 _ => None,
             })
             .collect();
-        
+
         // Extract conditions from WHERE clause
         let conditions = select
             .selection
@@ -170,7 +170,7 @@ impl QueryParser {
             .map(|expr| self.extract_conditions(expr))
             .transpose()?
             .unwrap_or_default();
-        
+
         // Extract ORDER BY
         let order_by: Vec<OrderBy> = query
             .order_by
@@ -186,7 +186,7 @@ impl QueryParser {
                 }
             })
             .collect();
-        
+
         // Extract LIMIT
         let limit = query.limit.as_ref().and_then(|expr| {
             if let Expr::Value(SqlValue::Number(n, _)) = expr {
@@ -195,7 +195,7 @@ impl QueryParser {
                 None
             }
         });
-        
+
         // Extract OFFSET
         let offset = query.offset.as_ref().and_then(|o| {
             if let Expr::Value(SqlValue::Number(n, _)) = &o.value {
@@ -204,7 +204,7 @@ impl QueryParser {
                 None
             }
         });
-        
+
         Ok(ParsedQuery {
             operation: QueryOperation::Select,
             target,
@@ -216,14 +216,14 @@ impl QueryParser {
             data: None,
         })
     }
-    
+
     /// Extract conditions from a WHERE expression
     fn extract_conditions(&self, expr: &Expr) -> Result<Vec<Condition>> {
         let mut conditions = Vec::new();
         self.extract_conditions_recursive(expr, &mut conditions)?;
         Ok(conditions)
     }
-    
+
     fn extract_conditions_recursive(&self, expr: &Expr, conditions: &mut Vec<Condition>) -> Result<()> {
         match expr {
             Expr::BinaryOp { left, op, right } => {
@@ -299,7 +299,7 @@ impl QueryParser {
         }
         Ok(())
     }
-    
+
     /// Convert a SQL expression to a Value
     fn convert_expr(&self, expr: &Expr) -> Result<Value> {
         match expr {
@@ -316,7 +316,7 @@ impl QueryParser {
             _ => bail!("Unsupported expression type: {:?}", expr),
         }
     }
-    
+
     /// Convert a SQL value to a Value
     fn convert_sql_value(&self, val: &SqlValue) -> Result<Value> {
         match val {
@@ -335,7 +335,7 @@ impl QueryParser {
             _ => bail!("Unsupported SQL value type"),
         }
     }
-    
+
     /// Extract values from INSERT statement
     fn extract_insert_values(&self, columns: &[String], source: &Query) -> Result<Option<BTreeMap<String, Value>>> {
         if let SetExpr::Values(values) = &*source.body {
@@ -362,56 +362,57 @@ impl Default for QueryParser {
 #[cfg(test)]
 mod tests {
     use super::*;
-    
+
     #[test]
     fn test_parse_select() {
         let parser = QueryParser::new();
-        
+
         let query = parser.parse("SELECT * FROM users WHERE age > 25").unwrap();
         assert_eq!(query.operation, QueryOperation::Select);
         assert_eq!(query.target, "users");
         assert_eq!(query.conditions.len(), 1);
         assert_eq!(query.conditions[0].column, "age");
     }
-    
+
     #[test]
     fn test_parse_select_with_limit() {
         let parser = QueryParser::new();
-        
+
         let query = parser.parse("SELECT name, email FROM users LIMIT 10").unwrap();
         assert_eq!(query.columns, vec!["name", "email"]);
         assert_eq!(query.limit, Some(10));
     }
-    
+
     #[test]
     fn test_parse_insert() {
         let parser = QueryParser::new();
-        
+
         let query = parser.parse("INSERT INTO users (name, age) VALUES ('John', 30)").unwrap();
         assert_eq!(query.operation, QueryOperation::Insert);
         assert_eq!(query.target, "users");
-        
+
         let data = query.data.unwrap();
         assert_eq!(data.get("name").unwrap().as_str(), Some("John"));
         assert_eq!(data.get("age").unwrap().as_int(), Some(30));
     }
-    
+
     #[test]
     fn test_parse_update() {
         let parser = QueryParser::new();
-        
+
         let query = parser.parse("UPDATE users SET age = 31 WHERE name = 'John'").unwrap();
         assert_eq!(query.operation, QueryOperation::Update);
         assert_eq!(query.conditions.len(), 1);
     }
-    
+
     #[test]
     fn test_parse_delete() {
         let parser = QueryParser::new();
-        
+
         let query = parser.parse("DELETE FROM users WHERE age < 18").unwrap();
         assert_eq!(query.operation, QueryOperation::Delete);
         assert_eq!(query.conditions.len(), 1);
     }
 }
+
 

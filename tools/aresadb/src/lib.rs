@@ -40,7 +40,7 @@
 //! async fn main() -> anyhow::Result<()> {
 //!     // Open or create database
 //!     let db = Database::create("./mydata", "myapp").await?;
-//!     
+//!
 //!     // Insert a node
 //!     let props = serde_json::json!({
 //!         "name": "John",
@@ -48,11 +48,11 @@
 //!         "age": 30
 //!     });
 //!     let node = db.insert_node("user", props).await?;
-//!     
+//!
 //!     // Query with SQL
 //!     let engine = QueryEngine::new(db);
 //!     let results = engine.execute_sql("SELECT * FROM users WHERE age > 25", None).await?;
-//!     
+//!
 //!     Ok(())
 //! }
 //! ```
@@ -76,4 +76,5 @@ pub const VERSION: &str = env!("CARGO_PKG_VERSION");
 
 /// Database file format version
 pub const FORMAT_VERSION: u32 = 1;
+
 

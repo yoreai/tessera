@@ -37,10 +37,10 @@ fn format_as_table(result: &QueryResult) -> String {
     if result.is_empty() {
         return "(empty result)".to_string();
     }
-    
+
     // Calculate column widths
     let mut widths: Vec<usize> = result.columns.iter().map(|c| c.len()).collect();
-    
+
     for row in &result.rows {
         for (i, value) in row.iter().enumerate() {
             let len = format!("{}", value).len();
@@ -49,27 +49,27 @@ fn format_as_table(result: &QueryResult) -> String {
             }
         }
     }
-    
+
     // Cap widths at 50
     for w in &mut widths {
         if *w > 50 {
             *w = 50;
         }
     }
-    
+
     let mut lines = Vec::new();
-    
+
     // Header
     let header: Vec<String> = result.columns.iter()
         .enumerate()
         .map(|(i, c)| format!("{:width$}", c, width = widths.get(i).copied().unwrap_or(10)))
         .collect();
     lines.push(header.join(" | "));
-    
+
     // Separator
     let sep: Vec<String> = widths.iter().map(|w| "-".repeat(*w)).collect();
     lines.push(sep.join("-+-"));
-    
+
     // Rows
     for row in &result.rows {
         let row_str: Vec<String> = row.iter()
@@ -86,7 +86,7 @@ fn format_as_table(result: &QueryResult) -> String {
             .collect();
         lines.push(row_str.join(" | "));
     }
-    
+
     lines.join("\n")
 }
 
@@ -96,10 +96,10 @@ fn format_as_json(result: &QueryResult) -> String {
 
 fn format_as_csv(result: &QueryResult) -> String {
     let mut lines = Vec::new();
-    
+
     // Header
     lines.push(result.columns.join(","));
-    
+
     // Rows
     for row in &result.rows {
         let row_str: Vec<String> = row.iter()
@@ -114,7 +114,8 @@ fn format_as_csv(result: &QueryResult) -> String {
             .collect();
         lines.push(row_str.join(","));
     }
-    
+
     lines.join("\n")
 }
+
 
