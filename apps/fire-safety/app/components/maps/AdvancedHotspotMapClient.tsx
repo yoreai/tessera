@@ -1,44 +1,14 @@
 "use client";
 
-import { useEffect, useState, useId } from "react";
-import type { FireIncident } from "../../lib/fireData";
+import { MapContainer, TileLayer, CircleMarker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import type { FireIncident } from "../../../lib/fireData";
 
-interface AdvancedHotspotMapProps {
+interface Props {
   incidents: FireIncident[];
 }
 
-function MapInner({ incidents, mapId }: { incidents: FireIncident[]; mapId: string }) {
-  const [mapComponents, setMapComponents] = useState<{
-    MapContainer: any;
-    TileLayer: any;
-    CircleMarker: any;
-    Popup: any;
-  } | null>(null);
-
-  useEffect(() => {
-    import("react-leaflet").then((mod) => {
-      setMapComponents({
-        MapContainer: mod.MapContainer,
-        TileLayer: mod.TileLayer,
-        CircleMarker: mod.CircleMarker,
-        Popup: mod.Popup,
-      });
-    });
-  }, []);
-
-  if (!mapComponents) {
-    return (
-      <div className="h-[600px] bg-gray-700/50 rounded flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading map components...</p>
-        </div>
-      </div>
-    );
-  }
-
-  const { MapContainer, TileLayer, CircleMarker, Popup } = mapComponents;
-
+export default function AdvancedHotspotMapClient({ incidents }: Props) {
   // Aggregate by city
   const cityData: { [key: string]: { lats: number[]; lngs: number[]; count: number } } = {};
 
@@ -84,9 +54,8 @@ function MapInner({ incidents, mapId }: { incidents: FireIncident[]; mapId: stri
 
   return (
     <div className="relative">
-      <div id={mapId} className="h-[600px] rounded-lg overflow-hidden border border-gray-700">
+      <div className="h-[600px] rounded-lg overflow-hidden border border-gray-700">
         <MapContainer 
-          key={mapId}
           center={[centerLat, centerLng]} 
           zoom={10} 
           style={{ height: "100%", width: "100%" }}
@@ -193,24 +162,3 @@ function MapInner({ incidents, mapId }: { incidents: FireIncident[]; mapId: stri
   );
 }
 
-export default function AdvancedHotspotMap({ incidents }: AdvancedHotspotMapProps) {
-  const [isClient, setIsClient] = useState(false);
-  const mapId = useId();
-
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  if (!isClient) {
-    return (
-      <div className="h-[600px] bg-gray-700/50 rounded flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-400 mx-auto mb-4"></div>
-          <p className="text-gray-400">Loading advanced hotspot map...</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <MapInner incidents={incidents} mapId={`hotspot-${mapId}`} />;
-}

@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Disable strict mode to prevent Leaflet double-initialization
+  reactStrictMode: false,
   images: {
     remotePatterns: [
       {

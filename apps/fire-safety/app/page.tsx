@@ -23,9 +23,8 @@ import DashboardFooter from "./components/DashboardFooter";
 import dynamic from "next/dynamic";
 import { Flame, Zap, Database } from "lucide-react";
 
-// Dynamic imports for map components
-const InteractiveIncidentMap = dynamic(() => import("./components/InteractiveIncidentMap"), { ssr: false });
-const AdvancedHotspotMap = dynamic(() => import("./components/AdvancedHotspotMap"), { ssr: false });
+// Dynamic import for map wrapper
+const MapWrapper = dynamic(() => import("./components/MapWrapper"), { ssr: false });
 
 const YEARS = [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025];
 
@@ -340,11 +339,11 @@ export default function FireSafetyDashboard() {
                     </div>
 
                     <div className="p-6">
-                      {mapTab === "incidents" ? (
-                        <InteractiveIncidentMap incidents={filteredIncidents} />
-                      ) : (
-                        <AdvancedHotspotMap incidents={filteredIncidents} />
-                      )}
+                      <MapWrapper 
+                        key={`map-wrapper-${mapTab}`}
+                        incidents={filteredIncidents} 
+                        mapType={mapTab === "incidents" ? "incidents" : "hotspots"} 
+                      />
                     </div>
                   </div>
                 </motion.div>
