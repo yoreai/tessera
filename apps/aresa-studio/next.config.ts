@@ -1,12 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  output: 'export',  // Static export for embedding
+  // Note: Static export removed to support demo mode API routes on Vercel
+  // When deploying as standalone app, API routes provide demo data
+  // When running with aresa-cli backend, API routes proxy to localhost:3001
   images: {
-    unoptimized: true,  // Required for static export
+    unoptimized: true,
   },
-  // Disable server-side features for static export
-  trailingSlash: true,
 };
 
 export default nextConfig;

@@ -1,6 +1,9 @@
-// API client for communicating with Rust backend
+// API client for ARESA Studio
+// Uses local Next.js API routes which can either:
+// 1. Return demo data (DEMO_MODE=true in lib/demo-data.ts)
+// 2. Proxy to aresa-cli backend (when running locally)
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+const API_BASE = '';
 
 export interface Connection {
   name: string;

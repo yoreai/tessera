@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
 import Sidebar from "@/components/Sidebar";
+import DemoBanner from "@/components/DemoBanner";
 
 export const metadata: Metadata = {
   title: "ARESA Studio - Universal Database Management",
@@ -29,11 +30,14 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <div className="flex h-screen">
-            <Sidebar />
-            {/* Main Content */}
-            <div className="flex-1 overflow-auto">
-              {children}
+          <div className="flex flex-col h-screen">
+            <DemoBanner />
+            <div className="flex flex-1 overflow-hidden">
+              <Sidebar />
+              {/* Main Content */}
+              <div className="flex-1 overflow-auto">
+                {children}
+              </div>
             </div>
           </div>
         </Providers>
