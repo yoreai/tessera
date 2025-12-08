@@ -141,7 +141,7 @@ export const publications: Publication[] = [
     abstract: "A unified command-line interface and web UI for querying 8+ database types with a single tool. Supports PostgreSQL, MySQL, SQLite, ClickHouse, BigQuery, DuckDB, Snowflake, and Databricks. Features schema exploration, query history, and connection management with hot-reloading configuration.",
     keywords: ["Database CLI", "Multi-Database", "Query Interface", "Data Engineering", "SQL", "Rust"],
     category: "dashboard",
-    demoUrl: "https://aresacli-yoreai.vercel.app",
+    demoUrl: "https://aresacli.vercel.app",
     metrics: [
       { label: "Databases", value: "8+" },
       { label: "Built With", value: "Rust" },
