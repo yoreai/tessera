@@ -13,17 +13,23 @@ const components = {
   // Tables
   table: (props: any) => (
     <div className="overflow-x-auto my-6">
-      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700" {...props} />
+      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 border border-gray-200 dark:border-gray-700 rounded-lg" {...props} />
     </div>
   ),
   thead: (props: any) => (
-    <thead className="bg-gray-50 dark:bg-gray-800" {...props} />
+    <thead className="bg-gray-100 dark:bg-gray-800" {...props} />
+  ),
+  tbody: (props: any) => (
+    <tbody className="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700" {...props} />
+  ),
+  tr: (props: any) => (
+    <tr className="hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors" {...props} />
   ),
   th: (props: any) => (
-    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100" {...props} />
+    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-200 dark:border-gray-700" {...props} />
   ),
   td: (props: any) => (
-    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-400 border-b border-gray-200 dark:border-gray-700" {...props} />
+    <td className="px-4 py-3 text-sm text-gray-600 dark:text-gray-300" {...props} />
   ),
 
   // Headings

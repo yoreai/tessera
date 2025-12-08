@@ -241,9 +241,9 @@ def predict_adr_risk(drug, patient_profile):
     """
     patient_embedding = encode_patient(patient_profile)
     drug_embedding = gnn.encode(drug)
-    
+
     risk_scores = adr_head(
-        drug_embedding, 
+        drug_embedding,
         patient_embedding,
         context=patient_medications
     )
@@ -342,8 +342,8 @@ interactions = kg.check_interactions(medications)
 
 # Output:
 # [
-#   {"drugs": ["warfarin", "aspirin"], 
-#    "severity": "major", 
+#   {"drugs": ["warfarin", "aspirin"],
+#    "severity": "major",
 #    "mechanism": "additive anticoagulation",
 #    "recommendation": "Monitor INR closely"},
 #   ...
