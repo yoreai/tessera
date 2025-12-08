@@ -4,7 +4,7 @@ import { generateQueryResult, DEMO_MODE } from '@/lib/demo-data';
 export async function POST(request: Request) {
   const body = await request.json();
   const { source, query, limit } = body;
-  
+
   if (DEMO_MODE) {
     // Simulate query execution delay based on "database type"
     const delays: Record<string, number> = {
@@ -17,12 +17,12 @@ export async function POST(request: Request) {
       'demo-sqlite': 2 + Math.random() * 10,
       'demo-duckdb': 15 + Math.random() * 20,
     };
-    
+
     const delay = delays[source] || 50;
     await new Promise(resolve => setTimeout(resolve, delay));
-    
+
     const result = generateQueryResult(source, query);
-    
+
     return NextResponse.json({
       ...result,
       demo: true,
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       query,
     });
   }
-  
+
   // Production: proxy to backend
   try {
     const response = await fetch('http://localhost:3001/api/query', {

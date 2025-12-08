@@ -4,9 +4,9 @@ import { useState } from 'react';
 
 export default function DemoBanner() {
   const [dismissed, setDismissed] = useState(false);
-  
+
   if (dismissed) return null;
-  
+
   return (
     <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-500/10 border-b border-amber-500/20">
       <div className="max-w-7xl mx-auto px-4 py-2 flex items-center justify-between">
@@ -18,7 +18,7 @@ export default function DemoBanner() {
             <span className="font-semibold text-sm">Demo Mode</span>
           </span>
           <span className="text-sm text-gray-600 dark:text-gray-400">
-            Explore all 8 database types with sample data • 
+            Explore all 8 database types with sample data •
             <span className="text-amber-600 dark:text-amber-400 font-medium"> PostgreSQL, MySQL, SQLite, BigQuery, ClickHouse, DuckDB, Snowflake, Databricks</span>
           </span>
         </div>

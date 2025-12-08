@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
-  
+
   if (DEMO_MODE) {
     // Check if it's a demo connection
     const connection = DEMO_CONNECTIONS.find(c => c.name === name);
@@ -21,7 +21,7 @@ export async function GET(
     }
     return NextResponse.json({ status: 'not_found' }, { status: 404 });
   }
-  
+
   // Production: proxy to backend
   try {
     const response = await fetch(`http://localhost:3001/api/connections/${name}/ping`);

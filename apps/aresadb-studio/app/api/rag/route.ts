@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { 
+  sampleMedicalTranscriptions, 
+  samplePubMedAbstracts,
+  sampleDrugReviews 
+} from '@/lib/demo-data'
 
-const execAsync = promisify(exec)
-
-const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
-const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+// Demo mode for Vercel deployment
+const DEMO_MODE = process.env.ARESADB_DEMO !== 'false'
 
 export async function POST(request: NextRequest) {
   try {
@@ -24,7 +25,69 @@ export async function POST(request: NextRequest) {
 
     const startTime = performance.now()
 
-    // Get relevant context via AresaDB RAG
+    // Demo mode: Return sample RAG context
+    if (DEMO_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 200 + Math.random() * 300))
+      
+      // Select demo data based on table
+      let sourceData: any[] = []
+      if (table.includes('transcription')) {
+        sourceData = sampleMedicalTranscriptions.map(t => ({
+          id: t.id,
+          title: t.description,
+          content: t.transcription,
+          similarity: 0.85 + Math.random() * 0.1,
+          metadata: { specialty: t.medical_specialty, keywords: t.keywords }
+        }))
+      } else if (table.includes('pubmed')) {
+        sourceData = samplePubMedAbstracts.map(p => ({
+          id: p.id,
+          title: p.title,
+          content: p.abstract,
+          similarity: 0.80 + Math.random() * 0.15,
+          metadata: { journal: p.journal, authors: p.authors }
+        }))
+      } else {
+        sourceData = sampleDrugReviews.map(r => ({
+          id: r.id,
+          title: `${r.drug_name} - ${r.condition}`,
+          content: r.review,
+          similarity: 0.75 + Math.random() * 0.2,
+          metadata: { rating: r.rating, drug: r.drug_name }
+        }))
+      }
+
+      // Simulate context retrieval
+      const chunks = sourceData.slice(0, 5).map(item => ({
+        ...item,
+        tokens: Math.floor(item.content.length / 4),
+      }))
+
+      const context = {
+        chunks,
+        totalTokens: chunks.reduce((sum, c) => sum + c.tokens, 0),
+        query,
+        table,
+      }
+
+      return NextResponse.json({
+        success: true,
+        context,
+        retrievalTime: performance.now() - startTime,
+        query,
+        response: generateDemoResponse(query, context),
+        demo: true,
+      })
+    }
+
+    // Production mode: Use AresaDB CLI
+    const { exec } = await import('child_process')
+    const { promisify } = await import('util')
+    const execAsync = promisify(exec)
+    
+    const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
+    const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+
     const contextCmd = `${ARESADB_PATH} --db ${DB_PATH} context "${query.replace(/"/g, '\\"')}" --table ${table} --max-tokens ${maxTokens} --format json`
 
     try {
@@ -40,18 +103,11 @@ export async function POST(request: NextRequest) {
         context = { chunks: [], totalTokens: 0 }
       }
 
-      const endTime = performance.now()
-      const retrievalTime = endTime - startTime
-
-      // For now, return the retrieved context
-      // In production, you would send this to an LLM for response generation
       return NextResponse.json({
         success: true,
         context,
-        retrievalTime,
+        retrievalTime: performance.now() - startTime,
         query,
-        // response would come from LLM integration
-        // For demo, we return a placeholder
         response: generateDemoResponse(query, context),
       })
     } catch (execError: any) {

@@ -12,7 +12,7 @@ export async function GET() {
     }));
     return NextResponse.json(connections);
   }
-  
+
   // In production, proxy to aresa-cli backend
   try {
     const response = await fetch('http://localhost:3001/api/connections');
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       demo: true,
     });
   }
-  
+
   // In production, proxy to backend
   try {
     const body = await request.json();

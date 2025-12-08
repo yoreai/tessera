@@ -5,7 +5,7 @@ export async function GET() {
   if (DEMO_MODE) {
     return NextResponse.json(DEMO_HISTORY);
   }
-  
+
   // Production: proxy to backend
   try {
     const response = await fetch('http://localhost:3001/api/history');
@@ -19,7 +19,7 @@ export async function DELETE() {
   if (DEMO_MODE) {
     return NextResponse.json({ success: true, message: 'Demo mode: History cleared', demo: true });
   }
-  
+
   try {
     const response = await fetch('http://localhost:3001/api/history', { method: 'DELETE' });
     return NextResponse.json(await response.json());

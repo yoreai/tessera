@@ -1,11 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { 
+  sampleDrugReviews, 
+  sampleMedicalTranscriptions, 
+  samplePubMedAbstracts 
+} from '@/lib/demo-data'
 
-const execAsync = promisify(exec)
+// Demo mode for Vercel deployment
+const DEMO_MODE = process.env.ARESADB_DEMO !== 'false'
 
-const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
-const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+// Simple similarity scoring for demo (just keyword matching)
+function demoSimilarity(text: string, query: string): number {
+  const queryWords = query.toLowerCase().split(/\s+/)
+  const textLower = text.toLowerCase()
+  let matches = 0
+  for (const word of queryWords) {
+    if (textLower.includes(word)) matches++
+  }
+  return 0.5 + (matches / queryWords.length) * 0.5
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -25,17 +37,82 @@ export async function POST(request: NextRequest) {
 
     const startTime = performance.now()
 
-    // Execute vector search via AresaDB CLI
+    // Demo mode: Return sample vector search results
+    if (DEMO_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 100 + Math.random() * 200))
+      
+      let sourceData: any[] = []
+      let textField = 'text'
+
+      if (table === 'medical_transcriptions' || table.includes('transcription')) {
+        sourceData = sampleMedicalTranscriptions.map(t => ({
+          ...t,
+          text: t.transcription,
+          similarity: demoSimilarity(t.transcription + ' ' + t.description, query)
+        }))
+        textField = 'transcription'
+      } else if (table === 'drug_reviews' || table.includes('drug')) {
+        sourceData = sampleDrugReviews.map(r => ({
+          ...r,
+          text: r.review,
+          similarity: demoSimilarity(r.review + ' ' + r.drug_name + ' ' + r.condition, query)
+        }))
+        textField = 'review'
+      } else if (table === 'pubmed_abstracts' || table.includes('pubmed')) {
+        sourceData = samplePubMedAbstracts.map(p => ({
+          ...p,
+          text: p.abstract,
+          similarity: demoSimilarity(p.abstract + ' ' + p.title, query)
+        }))
+        textField = 'abstract'
+      } else {
+        // Default to transcriptions
+        sourceData = sampleMedicalTranscriptions.map(t => ({
+          ...t,
+          text: t.transcription,
+          similarity: demoSimilarity(t.transcription, query)
+        }))
+      }
+
+      // Sort by similarity and take topK
+      const results = sourceData
+        .sort((a, b) => b.similarity - a.similarity)
+        .slice(0, topK)
+        .map((item, idx) => ({
+          rank: idx + 1,
+          id: item.id,
+          similarity: Math.round(item.similarity * 1000) / 1000,
+          [textField]: item.text?.substring(0, 200) + '...',
+          metadata: { ...item, text: undefined, similarity: undefined }
+        }))
+
+      return NextResponse.json({
+        success: true,
+        results,
+        executionTime: performance.now() - startTime,
+        count: results.length,
+        query,
+        metric,
+        table,
+        demo: true,
+      })
+    }
+
+    // Production mode: Use AresaDB CLI
+    const { exec } = await import('child_process')
+    const { promisify } = await import('util')
+    const execAsync = promisify(exec)
+    
+    const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
+    const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+
     const cmd = `${ARESADB_PATH} --db ${DB_PATH} search "${query.replace(/"/g, '\\"')}" --table ${table} --top-k ${topK} --metric ${metric} --format json`
 
     try {
-      const { stdout, stderr } = await execAsync(cmd, {
+      const { stdout } = await execAsync(cmd, {
         timeout: 30000,
         maxBuffer: 10 * 1024 * 1024,
       })
-
-      const endTime = performance.now()
-      const executionTime = endTime - startTime
 
       let results
       try {
@@ -47,7 +124,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         results,
-        executionTime,
+        executionTime: performance.now() - startTime,
         count: results.length,
         query,
         metric,

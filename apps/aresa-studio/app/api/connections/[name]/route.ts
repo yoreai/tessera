@@ -6,7 +6,7 @@ export async function DELETE(
   { params }: { params: Promise<{ name: string }> }
 ) {
   const { name } = await params;
-  
+
   if (DEMO_MODE) {
     return NextResponse.json({
       success: true,
@@ -14,7 +14,7 @@ export async function DELETE(
       demo: true,
     });
   }
-  
+
   // Production: proxy to backend
   try {
     const response = await fetch(`http://localhost:3001/api/connections/${name}`, {

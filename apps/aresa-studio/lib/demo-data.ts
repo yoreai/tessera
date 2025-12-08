@@ -1,6 +1,6 @@
 /**
  * ARESA Studio - Demo Mode Data
- * 
+ *
  * Comprehensive sample data showcasing all supported database types.
  * Each database type demonstrates its typical use case with realistic data.
  */
@@ -299,7 +299,7 @@ export const DEMO_SAMPLE_QUERIES: Record<string, { query: string; description: s
 // Generate realistic query results based on connection and query
 export function generateQueryResult(source: string, query: string): DemoQueryResult {
   const lowerQuery = query.toLowerCase();
-  
+
   // PostgreSQL - E-commerce data
   if (source === "demo-postgres") {
     if (lowerQuery.includes("users")) {
@@ -345,7 +345,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       };
     }
   }
-  
+
   // BigQuery - Analytics at scale
   if (source === "demo-bigquery") {
     if (lowerQuery.includes("event_type") || lowerQuery.includes("events")) {
@@ -363,7 +363,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       };
     }
   }
-  
+
   // ClickHouse - Time-series & logs
   if (source === "demo-clickhouse") {
     if (lowerQuery.includes("logs") || lowerQuery.includes("level")) {
@@ -380,7 +380,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       };
     }
   }
-  
+
   // Snowflake - Enterprise data warehouse
   if (source === "demo-snowflake") {
     if (lowerQuery.includes("revenue") || lowerQuery.includes("sales")) {
@@ -397,7 +397,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       };
     }
   }
-  
+
   // Databricks - ML & Lakehouse
   if (source === "demo-databricks") {
     if (lowerQuery.includes("feature") || lowerQuery.includes("ml")) {
@@ -414,7 +414,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       };
     }
   }
-  
+
   // DuckDB - Local analytics
   if (source === "demo-duckdb") {
     return {
@@ -429,7 +429,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       executionTimeMs: 23,
     };
   }
-  
+
   // MySQL - Blog/CMS
   if (source === "demo-mysql") {
     return {
@@ -443,7 +443,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       executionTimeMs: 15,
     };
   }
-  
+
   // SQLite - Local app data
   if (source === "demo-sqlite") {
     return {
@@ -457,7 +457,7 @@ export function generateQueryResult(source: string, query: string): DemoQueryRes
       executionTimeMs: 2,
     };
   }
-  
+
   // Default fallback
   return {
     columns: ["message"],

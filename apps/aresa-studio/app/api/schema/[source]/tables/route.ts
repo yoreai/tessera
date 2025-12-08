@@ -6,7 +6,7 @@ export async function GET(
   { params }: { params: Promise<{ source: string }> }
 ) {
   const { source } = await params;
-  
+
   if (DEMO_MODE) {
     const tables = DEMO_SCHEMAS[source];
     if (tables) {
@@ -16,7 +16,7 @@ export async function GET(
     }
     return NextResponse.json([], { status: 200 });
   }
-  
+
   // Production: proxy to backend
   try {
     const response = await fetch(`http://localhost:3001/api/schema/${source}/tables`);

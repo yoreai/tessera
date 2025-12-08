@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { exec } from 'child_process'
-import { promisify } from 'util'
+import { 
+  sampleDrugReviews, 
+  sampleMedicalTranscriptions, 
+  sampleHeartDisease, 
+  samplePubMedAbstracts,
+  datasetStats 
+} from '@/lib/demo-data'
 
-const execAsync = promisify(exec)
-
-// Path to AresaDB CLI - adjust based on your setup
-const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
-const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+// Demo mode for Vercel deployment
+const DEMO_MODE = process.env.ARESADB_DEMO !== 'false'
 
 export async function POST(request: NextRequest) {
   try {
@@ -20,20 +22,75 @@ export async function POST(request: NextRequest) {
     }
 
     const startTime = performance.now()
+    const lowerQuery = query.toLowerCase()
 
-    // Execute query via AresaDB CLI
+    // Demo mode: Return sample data based on query
+    if (DEMO_MODE) {
+      await new Promise(resolve => setTimeout(resolve, 50 + Math.random() * 150))
+      
+      let results: any[] = []
+      let tableName = 'unknown'
+
+      if (lowerQuery.includes('drug') || lowerQuery.includes('review') || lowerQuery.includes('medication')) {
+        results = sampleDrugReviews
+        tableName = 'drug_reviews'
+      } else if (lowerQuery.includes('transcription') || lowerQuery.includes('clinical') || lowerQuery.includes('specialty')) {
+        results = sampleMedicalTranscriptions
+        tableName = 'medical_transcriptions'
+      } else if (lowerQuery.includes('heart') || lowerQuery.includes('disease') || lowerQuery.includes('cardio')) {
+        results = sampleHeartDisease
+        tableName = 'heart_disease'
+      } else if (lowerQuery.includes('pubmed') || lowerQuery.includes('abstract') || lowerQuery.includes('paper') || lowerQuery.includes('research')) {
+        results = samplePubMedAbstracts
+        tableName = 'pubmed_abstracts'
+      } else if (lowerQuery.includes('select *') || lowerQuery.includes('from')) {
+        // Try to detect table from query
+        if (lowerQuery.includes('drug')) results = sampleDrugReviews
+        else if (lowerQuery.includes('transcription')) results = sampleMedicalTranscriptions
+        else if (lowerQuery.includes('heart')) results = sampleHeartDisease
+        else results = sampleDrugReviews // default
+        tableName = 'detected_table'
+      } else {
+        // Default to drug reviews
+        results = sampleDrugReviews
+        tableName = 'drug_reviews'
+      }
+
+      // Handle LIMIT clause
+      const limitMatch = lowerQuery.match(/limit\s+(\d+)/i)
+      if (limitMatch) {
+        const limit = parseInt(limitMatch[1])
+        results = results.slice(0, limit)
+      }
+
+      const executionTime = performance.now() - startTime
+
+      return NextResponse.json({
+        success: true,
+        results,
+        executionTime,
+        rowCount: results.length,
+        demo: true,
+        table: tableName,
+      })
+    }
+
+    // Production mode: Use AresaDB CLI
+    const { exec } = await import('child_process')
+    const { promisify } = await import('util')
+    const execAsync = promisify(exec)
+    
+    const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
+    const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+
     const cmd = `${ARESADB_PATH} --db ${DB_PATH} query "${query.replace(/"/g, '\\"')}" --format ${format}`
 
     try {
-      const { stdout, stderr } = await execAsync(cmd, {
-        timeout: 30000, // 30 second timeout
-        maxBuffer: 10 * 1024 * 1024, // 10MB buffer
+      const { stdout } = await execAsync(cmd, {
+        timeout: 30000,
+        maxBuffer: 10 * 1024 * 1024,
       })
 
-      const endTime = performance.now()
-      const executionTime = endTime - startTime
-
-      // Parse results
       let results
       if (format === 'json') {
         try {
@@ -48,11 +105,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: true,
         results,
-        executionTime,
+        executionTime: performance.now() - startTime,
         rowCount: Array.isArray(results) ? results.length : 1,
       })
     } catch (execError: any) {
-      // AresaDB command failed
       return NextResponse.json({
         success: false,
         error: execError.stderr || execError.message,
@@ -70,7 +126,24 @@ export async function POST(request: NextRequest) {
 
 // Health check endpoint
 export async function GET() {
+  if (DEMO_MODE) {
+    return NextResponse.json({
+      status: 'connected',
+      database: 'demo-healthcare-ml',
+      datasets: Object.keys(datasetStats),
+      demo: true,
+      info: 'AresaDB Studio Demo Mode - Healthcare ML Datasets',
+    })
+  }
+
   try {
+    const { exec } = await import('child_process')
+    const { promisify } = await import('util')
+    const execAsync = promisify(exec)
+    
+    const ARESADB_PATH = process.env.ARESADB_PATH || '../../../tools/aresadb/target/release/aresadb'
+    const DB_PATH = process.env.ARESADB_DB_PATH || '/tmp/aresadb-studio-demo'
+    
     const cmd = `${ARESADB_PATH} --db ${DB_PATH} status`
     const { stdout } = await execAsync(cmd, { timeout: 5000 })
 
