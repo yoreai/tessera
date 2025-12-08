@@ -6,7 +6,7 @@ import type { FireIncident } from "../../lib/fireData";
 // Dynamically import the actual map components with SSR disabled
 const InteractiveIncidentMapClient = dynamic(
   () => import("./maps/InteractiveIncidentMapClient"),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="h-[600px] bg-gray-700/50 rounded flex items-center justify-center">
@@ -21,7 +21,7 @@ const InteractiveIncidentMapClient = dynamic(
 
 const AdvancedHotspotMapClient = dynamic(
   () => import("./maps/AdvancedHotspotMapClient"),
-  { 
+  {
     ssr: false,
     loading: () => (
       <div className="h-[600px] bg-gray-700/50 rounded flex items-center justify-center">

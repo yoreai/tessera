@@ -38,9 +38,9 @@ export default function InteractiveIncidentMapClient({ incidents }: Props) {
   return (
     <div className="relative">
       <div className="h-[600px] rounded-lg overflow-hidden border border-gray-700">
-        <MapContainer 
-          center={[centerLat, centerLng]} 
-          zoom={10} 
+        <MapContainer
+          center={[centerLat, centerLng]}
+          zoom={10}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer

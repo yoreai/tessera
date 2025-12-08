@@ -6,9 +6,6 @@ import {
   Network,
   Users,
   Flame,
-  Music,
-  Factory,
-  Share2,
   BarChart3,
   Clock,
   ExternalLink,
@@ -16,6 +13,10 @@ import {
   FileText,
   Beaker,
   ArrowRight,
+  Database,
+  Terminal,
+  Stethoscope,
+  GitBranch,
 } from "lucide-react";
 import { Navigation } from "./components/Navigation";
 import { publications, books } from "../lib/publications";
@@ -25,9 +26,10 @@ const iconMap: Record<string, any> = {
   "coordinate-embedding": Network,
   "multi-agent-coordination": Users,
   "fire-safety-dashboard": Flame,
-  "spotify-popularity": Music,
-  "manufacturing-analytics": Factory,
-  "network-centrality": Share2,
+  "aresadb-studio": Database,
+  "aresa-studio": Terminal,
+  "clinical-documentation-intelligence": Stethoscope,
+  "healthcare-knowledge-graphs": GitBranch,
 };
 
 const gradientMap: Record<string, string> = {
@@ -35,9 +37,10 @@ const gradientMap: Record<string, string> = {
   "coordinate-embedding": "from-blue-500 to-cyan-500",
   "multi-agent-coordination": "from-emerald-500 to-teal-500",
   "fire-safety-dashboard": "from-orange-500 to-red-500",
-  "spotify-popularity": "from-green-500 to-emerald-500",
-  "manufacturing-analytics": "from-slate-500 to-zinc-500",
-  "network-centrality": "from-violet-500 to-purple-500",
+  "aresadb-studio": "from-violet-500 to-purple-600",
+  "aresa-studio": "from-cyan-500 to-blue-600",
+  "clinical-documentation-intelligence": "from-rose-500 to-pink-600",
+  "healthcare-knowledge-graphs": "from-amber-500 to-orange-600",
 };
 
 export default function HomePage() {

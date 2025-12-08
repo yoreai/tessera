@@ -339,10 +339,10 @@ export default function FireSafetyDashboard() {
                     </div>
 
                     <div className="p-6">
-                      <MapWrapper 
+                      <MapWrapper
                         key={`map-wrapper-${mapTab}`}
-                        incidents={filteredIncidents} 
-                        mapType={mapTab === "incidents" ? "incidents" : "hotspots"} 
+                        incidents={filteredIncidents}
+                        mapType={mapTab === "incidents" ? "incidents" : "hotspots"}
                       />
                     </div>
                   </div>

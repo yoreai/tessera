@@ -70,10 +70,10 @@ function MapInner({ incidents, mapId }: { incidents: FireIncident[]; mapId: stri
   return (
     <div className="relative">
       <div id={mapId} className="h-[600px] rounded-lg overflow-hidden border border-gray-700">
-        <MapContainer 
+        <MapContainer
           key={mapId}
-          center={[centerLat, centerLng]} 
-          zoom={10} 
+          center={[centerLat, centerLng]}
+          zoom={10}
           style={{ height: "100%", width: "100%" }}
         >
           <TileLayer
