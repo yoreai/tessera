@@ -87,7 +87,7 @@ export default function Sidebar() {
       `}
     >
       {/* Logo */}
-      <Link 
+      <Link
         href="/"
         className={`
           p-4 border-b border-slate-800 flex items-center gap-3 hover:bg-slate-800/50 transition-colors
@@ -96,15 +96,15 @@ export default function Sidebar() {
       >
         {/* App Icon */}
         <div className="w-10 h-10 flex-shrink-0 relative">
-          <Image 
-            src="/favicon.svg" 
-            alt="ARESA Studio" 
-            width={40} 
+          <Image
+            src="/favicon.svg"
+            alt="ARESA Studio"
+            width={40}
             height={40}
             className="drop-shadow-[0_0_8px_rgba(34,211,238,0.4)]"
           />
         </div>
-        
+
         {/* App Name */}
         <div className={`overflow-hidden transition-all duration-300 ${isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
           <h1 className="text-lg font-bold gradient-text-cyan-blue whitespace-nowrap">
