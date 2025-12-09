@@ -119,9 +119,9 @@ export default function Dashboard() {
               </div>
             ) : (
               connections.map((conn) => (
-                <ConnectionCard 
-                  key={conn.name} 
-                  connection={conn} 
+                <ConnectionCard
+                  key={conn.name}
+                  connection={conn}
                   onClick={() => {
                     setSelectedConnection(conn.name);
                     router.push('/query');
