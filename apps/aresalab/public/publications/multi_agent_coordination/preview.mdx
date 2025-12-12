@@ -18,6 +18,12 @@ Experimental evaluation on California fire hazard data demonstrates that the 128
 
 **Mathematics Subject Classification:** 68T42 (Agent Technology), 68W15 (Distributed Algorithms), 62F10 (Point Estimation)
 
+## Key Takeaways
+
+- Environmental risk assessment is fundamentally multi-domain; scaling it requires combining specialized expertise rather than relying on a single monolithic model.
+- MACP structures 128 specialized agents into pools and uses weighted consensus to produce stable, interpretable risk scores with calibrated confidence.
+- The protocol is designed for reliability: it supports fault tolerance and consensus guarantees that remain useful under noisy or adversarial agent outputs.
+
 ---
 
 ## Introduction
@@ -82,3 +88,9 @@ This paper presents the Multi-Agent Geospatial Coordination Protocol (MACP), a t
 ## Paper Organization
 
 Section 2 develops the theoretical framework for multi-agent coordination, formalizing agent pools, consensus mechanisms, and communication protocols. Section 3 proves the main theoretical results on consensus optimality and fault tolerance. Section 4 describes the agent specialization architecture. Section 5 presents experimental results. Section 6 concludes with discussion and future directions.
+
+## Key Takeaways
+
+- Large-scale risk assessment requires combining heterogeneous signals (geography, weather, infrastructure, and historical events) without collapsing nuance into a single model.
+- Multi-agent coordination provides a practical structure: specialized pools assess different hazards, then consensus combines them into a final risk score and confidence.
+- We evaluate MACP on California fire hazard data and show both improved accuracy and efficient scaling as the number of agents increases.
