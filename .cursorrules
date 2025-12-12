@@ -9,15 +9,15 @@ ARESA contains **applications and tools** for autonomous research:
 
 ## 🚨 CRITICAL: Publications are NOT here
 
-**Publications are managed in the SEPARATE `quarto/` repository.**
+**Publications are managed in the `genass/` repository.**
 
 ```
-THIS REPO (aresa/)                    SEPARATE REPO (quarto/)
-├── apps/aresalab/                    ├── publications/  ← SOURCE FILES
-│   └── public/publications/          │   ├── *.qmd
-│       ├── pdf/  ← OUTPUTS ONLY      │   └── _quarto.yml
-│       └── */preview.mdx             ├── output/        ← STAGING
-│                                     └── Makefile       ← BUILD COMMANDS
+THIS REPO (aresa/)                    GENASS REPO (genass/)
+├── apps/aresalab/                    ├── generated/publications/
+│   └── public/publications/          │   ├── quarto/     ← SOURCE FILES
+│       ├── pdf/  ← OUTPUTS ONLY      │   ├── pdf/        ← STAGING
+│       └── */preview.mdx             │   └── previews/   ← STAGING
+│                                     └── Makefile        ← BUILD COMMANDS
 ```
 
 ### ❌ Never do this in aresa:
@@ -28,7 +28,7 @@ THIS REPO (aresa/)                    SEPARATE REPO (quarto/)
 
 ### ✅ Instead:
 ```bash
-cd ../quarto
+cd ../genass
 make pdf              # Generate PDFs
 make previews         # Generate MDX previews
 make publish          # Copy to aresalab when ready
@@ -39,7 +39,7 @@ make publish          # Copy to aresalab when ready
 ### aresalab/
 Main research hub displaying publications.
 - `lib/publications.ts` - Publication registry (add new pubs here)
-- `public/publications/` - Published outputs only (from quarto)
+- `public/publications/` - Published outputs only (from genass)
 
 ### aresadb-studio/
 Database exploration interface.
@@ -79,13 +79,12 @@ cd tools/aresa-cli && cargo build --release
 
 ## Adding a New Publication
 
-1. Create source files in `quarto/publications/new_paper/`
-2. Build: `cd quarto && make pdf new_paper && make previews`
+1. Create source files in `genass/generated/publications/quarto/new_paper/`
+2. Build: `cd genass && make pdf-single NAME=new_paper && make previews`
 3. Publish: `make publish`
 4. Register in `aresa/apps/aresalab/lib/publications.ts`
 
 ---
 
-**Version:** 2.0
+**Version:** 3.0
 **Updated:** December 2025
-

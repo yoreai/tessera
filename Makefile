@@ -1,21 +1,21 @@
 .PHONY: help clean
 
-# Publication output directory (receives published content from quarto/)
+# Publication output directory (receives published content from genass/)
 PUB_DIR := apps/aresalab/public/publications
 
 help:
 	@echo "🎓 ARESA Monorepo"
 	@echo ""
 	@echo "Publications:"
-	@echo "  Publications are managed in the separate quarto/ repository."
+	@echo "  Publications are managed in the genass/ repository."
 	@echo "  To update publications:"
 	@echo ""
-	@echo "    cd ../quarto"
+	@echo "    cd ../genass"
 	@echo "    make pdf              # Generate PDFs"
 	@echo "    make previews         # Generate web previews"
 	@echo "    make publish          # Copy to aresalab"
 	@echo ""
-	@echo "  See ../quarto/README.md for full documentation."
+	@echo "  See ../genass/README.md for full documentation."
 	@echo ""
 	@echo "Local Commands:"
 	@echo "  make clean              - Remove generated files from aresalab"
@@ -30,5 +30,5 @@ clean:
 	@rm -rf $(PUB_DIR)/*/*.log 2>/dev/null || true
 	@echo "✅ Cleanup complete"
 	@echo ""
-	@echo "Note: To regenerate publications, use the quarto/ repo:"
-	@echo "  cd ../quarto && make all && make publish"
+	@echo "Note: To regenerate publications, use the genass/ repo:"
+	@echo "  cd ../genass && make pdf && make previews && make publish"
